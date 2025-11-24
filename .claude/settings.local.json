@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx drizzle-kit generate)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose exec api sh -c \"cd /app/backend && npx drizzle-kit push\")",
+      "Bash(docker-compose exec api sh -c \"pwd && ls -la\")",
+      "Bash(docker-compose exec:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

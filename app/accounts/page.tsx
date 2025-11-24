@@ -1,0 +1,944 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { useAccounts } from '@/hooks/use-accounts';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Plus, Trash2, Edit, CreditCard, Wallet, PiggyBank, BarChart } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import Layout from '@/components/finflow/layout';
+import { Account } from '@/lib/types';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { getTranslatedText } from '@/lib/translation-utils';
+import { useCurrency } from '@/components/finflow/CurrencyContext';
+import { PostFinanceIcon, UBSIcon, getSwissBrandIcon } from '@/components/icons/swiss-brand-icons';
+
+export default function AccountsPage() {
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { accounts, isLoading: accountsLoading, createAccount, updateAccount, deleteAccount, isCreating, isUpdating, isDeleting } = useAccounts();
+  const router = useRouter();
+  const { t, language } = useLanguage();
+  const { currency: userCurrency } = useCurrency();
+
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  
+  // Form state
+  const [accountName, setAccountName] = useState('');
+  const [accountType, setAccountType] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [accountBalance, setAccountBalance] = useState('');
+  const [accountCurrency, setAccountCurrency] = useState('');
+  
+  // Set initial currency when user currency changes or dialog opens
+  useEffect(() => {
+    if (isCreateDialogOpen && !accountCurrency) {
+      setAccountCurrency(userCurrency);
+    }
+  }, [isCreateDialogOpen, userCurrency, accountCurrency]);
+
+  const [selectedTab, setSelectedTab] = useState('all');
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!isCreateDialogOpen) {
+      setAccountName('');
+      setAccountType('');
+      setBankName('');
+      setAccountBalance('');
+      setAccountCurrency(userCurrency);
+    }
+  }, [isCreateDialogOpen, userCurrency]);
+
+  // Set form values when editing an account
+  useEffect(() => {
+    if (selectedAccount && isEditDialogOpen) {
+      const translatedName = getTranslatedText(
+        selectedAccount.name, 
+        selectedAccount.nameTranslations, 
+        language
+      );
+      
+      // Extract bank info if account has bank name prefix
+      const bankInfo = extractBankInfo(translatedName);
+      
+      setAccountName(bankInfo.accountName);
+      setAccountType(selectedAccount.type);
+      setBankName(bankInfo.bankName || '');
+      setAccountBalance(selectedAccount.balance.toString());
+      setAccountCurrency(selectedAccount.currency || 'CHF');
+    }
+  }, [selectedAccount, isEditDialogOpen, language]);
+
+  // Handle create account
+  const handleCreateAccount = () => {
+    // If bank or savings account with bank name selected and not "Other", prepend it to account name
+    const finalName = (accountType === 'Bank' || accountType === 'Savings') && bankName && bankName !== 'Other' ? `${bankName} - ${accountName}` : accountName;
+    
+    // Map frontend types to backend types
+    const typeMap: Record<string, string> = {
+      'Bank': 'bank',
+      'Credit Card': 'creditCard',
+      'Cash': 'cash',
+      'Investment': 'investment',
+      'Savings': 'savings'
+    };
+    
+    createAccount({
+      name: finalName,
+      type: typeMap[accountType] || 'bank',
+      currency: accountCurrency,
+      balance: parseFloat(accountBalance) || 0,
+    });
+    setIsCreateDialogOpen(false);
+    setBankName(''); // Reset bank name
+  };
+
+  // Handle update account
+  const handleUpdateAccount = () => {
+    if (selectedAccount) {
+      // If bank or savings account with bank name selected and not "Other", prepend bank name
+      const finalName = (accountType === 'Bank' || accountType === 'Savings') && bankName && bankName !== 'Other'
+        ? `${bankName} - ${accountName}`
+        : accountName;
+      
+      // Map frontend types to backend types
+      const typeMap: Record<string, string> = {
+        'Bank': 'bank',
+        'Credit Card': 'creditCard',
+        'Cash': 'cash',
+        'Investment': 'investment',
+        'Savings': 'savings'
+      };
+      
+      updateAccount({
+        id: selectedAccount.id,
+        data: {
+          name: finalName,
+          type: typeMap[accountType] || selectedAccount.type,
+          currency: accountCurrency,
+          openingBalanceCents: Math.round((parseFloat(accountBalance) || 0) * 100),
+        },
+      });
+      setIsEditDialogOpen(false);
+      setBankName(''); // Reset bank name
+    }
+  };
+
+  // Handle delete account
+  const handleDeleteAccount = () => {
+    if (selectedAccount) {
+      deleteAccount(selectedAccount.id);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  // Filter accounts based on selected tab
+  const filteredAccounts = selectedTab === 'all'
+    ? accounts
+    : accounts?.filter((account) => {
+        switch (selectedTab) {
+          case 'bank': return account.type.toLowerCase() === 'bank';
+          case 'credit-card': return account.type.toLowerCase() === 'credit card';
+          case 'cash': return account.type.toLowerCase() === 'cash';
+          case 'investment': return account.type.toLowerCase() === 'investment';
+          case 'savings': return account.type.toLowerCase() === 'savings';
+          default: return true;
+        }
+      });
+
+  // Show loading state while checking authentication or fetching data
+  if (authLoading || accountsLoading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+
+  // If not authenticated, don't render anything (will be redirected)
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  // Extract bank info from account name
+  const extractBankInfo = (accountName: string) => {
+    const bankMapping: { [key: string]: string } = {
+      'PostFinance': 'postfinance',
+      'UBS': 'ubs',
+      'Credit Suisse': 'creditsuisse',
+      'Raiffeisen': 'raiffeisen',
+      'ZKB': 'zkb',
+      'Other': 'other'
+    };
+    
+    for (const [bankDisplay, bankKey] of Object.entries(bankMapping)) {
+      if (accountName.startsWith(bankDisplay + ' - ')) {
+        const IconComponent = getSwissBrandIcon(bankKey);
+        return {
+          bankName: bankDisplay === 'Other' ? null : bankDisplay,
+          accountName: accountName.replace(bankDisplay + ' - ', ''),
+          IconComponent
+        };
+      }
+    }
+    return { bankName: null, accountName, IconComponent: null };
+  };
+
+  // Get bank gradient based on bank name - realistic card colors
+  const getBankGradient = (bankName: string | null) => {
+    switch (bankName?.toLowerCase()) {
+      case 'postfinance':
+        // PostFinance Yellow Card
+        return 'bg-gradient-to-br from-[#FFC000] via-[#FFD700] to-[#FFA500]';
+      case 'ubs':
+        // UBS White/Grey Card with subtle gradient
+        return 'bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300';
+      case 'credit suisse':
+        // Credit Suisse Blue Card
+        return 'bg-gradient-to-br from-[#0D47A1] via-[#1565C0] to-[#1976D2]';
+      case 'raiffeisen':
+        // Raiffeisen Yellow/Black Card
+        return 'bg-gradient-to-br from-[#FFED00] via-[#FFE000] to-[#F5D300]';
+      case 'zkb':
+        // ZKB Blue Card
+        return 'bg-gradient-to-br from-[#0066B3] via-[#0077CC] to-[#0088DD]';
+      default:
+        // Generic dark card
+        return 'bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900';
+    }
+  };
+
+  // Get text color for card (light cards need dark text)
+  const getCardTextColor = (bankName: string | null) => {
+    switch (bankName?.toLowerCase()) {
+      case 'ubs':
+      case 'raiffeisen':
+      case 'postfinance':
+        return 'text-gray-900'; // Dark text for light backgrounds
+      default:
+        return 'text-white'; // White text for dark backgrounds
+    }
+  };
+
+  // Get account icon based on type
+  const getAccountIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'bank':
+        return <CreditCard className="h-5 w-5" />;
+      case 'credit card':
+        return <CreditCard className="h-5 w-5" />;
+      case 'investment':
+        return <BarChart className="h-5 w-5" />;
+      case 'savings':
+        return <PiggyBank className="h-5 w-5" />;
+      case 'cash':
+      default:
+        return <Wallet className="h-5 w-5" />;
+    }
+  };
+
+  // Get cash banknote design based on currency
+  const getCashDesign = (currency: string) => {
+    switch (currency?.toUpperCase()) {
+      case 'CHF':
+        // Swiss 1000 CHF note (purple/violet - Jacob Burckhardt)
+        return {
+          gradient: 'bg-gradient-to-br from-[#9b4d96] via-[#8b4789] to-[#7a3f7c]',
+          textColor: 'text-white',
+          value: '1000',
+          symbol: 'CHF',
+          pattern: 'swiss',
+          accent: '#c084bd'
+        };
+      case 'EUR':
+        // Euro 200€ note (yellow-brown)
+        return {
+          gradient: 'bg-gradient-to-br from-[#f4e04d] via-[#e8d347] to-[#d4b942]',
+          textColor: 'text-gray-900',
+          value: '200',
+          symbol: '€',
+          pattern: 'euro',
+          accent: '#c9b037'
+        };
+      default:
+        // Generic banknote (green)
+        return {
+          gradient: 'bg-gradient-to-br from-[#2D5F3F] via-[#3A7550] to-[#275040]',
+          textColor: 'text-white',
+          value: '100',
+          symbol: currency || '$',
+          pattern: 'generic',
+          accent: '#4a9d66'
+        };
+    }
+  };
+
+  return (
+    <Layout user={user}>
+      <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">{t('accounts')}</h1>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                {t('addAccount')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t('create')} {t('account')}</DialogTitle>
+                <DialogDescription>
+                  {t('addAccount')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    {t('name')}
+                  </Label>
+                  <Input
+                    id="name"
+                    value={accountName}
+                    onChange={(e) => setAccountName(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="type" className="text-right">
+                    {t('type')}
+                  </Label>
+                  <Select value={accountType} onValueChange={setAccountType}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder={t('selectAccountType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Bank">{t('bank')}</SelectItem>
+                      <SelectItem value="Credit Card">{t('creditCard')}</SelectItem>
+                      <SelectItem value="Cash">{t('cash')}</SelectItem>
+                      <SelectItem value="Investment">{t('investment')}</SelectItem>
+                      <SelectItem value="Savings">{t('savings')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {(accountType === 'Bank' || accountType === 'Savings') && (
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="bankName" className="text-right">
+                      Bank
+                    </Label>
+                    <Select value={bankName} onValueChange={setBankName}>
+                      <SelectTrigger className="col-span-3">
+                        <SelectValue placeholder="Bank auswählen (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PostFinance">🟡 PostFinance</SelectItem>
+                        <SelectItem value="UBS">🔴 UBS</SelectItem>
+                        <SelectItem value="Credit Suisse">🔵 Credit Suisse</SelectItem>
+                        <SelectItem value="Raiffeisen">🟢 Raiffeisen</SelectItem>
+                        <SelectItem value="ZKB">🔵 Zürcher Kantonalbank (ZKB)</SelectItem>
+                        <SelectItem value="Other">Andere Bank</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="currency" className="text-right">
+                    {t('currency')}
+                  </Label>
+                  <Select value={accountCurrency} onValueChange={setAccountCurrency}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EUR">€ EUR - Euro</SelectItem>
+                      <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                      <SelectItem value="USD">$ USD - US Dollar</SelectItem>
+                      <SelectItem value="MAD">MAD - Moroccan Dirham</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="balance" className="text-right">
+                    {t('balance')}
+                  </Label>
+                  <Input
+                    id="balance"
+                    type="number"
+                    value={accountBalance}
+                    onChange={(e) => setAccountBalance(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" onClick={handleCreateAccount} disabled={isCreating}>
+                  {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {t('create')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <Tabs defaultValue="all" className="mb-6" value={selectedTab} onValueChange={setSelectedTab}>
+          <TabsList className="bg-gray-100 dark:bg-[#232e40] border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+            <TabsTrigger value="all">{t('all')}</TabsTrigger>
+            <TabsTrigger value="bank">{t('bank')}</TabsTrigger>
+            <TabsTrigger value="credit-card">{t('creditCard')}</TabsTrigger>
+            <TabsTrigger value="cash">{t('cash')}</TabsTrigger>
+            <TabsTrigger value="investment">{t('investment')}</TabsTrigger>
+            <TabsTrigger value="savings">{t('savings')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value={selectedTab}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAccounts?.map((account) => {
+                const translatedName = getTranslatedText(account.name, account.nameTranslations, language);
+                const bankInfo = extractBankInfo(translatedName);
+                const isBankOrSavings = account.type.toLowerCase() === 'bank' || account.type.toLowerCase() === 'savings';
+                const isCash = account.type.toLowerCase() === 'cash';
+                const cashDesign = isCash ? getCashDesign(account.currency) : null;
+                
+                return (
+                  <Card key={account.id} className="overflow-hidden">
+                    {/* Realistic Banknote Design for Cash */}
+                    {isCash && cashDesign ? (
+                      <div className={`${cashDesign.gradient} ${cashDesign.textColor} p-6 relative overflow-hidden rounded-xl shadow-2xl border-2 border-white/20`} style={{ minHeight: '220px', aspectRatio: '1.586/1' }}>
+                        {/* Holographic/Security Pattern */}
+                        <div className="absolute inset-0 opacity-5">
+                          <div className="absolute inset-0" style={{
+                            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)`,
+                          }}></div>
+                        </div>
+                        
+                        {/* Watermark effect */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
+                          <div className="text-[120px] font-bold">{cashDesign.value}</div>
+                        </div>
+
+                        {/* Banknote Content */}
+                        <div className="relative z-10 h-full flex flex-col justify-between">
+                          {/* Top Section: Large denomination */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex flex-col">
+                              <div className="text-7xl font-bold tracking-tighter leading-none mb-2" style={{ 
+                                textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+                                fontFamily: 'serif'
+                              }}>
+                                {cashDesign.value}
+                              </div>
+                              <div className="text-2xl font-bold tracking-wider" style={{ fontFamily: 'serif' }}>
+                                {cashDesign.symbol}
+                              </div>
+                              {/* Small security text */}
+                              <div className="text-[10px] mt-1 opacity-60 uppercase tracking-widest">
+                                {account.currency === 'CHF' ? 'Schweizerische Nationalbank' : account.currency === 'EUR' ? 'European Central Bank' : 'Central Bank'}
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex space-x-1">
+                              <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
+                                setIsEditDialogOpen(open);
+                                if (open) setSelectedAccount(account);
+                              }}>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" className={`h-8 w-8 ${cashDesign.textColor} hover:bg-black/20 backdrop-blur-sm rounded-full`}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>{t('editAccount')}</DialogTitle>
+                                    <DialogDescription>{t('updateAccountDetails')}</DialogDescription>
+                                  </DialogHeader>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <Label htmlFor="edit-type-cash" className="text-right">{t('type')}</Label>
+                                      <Select value={accountType} onValueChange={setAccountType}>
+                                        <SelectTrigger className="col-span-3">
+                                          <SelectValue placeholder={t('selectAccountType')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="Bank">{t('bank')}</SelectItem>
+                                          <SelectItem value="Credit Card">{t('creditCard')}</SelectItem>
+                                          <SelectItem value="Cash">{t('cash')}</SelectItem>
+                                          <SelectItem value="Investment">{t('investment')}</SelectItem>
+                                          <SelectItem value="Savings">{t('savings')}</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <Label htmlFor="edit-name-cash" className="text-right">{t('name')}</Label>
+                                      <Input id="edit-name-cash" value={accountName} onChange={(e) => setAccountName(e.target.value)} className="col-span-3" />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <Label htmlFor="edit-currency-cash" className="text-right">{t('currency')}</Label>
+                                      <Select value={accountCurrency} onValueChange={setAccountCurrency}>
+                                        <SelectTrigger className="col-span-3">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="EUR">€ EUR - Euro</SelectItem>
+                                          <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                                          <SelectItem value="USD">$ USD - US Dollar</SelectItem>
+                                          <SelectItem value="MAD">MAD - Moroccan Dirham</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                      <Label htmlFor="edit-balance-cash" className="text-right">{t('balance')}</Label>
+                                      <Input id="edit-balance-cash" type="number" value={accountBalance} onChange={(e) => setAccountBalance(e.target.value)} className="col-span-3" />
+                                    </div>
+                                  </div>
+                                  <DialogFooter>
+                                    <Button type="submit" onClick={handleUpdateAccount} disabled={isUpdating}>
+                                      {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                      {t('update')}
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" className={`h-8 w-8 ${cashDesign.textColor} hover:bg-red-500/20`} onClick={() => setSelectedAccount(account)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
+                                    <AlertDialogDescription>{t('deleteAccountConfirm')}</AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700">
+                                      {t('delete')}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+
+                          {/* Middle: Account Name with decorative elements */}
+                          <div className="flex-1 flex items-center justify-center">
+                            <div className="text-center">
+                              {/* Decorative circle with value */}
+                              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-4 mb-2" style={{
+                                borderColor: cashDesign.accent,
+                                backgroundColor: `${cashDesign.accent}20`
+                              }}>
+                                <span className="text-2xl font-bold">{cashDesign.value}</span>
+                              </div>
+                              <div className="text-base font-semibold tracking-wide uppercase opacity-90 mt-2">
+                                {translatedName}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Bottom: Balance + Serial Number Style */}
+                          <div className="flex items-end justify-between">
+                            <div>
+                              <div className="text-xs uppercase tracking-wider opacity-60 mb-1">{t('balance')}</div>
+                              <div className="text-2xl font-bold tracking-tight">
+                                {new Intl.NumberFormat('de-DE', {
+                                  style: 'currency',
+                                  currency: account.currency || 'CHF'
+                                }).format((Number(account.balance) || 0) / 100)}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs uppercase tracking-[0.15em] font-bold opacity-70 mb-1">
+                                CASH
+                              </div>
+                              <div className="text-[10px] opacity-50 font-mono tracking-wider">
+                                {account.id.slice(-8).toUpperCase()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : isBankOrSavings && bankInfo.bankName ? (
+                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-5 relative overflow-hidden rounded-xl`} style={{ minHeight: '220px', aspectRatio: '1.586/1' }}>
+                        
+                        {/* Card Content */}
+                        <div className="relative z-10 h-full flex flex-col justify-between">
+                          {/* Top Row: Chip + Contactless + Bank Logo */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-3">
+                              {/* EMV Chip */}
+                              <div className="w-11 h-9 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-md relative overflow-hidden shadow-md">
+                                <div className="absolute inset-1 grid grid-cols-4 gap-[1px]">
+                                  {[...Array(16)].map((_, i) => (
+                                    <div key={i} className="bg-yellow-600/40 rounded-[1px]"></div>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Contactless Symbol */}
+                              <svg width="24" height="24" viewBox="0 0 24 24" className={getCardTextColor(bankInfo.bankName)}>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2 0v-15.86c3.95.49 7 3.85 7 7.93s-3.05 7.44-7 7.93z" fill="currentColor" opacity="0.6"/>
+                              </svg>
+                            </div>
+                            
+                            {/* Bank Logo + Action Buttons */}
+                            <div className="flex items-start space-x-2">
+                              {/* Bank Logo - Direct integration without white background */}
+                              {bankInfo.IconComponent && (
+                                <div className="h-6 flex items-center justify-center opacity-90">
+                                  <bankInfo.IconComponent />
+                                </div>
+                              )}
+                              <div className="flex space-x-1">
+                                <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
+                                  setIsEditDialogOpen(open);
+                                  if (open) setSelectedAccount(account);
+                                }}>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className={`h-8 w-8 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>{t('editAccount')}</DialogTitle>
+                                  <DialogDescription>
+                                    {t('updateAccountDetails')}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-type" className="text-right">
+                                      {t('type')}
+                                    </Label>
+                                    <Select value={accountType} onValueChange={setAccountType}>
+                                      <SelectTrigger className="col-span-3">
+                                        <SelectValue placeholder={t('selectAccountType')} />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Bank">{t('bank')}</SelectItem>
+                                        <SelectItem value="Credit Card">{t('creditCard')}</SelectItem>
+                                        <SelectItem value="Cash">{t('cash')}</SelectItem>
+                                        <SelectItem value="Investment">{t('investment')}</SelectItem>
+                                        <SelectItem value="Savings">{t('savings')}</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                                </div>
+                                
+                                {(accountType === 'Bank' || accountType === 'Savings') && (
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-bank" className="text-right">
+                                      Bank
+                                    </Label>
+                                      <Select value={bankName} onValueChange={setBankName}>
+                                        <SelectTrigger className="col-span-3">
+                                          <SelectValue placeholder="Bank auswählen" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="PostFinance">🟡 PostFinance</SelectItem>
+                                          <SelectItem value="UBS">🔴 UBS</SelectItem>
+                                          <SelectItem value="Credit Suisse">🔵 Credit Suisse</SelectItem>
+                                          <SelectItem value="Raiffeisen">🟢 Raiffeisen</SelectItem>
+                                          <SelectItem value="ZKB">🔵 ZKB</SelectItem>
+                                          <SelectItem value="Other">Andere</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  )}
+                                  
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-name" className="text-right">
+                                      {t('name')}
+                                    </Label>
+                                    <Input
+                                      id="edit-name"
+                                      value={accountName}
+                                      onChange={(e) => setAccountName(e.target.value)}
+                                      className="col-span-3"
+                                      placeholder={accountType === 'Bank' ? 'z.B. Sparkonto' : t('name')}
+                                    />
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-balance" className="text-right">
+                                      {t('balance')}
+                                    </Label>
+                                    <Input
+                                      id="edit-balance"
+                                      type="number"
+                                      step="0.01"
+                                      value={accountBalance}
+                                      onChange={(e) => setAccountBalance(e.target.value)}
+                                      className="col-span-3"
+                                    />
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="edit-currency" className="text-right">
+                                      {t('currency')}
+                                    </Label>
+                                    <Select value={accountCurrency} onValueChange={setAccountCurrency}>
+                                      <SelectTrigger className="col-span-3">
+                                        <SelectValue placeholder={t('currency')} />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                                        <SelectItem value="EUR">EUR - Euro</SelectItem>
+                                        <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                        <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  <Button type="submit" onClick={handleUpdateAccount} disabled={isUpdating}>
+                                    {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {t('save')}
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+                                <Dialog open={isDeleteDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
+                                  setIsDeleteDialogOpen(open);
+                                  if (open) setSelectedAccount(account);
+                                }}>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" className={`h-8 w-8 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>{t('deleteAccount')}</DialogTitle>
+                                  <DialogDescription>
+                                    {t('confirmDeleteAccount')}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                                    {t('cancel')}
+                                  </Button>
+                                  <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting}>
+                                    {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {t('delete')}
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                                </Dialog>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Middle Section: Account Name & Card Number */}
+                          <div className="flex-1 flex items-center">
+                            <div className="w-full">
+                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
+                                {isBankOrSavings && bankInfo.accountName ? bankInfo.accountName : account.name}
+                              </div>
+                              <div className="font-mono text-base tracking-[0.2em] opacity-80">
+                                •••• •••• •••• {String(account.id).slice(-4).padStart(4, '•')}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Bottom Section: Balance */}
+                          <div className="flex items-end justify-between">
+                            <div>
+                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
+                                {t('balance')}
+                              </div>
+                              <div className="text-3xl font-bold tracking-tight">
+                                {new Intl.NumberFormat('de-DE', {
+                                  style: 'currency',
+                                  currency: account.currency || 'CHF'
+                                }).format((Number(account.balance) || 0) / 100)}
+                              </div>
+                            </div>
+                            <div className="text-xs uppercase tracking-[0.15em] font-bold opacity-60">
+                              DEBIT
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Regular Account Card */
+                      <>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <div className="flex items-center space-x-2">
+                            {getAccountIcon(account.type)}
+                            <CardTitle className="text-sm font-medium">
+                              {translatedName}
+                            </CardTitle>
+                          </div>
+                          <div className="flex space-x-2">
+                      <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
+                        setIsEditDialogOpen(open);
+                        if (open) setSelectedAccount(account);
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>{t('editAccount')}</DialogTitle>
+                            <DialogDescription>
+                              {t('updateAccountDetails')}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="edit-type-2" className="text-right">
+                                {t('type')}
+                              </Label>
+                              <Select value={accountType} onValueChange={setAccountType}>
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder={t('selectAccountType')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Bank">{t('bank')}</SelectItem>
+                                  <SelectItem value="Credit Card">{t('creditCard')}</SelectItem>
+                                  <SelectItem value="Cash">{t('cash')}</SelectItem>
+                                  <SelectItem value="Investment">{t('investment')}</SelectItem>
+                                  <SelectItem value="Savings">{t('savings')}</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {(accountType === 'Bank' || accountType === 'Savings') && (
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="edit-bank-2" className="text-right">
+                                  Bank
+                                </Label>
+                                <Select value={bankName} onValueChange={setBankName}>
+                                  <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Bank auswählen" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="PostFinance">🟡 PostFinance</SelectItem>
+                                    <SelectItem value="UBS">🔴 UBS</SelectItem>
+                                    <SelectItem value="Credit Suisse">🔵 Credit Suisse</SelectItem>
+                                    <SelectItem value="Raiffeisen">🟢 Raiffeisen</SelectItem>
+                                    <SelectItem value="ZKB">🔵 ZKB</SelectItem>
+                                    <SelectItem value="Other">Andere</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            )}
+                            
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="edit-name-2" className="text-right">
+                                {t('name')}
+                              </Label>
+                              <Input
+                                id="edit-name-2"
+                                value={accountName}
+                                onChange={(e) => setAccountName(e.target.value)}
+                                className="col-span-3"
+                                placeholder={accountType === 'Bank' ? 'z.B. Sparkonto' : t('name')}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="edit-balance-2" className="text-right">
+                                {t('balance')}
+                              </Label>
+                              <Input
+                                id="edit-balance-2"
+                                type="number"
+                                step="0.01"
+                                value={accountBalance}
+                                onChange={(e) => setAccountBalance(e.target.value)}
+                                className="col-span-3"
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-4 items-center gap-4">
+                              <Label htmlFor="edit-currency-2" className="text-right">
+                                {t('currency')}
+                              </Label>
+                              <Select value={accountCurrency} onValueChange={setAccountCurrency}>
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder={t('currency')} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
+                                  <SelectItem value="EUR">EUR - Euro</SelectItem>
+                                  <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button type="submit" onClick={handleUpdateAccount} disabled={isUpdating}>
+                              {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              {t('save')}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={isDeleteDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
+                        setIsDeleteDialogOpen(open);
+                        if (open) setSelectedAccount(account);
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="icon">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>{t('deleteAccount')}</DialogTitle>
+                            <DialogDescription>
+                              {t('confirmDeleteAccount')}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                              {t('cancel')}
+                            </Button>
+                            <Button variant="destructive" onClick={handleDeleteAccount} disabled={isDeleting}>
+                              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              {t('delete')}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {new Intl.NumberFormat('de-DE', {
+                        style: 'currency',
+                        currency: account.currency || 'EUR'
+                      }).format((Number(account.balance) || 0) / 100)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{account.type}</p>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          );
+        })}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+}

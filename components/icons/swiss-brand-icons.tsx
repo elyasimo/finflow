@@ -1,0 +1,225 @@
+import React from 'react';
+
+// Schweizer Marken-Icons für Transaktionen
+
+// Socar (Car-Sharing/Tanken)
+export const SocarIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="socar-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FF6B35" />
+        <stop offset="100%" stopColor="#F7931E" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#socar-gradient)" opacity="0.1"/>
+    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5H15V7H17.5L19.5 11H17V14H19.5C20.88 14 22 12.88 22 11.5C22 11.23 21.96 10.97 21.88 10.72L18.92 6.01ZM7.5 5C6.84 5 6.28 5.42 6.08 6.01L3.12 10.72C3.04 10.97 3 11.23 3 11.5C3 12.88 4.12 14 5.5 14H8V11H5.5L7.5 7H10V5H7.5ZM7.5 16C6.12 16 5 17.12 5 18.5C5 19.88 6.12 21 7.5 21C8.88 21 10 19.88 10 18.5C10 17.12 8.88 16 7.5 16ZM17.5 16C16.12 16 15 17.12 15 18.5C15 19.88 16.12 21 17.5 21C18.88 21 20 19.88 20 18.5C20 17.12 18.88 16 17.5 16Z" fill="url(#socar-gradient)"/>
+  </svg>
+);
+
+// AXA Versicherung
+export const AXAIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="axa-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#00008F" />
+        <stop offset="100%" stopColor="#FF1721" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#axa-gradient)" opacity="0.1"/>
+    <path d="M12 1L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 1ZM19 11C19 15.52 16.02 19.69 12 20.93C7.98 19.69 5 15.52 5 11V6.3L12 3.19L19 6.3V11ZM7.41 15L12 10.41L16.59 15L18 13.59L12 7.59L6 13.59L7.41 15Z" fill="url(#axa-gradient)"/>
+  </svg>
+);
+
+// CSS Krankenkasse
+export const CSSIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="css-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#E30613" />
+        <stop offset="100%" stopColor="#C10510" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#css-gradient)" opacity="0.1"/>
+    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM18 14H14V18H10V14H6V10H10V6H14V10H18V14Z" fill="url(#css-gradient)"/>
+  </svg>
+);
+
+// Migros
+export const MigrosIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="migros-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FF6600" />
+        <stop offset="100%" stopColor="#FF8C00" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#migros-gradient)" opacity="0.1"/>
+    <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18ZM7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L21.16 4.96L19.42 4H19.41L18.31 6L15.55 11H8.53L8.4 10.73L6.16 6L5.21 4L4.27 2H1V4H3L6.6 11.59L5.25 14.03C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.29 15 7.17 14.89 7.17 14.75Z" fill="url(#migros-gradient)"/>
+  </svg>
+);
+
+// Coop
+export const CoopIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="coop-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FF5500" />
+        <stop offset="100%" stopColor="#FF7700" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#coop-gradient)" opacity="0.1"/>
+    <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18ZM7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L21.16 4.96L19.42 4H19.41L18.31 6L15.55 11H8.53L8.4 10.73L6.16 6L5.21 4L4.27 2H1V4H3L6.6 11.59L5.25 14.03C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.29 15 7.17 14.89 7.17 14.75Z" fill="url(#coop-gradient)"/>
+  </svg>
+);
+
+// SBB (Schweizerische Bundesbahnen)
+export const SBBIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sbb-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#EB0000" />
+        <stop offset="100%" stopColor="#C40000" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#sbb-gradient)" opacity="0.1"/>
+    <path d="M12 2C8 2 4.5 3.5 4.5 7V15.5C4.5 16.88 5.62 18 7 18H8V21H11V18H13V21H16V18H17C18.38 18 19.5 16.88 19.5 15.5V7C19.5 3.5 16 2 12 2ZM7.5 14C6.67 14 6 13.33 6 12.5C6 11.67 6.67 11 7.5 11C8.33 11 9 11.67 9 12.5C9 13.33 8.33 14 7.5 14ZM16.5 14C15.67 14 15 13.33 15 12.5C15 11.67 15.67 11 16.5 11C17.33 11 18 11.67 18 12.5C18 13.33 17.33 14 16.5 14ZM18 9H6V5.5C6 4 7.5 3.5 12 3.5C16.5 3.5 18 4 18 5.5V9Z" fill="url(#sbb-gradient)"/>
+  </svg>
+);
+
+// Swisscom
+export const SwisscomIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="swisscom-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#003DA5" />
+        <stop offset="100%" stopColor="#0080FF" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#swisscom-gradient)" opacity="0.1"/>
+    <path d="M20 15.5C20 16.61 19.11 17.5 18 17.5H6C4.89 17.5 4 16.61 4 15.5V8.5C4 7.39 4.89 6.5 6 6.5H18C19.11 6.5 20 7.39 20 8.5V15.5ZM9 11H7V9H9V11ZM9 15H7V13H9V15ZM13 11H11V9H13V11ZM13 15H11V13H13V15ZM17 11H15V9H17V11ZM17 15H15V13H17V15Z" fill="url(#swisscom-gradient)"/>
+  </svg>
+);
+
+// PostFinance - Official logo with cross and text
+export const PostFinanceIcon = () => (
+  <svg width="80" height="32" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="15" width="15" height="50" fill="white" rx="2"/>
+    <rect x="2.5" y="32.5" width="30" height="15" fill="white" rx="2"/>
+    <text x="45" y="50" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="bold" fill="#003DA5" letterSpacing="-1">PostFinance</text>
+  </svg>
+);
+
+// UBS - Official logo with three keys and text
+export const UBSIcon = () => (
+  <svg width="80" height="40" viewBox="0 0 160 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(5, 10)">
+      <circle cx="10" cy="10" r="6" fill="black" stroke="black" strokeWidth="2"/>
+      <rect x="8.5" y="10" width="3" height="25" fill="black"/>
+      <rect x="8.5" y="32" width="6" height="3" fill="black"/>
+      
+      <circle cx="25" cy="10" r="6" fill="black" stroke="black" strokeWidth="2"/>
+      <rect x="23.5" y="10" width="3" height="30" fill="black"/>
+      <rect x="23.5" y="37" width="6" height="3" fill="black"/>
+      
+      <circle cx="40" cy="10" r="6" fill="black" stroke="black" strokeWidth="2"/>
+      <rect x="38.5" y="10" width="3" height="25" fill="black"/>
+      <rect x="38.5" y="32" width="6" height="3" fill="black"/>
+    </g>
+    <text x="60" y="50" fontFamily="Arial, sans-serif" fontSize="36" fontWeight="bold" fill="#E60000" letterSpacing="2">UBS</text>
+  </svg>
+);
+
+// Credit Suisse - Logo with text
+export const CreditSuisseIcon = () => (
+  <svg width="100" height="32" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(10, 20)">
+      <path d="M0 35 L15 0 L30 35 Z" fill="#0D47A1"/>
+      <rect x="13" y="35" width="4" height="8" fill="#0D47A1"/>
+    </g>
+    <text x="55" y="50" fontFamily="Arial, sans-serif" fontSize="24" fontWeight="bold" fill="#0D47A1">CREDIT SUISSE</text>
+  </svg>
+);
+
+// Raiffeisen - Logo with crossed arrows
+export const RaiffeisenIcon = () => (
+  <svg width="100" height="32" viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(10, 25)">
+      <path d="M5 15 L15 5 L13 3 L5 11 L5 0 L3 0 L3 11 L-5 3 L-7 5 L3 15 L3 20 L5 20 L5 15 Z" fill="#FFED00" stroke="#000" strokeWidth="0.5"/>
+      <path d="M25 15 L15 5 L17 3 L25 11 L25 0 L27 0 L27 11 L35 3 L37 5 L27 15 L27 20 L25 20 L25 15 Z" fill="#FFED00" stroke="#000" strokeWidth="0.5"/>
+    </g>
+    <text x="60" y="50" fontFamily="Arial, sans-serif" fontSize="24" fontWeight="bold" fill="#000000">Raiffeisen</text>
+  </svg>
+);
+
+// ZKB (Zürcher Kantonalbank) - Logo
+export const ZKBIcon = () => (
+  <svg width="60" height="32" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="20" width="30" height="40" fill="#0066B3" rx="2"/>
+    <text x="55" y="50" fontFamily="Arial, sans-serif" fontSize="28" fontWeight="bold" fill="#0066B3">ZKB</text>
+  </svg>
+);
+
+// Shell
+export const ShellIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="shell-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#FFCC00" />
+        <stop offset="100%" stopColor="#DD1D21" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#shell-gradient)" opacity="0.1"/>
+    <path d="M19.77 7.23L19.78 7.22L16.06 3.5L15 4.56L17.11 6.67C16.17 7 15.5 7.93 15.5 9C15.5 10.38 16.62 11.5 18 11.5C18.36 11.5 18.69 11.42 19 11.29V18.5C19 19.05 18.55 19.5 18 19.5C17.45 19.5 17 19.05 17 18.5V14C17 12.9 16.1 12 15 12H14V5C14 3.9 13.1 3 12 3H6C4.9 3 4 3.9 4 5V21H14V13.5H15.5V18.5C15.5 19.88 16.62 21 18 21C19.38 21 20.5 19.88 20.5 18.5V9C20.5 8.31 20.22 7.68 19.77 7.23ZM12 10H6V5H12V10Z" fill="url(#shell-gradient)"/>
+  </svg>
+);
+
+// Aldi Suisse
+export const AldiIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="aldi-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0066B3" />
+        <stop offset="100%" stopColor="#009FE3" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#aldi-gradient)" opacity="0.1"/>
+    <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18ZM7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L21.16 4.96L19.42 4H19.41L18.31 6L15.55 11H8.53L8.4 10.73L6.16 6L5.21 4L4.27 2H1V4H3L6.6 11.59L5.25 14.03C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.29 15 7.17 14.89 7.17 14.75Z" fill="url(#aldi-gradient)"/>
+  </svg>
+);
+
+// Lidl
+export const LidlIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lidl-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0050AA" />
+        <stop offset="100%" stopColor="#FFC600" />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="10" fill="url(#lidl-gradient)" opacity="0.1"/>
+    <path d="M7 18C5.9 18 5.01 18.9 5.01 20C5.01 21.1 5.9 22 7 22C8.1 22 9 21.1 9 20C9 18.9 8.1 18 7 18ZM17 18C15.9 18 15.01 18.9 15.01 20C15.01 21.1 15.9 22 17 22C18.1 22 19 21.1 19 20C19 18.9 18.1 18 17 18ZM7.17 14.75L7.2 14.63L8.1 13H15.55C16.3 13 16.96 12.59 17.3 11.97L21.16 4.96L19.42 4H19.41L18.31 6L15.55 11H8.53L8.4 10.73L6.16 6L5.21 4L4.27 2H1V4H3L6.6 11.59L5.25 14.03C5.09 14.32 5 14.65 5 15C5 16.1 5.9 17 7 17H19V15H7.42C7.29 15 7.17 14.89 7.17 14.75Z" fill="url(#lidl-gradient)"/>
+  </svg>
+);
+
+export const swissBrandIcons: Record<string, React.FC> = {
+  'socar': SocarIcon,
+  'axa': AXAIcon,
+  'css': CSSIcon,
+  'migros': MigrosIcon,
+  'coop': CoopIcon,
+  'sbb': SBBIcon,
+  'swisscom': SwisscomIcon,
+  'postfinance': PostFinanceIcon,
+  'ubs': UBSIcon,
+  'creditsuisse': CreditSuisseIcon,
+  'raiffeisen': RaiffeisenIcon,
+  'zkb': ZKBIcon,
+  'shell': ShellIcon,
+  'aldi': AldiIcon,
+  'lidl': LidlIcon,
+};
+
+export const getSwissBrandIcon = (brandName: string): React.FC | null => {
+  const normalized = brandName.toLowerCase().replace(/\s+/g, '');
+  return swissBrandIcons[normalized] || null;
+};

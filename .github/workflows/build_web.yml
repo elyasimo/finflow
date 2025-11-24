@@ -1,0 +1,49 @@
+name: Build Flutter Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Build web
+        working-directory: app
+        run: flutter build web --release --web-renderer html
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: app/build/web
+          retention-days: 7
+
+      # Optional: Deploy to Netlify
+      - name: Deploy to Netlify
+        if: github.ref == 'refs/heads/main'
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: './app/build/web'
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: 'Deploy from GitHub Actions'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

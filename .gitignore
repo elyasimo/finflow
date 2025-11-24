@@ -1,0 +1,105 @@
+# Environment
+.env
+.env.local
+.env.production
+.env.production.local
+
+# Secrets Documentation (contains generated passwords)
+SECRETS.md
+SECURITY_ALERT.md
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.g.dart
+*.freezed.dart
+*.iconfig.dart
+*.config.dart
+
+# iOS
+*.ipa
+*.dSYM.zip
+*.dSYM
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/.symlinks/
+**/ios/Pods/
+**/ios/Podfile.lock
+**/ios/.generated/
+
+# Android
+*.apk
+*.ap_
+*.aab
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+
+# Web
+**/web/flutter_service_worker.js
+**/web/manifest.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage/
+test/.test_coverage.dart
+*.lcov
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+pgdata/
+postgres-data/
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+
+# Attachments/Uploads
+uploads/
+attachments/
+data/attachments/
+
+# Migrations (keep schema, ignore generated)
+# backend/drizzle/migrations/*.sql (keep this)
+
+# Build artifacts
+dist/
+out/
+*.bundle.js
+*.map
+
+# Misc
+.cache/
+.temp/
+tmp/

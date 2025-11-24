@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: finflow-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - finflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Security: Only expose port internally, not to host
+    # expose:
+    #   - "5432"
+
+  # Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: finflow-api-prod
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      
+      # API Server
+      NODE_ENV: ${NODE_ENV}
+      API_PORT: ${API_PORT}
+      API_HOST: ${API_HOST}
+      
+      # Security
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
+      
+      # CORS
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      
+      # Rate Limiting
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS}
+      
+      # External APIs
+      ALPHA_VANTAGE_KEY: ${ALPHA_VANTAGE_KEY}
+      ALPHA_VANTAGE_BASE_URL: ${ALPHA_VANTAGE_BASE_URL}
+      YAHOO_FINANCE_ENABLED: ${YAHOO_FINANCE_ENABLED}
+      
+      # Trading APIs
+      ALPACA_API_KEY: ${ALPACA_API_KEY}
+      ALPACA_API_SECRET: ${ALPACA_API_SECRET}
+      ALPACA_PAPER_TRADING: ${ALPACA_PAPER_TRADING}
+      ALPACA_BASE_URL: ${ALPACA_BASE_URL}
+      BINANCE_API_BASE: ${BINANCE_API_BASE}
+      BINANCE_API_TESTNET_BASE: ${BINANCE_API_TESTNET_BASE}
+      BINANCE_USE_TESTNET: ${BINANCE_USE_TESTNET}
+      BINANCE_API_KEY: ${BINANCE_API_KEY}
+      BINANCE_API_SECRET: ${BINANCE_API_SECRET}
+      ENABLE_TRADING_AGENT: ${ENABLE_TRADING_AGENT}
+      
+      # File Storage
+      UPLOAD_MAX_SIZE_MB: ${UPLOAD_MAX_SIZE_MB}
+      ATTACHMENTS_PATH: ${ATTACHMENTS_PATH}
+      
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL}
+    volumes:
+      - attachments_data:/app/data/attachments
+    networks:
+      - finflow-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # Coolify will handle port exposure and SSL termination
+    ports:
+      - "8080:8080"
+
+  # Frontend (Next.js)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    container_name: finflow-web-prod
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    networks:
+      - finflow-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # Coolify will handle port exposure and SSL termination
+    ports:
+      - "3000:3000"
+
+networks:
+  finflow-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  attachments_data:
+    driver: local
