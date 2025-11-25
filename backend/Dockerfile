@@ -30,9 +30,8 @@ COPY . .
 # Build TypeScript (while we still have typescript & tsc)
 RUN npm run build
 
-# Keep drizzle-kit for migrations, but remove other dev dependencies
-# We'll do selective pruning instead of full production prune
-RUN npm install drizzle-kit --save
+# Don't prune - keep all node_modules for migrations
+# drizzle-kit needs drizzle-orm and other dependencies at runtime
 
 # Stage 2: Production
 FROM node:18-alpine
