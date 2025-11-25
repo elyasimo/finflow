@@ -29,7 +29,7 @@ export class TransactionsController {
     try {
       const { accountId, categoryId, startDate, endDate, limit = 100, offset = 0 } = req.query;
 
-      let query = db.query.transactions.findMany({
+      const query = db.query.transactions.findMany({
         where: and(
           eq(transactions.userId, req.userId!),
           accountId ? eq(transactions.accountId, accountId as string) : undefined,
@@ -373,8 +373,8 @@ export class TransactionsController {
           if (dateStr.includes('.')) {
             // DD.MM.YY or DD.MM.YYYY format
             const parts = dateStr.split('.');
-            let day = parts[0];
-            let month = parts[1];
+            const day = parts[0];
+            const month = parts[1];
             let year = parts[2];
             
             // Handle 2-digit year (25 -> 2025, 21 -> 2021)

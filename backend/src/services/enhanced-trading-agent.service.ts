@@ -334,7 +334,7 @@ export class EnhancedTradingAgentService {
     // === BUYING DECISIONS ===
     if (holdings === 0 || positionPercent < this.MIN_POSITION_SIZE * 100) {
       let buyScore = 0;
-      let reasons: string[] = [];
+      const reasons: string[] = [];
 
       // Strategy-based buy logic
       if (agent.strategy === 'conservative') {

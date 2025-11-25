@@ -65,12 +65,47 @@ interface CategorySpending {
   color: string;
 }
 
+interface Account {
+  id: string;
+  name: string;
+  type: string;
+  balance: number;
+  currency: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface Transaction {
+  id: string;
+  amountCents: number;
+  type: 'income' | 'expense' | 'transfer';
+  category?: Category;
+  date: string;
+}
+
+interface CryptoHolding {
+  asset: string;
+  symbol: string;
+  amount: number;
+  quantity: number;
+  value: number;
+  valueEur: number;
+  priceEur: number;
+  change24h: number;
+  priceChange24h: number;
+  currentPrice: number;
+  monitoredBy?: string;
+}
+
 export default function AnalyticsPage() {
   const { user } = useAuth();
   const { currency: selectedCurrency } = useCurrency();
   const { t } = useLanguage();
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedAccount, setSelectedAccount] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('12'); // months
   const [balanceData, setBalanceData] = useState<BalanceData[]>([]);
@@ -78,7 +113,7 @@ export default function AnalyticsPage() {
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [netBalance, setNetBalance] = useState(0);
   const [categorySpending, setCategorySpending] = useState<CategorySpending[]>([]);
-  const [cryptoPortfolio, setCryptoPortfolio] = useState<any[]>([]);
+  const [cryptoPortfolio, setCryptoPortfolio] = useState<CryptoHolding[]>([]);
   const [totalCryptoValue, setTotalCryptoValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
@@ -127,7 +162,7 @@ export default function AnalyticsPage() {
       const categoryMap = new Map<string, number>();
       const categoryColors = ['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6'];
 
-      transactions.forEach((tx: any) => {
+      transactions.forEach((tx: Transaction) => {
         const amount = Math.abs(tx.amountCents / 100);
 
         if (tx.type === 'income') {
@@ -168,7 +203,7 @@ export default function AnalyticsPage() {
         const portfolio = cryptoRes.portfolio || [];
         setCryptoPortfolio(portfolio);
 
-        const cryptoTotal = portfolio.reduce((sum: number, asset: any) => sum + (asset.valueEur || 0), 0);
+        const cryptoTotal = portfolio.reduce((sum: number, asset: CryptoHolding) => sum + (asset.valueEur || asset.value || 0), 0);
         setTotalCryptoValue(cryptoTotal);
       } catch (error) {
         console.error('Error loading crypto portfolio:', error);
@@ -181,7 +216,7 @@ export default function AnalyticsPage() {
     }
   };
 
-  const generateBalanceChart = (transactions: any[], startDate: Date, endDate: Date) => {
+  const generateBalanceChart = (transactions: Transaction[], startDate: Date, endDate: Date) => {
     const monthlyData = new Map<string, { income: number; expenses: number }>();
 
     // Initialize all months in range
@@ -193,7 +228,7 @@ export default function AnalyticsPage() {
     }
 
     // Fill with transaction data
-    transactions.forEach((tx: any) => {
+    transactions.forEach((tx: Transaction) => {
       const date = new Date(tx.date);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 

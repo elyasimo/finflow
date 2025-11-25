@@ -812,11 +812,11 @@ export function getStocksByCountry(country: string): StockConfig[] {
 }
 
 export function getAllSectors(): string[] {
-  return [...new Set(SUPPORTED_STOCKS.map((s) => s.sector))];
+  return Array.from(new Set(SUPPORTED_STOCKS.map((s) => s.sector)));
 }
 
 export function getAllCountries(): string[] {
-  return [...new Set(SUPPORTED_STOCKS.map((s) => s.country).filter(Boolean))] as string[];
+  return Array.from(new Set(SUPPORTED_STOCKS.map((s) => s.country).filter(Boolean))) as string[];
 }
 
 // Statistiken

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * One-time script to translate existing database content
  * Run this once to translate all your existing budgets, accounts, categories

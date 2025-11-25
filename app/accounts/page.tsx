@@ -519,7 +519,7 @@ export default function AccountsPage() {
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
-                                    <AlertDialogDescription>{t('deleteAccountConfirm')}</AlertDialogDescription>
+                                    <AlertDialogDescription>{t('confirmDeleteAccount')}</AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>

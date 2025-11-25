@@ -103,3 +103,4 @@ out/
 .cache/
 .temp/
 tmp/
+.next/
