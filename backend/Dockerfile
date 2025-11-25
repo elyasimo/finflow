@@ -59,6 +59,10 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nodejs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nodejs:nodejs /app/start.sh ./start.sh
+
+# Make start script executable (do this before switching to nodejs user)
+RUN chmod +x start.sh && chown nodejs:nodejs start.sh
 
 # Create data directories
 RUN mkdir -p /app/data/attachments && \
@@ -74,5 +78,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
-# Start application
-CMD ["node", "dist/server.js"]
+# Start application with migrations
+CMD ["./start.sh"]
