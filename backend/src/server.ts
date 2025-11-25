@@ -25,7 +25,8 @@ import { webSocketService } from './services/websocket.service.js';
 import { alertsMonitorService } from './services/alerts-monitor.service.js';
 import { db } from './db.js';
 import { sql } from 'drizzle-orm';
-import { runMigrations } from './utils/migrations.js';
+// Migrations now handled by start.sh using drizzle-kit push
+// import { runMigrations } from './utils/migrations.js';
 import http from 'http';
 
 dotenv.config();
@@ -248,8 +249,8 @@ server.listen(port, async () => {
   console.log(`📊 Health check: http://localhost:${port}/health`);
   console.log(`🔌 WebSocket available at ws://localhost:${port}/ws`);
 
-  // Run migrations on startup
-  await runMigrations();
+  // Migrations are now handled by start.sh using drizzle-kit push
+  // await runMigrations();
 
   // Start trading agent service (checks every 60 seconds)
   if (process.env.ENABLE_TRADING_AGENT === 'true') {
