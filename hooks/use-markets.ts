@@ -50,6 +50,28 @@ interface MarketsResponse {
   }[];
 }
 
+// Yahoo Finance API response structure
+interface YahooFinanceQuote {
+  symbol: string;
+  shortName?: string;
+  longName?: string;
+  regularMarketPrice?: number;
+  regularMarketChange?: number;
+  regularMarketChangePercent?: number;
+  regularMarketVolume?: number;
+  marketCap?: number;
+  regularMarketDayHigh?: number;
+  regularMarketDayLow?: number;
+  fiftyTwoWeekHigh?: number;
+  fiftyTwoWeekLow?: number;
+}
+
+interface YahooFinanceApiResponse {
+  quoteResponse?: {
+    result?: YahooFinanceQuote[];
+  };
+}
+
 // Yahoo Finance API für Marktdaten
 const fetchMarketData = async (): Promise<MarketsResponse> => {
   try {
@@ -98,12 +120,12 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
     const forexData = await forexResponse.json();
     
     // Mappingfunktion für die Aktien
-    const mapStocks = (apiData: any): MarketData[] => {
+    const mapStocks = (apiData: YahooFinanceApiResponse): MarketData[] => {
       if (!apiData.quoteResponse || !apiData.quoteResponse.result) {
         return [];
       }
       
-      return apiData.quoteResponse.result.map((item: any) => ({
+      return apiData.quoteResponse.result.map((item: YahooFinanceQuote) => ({
         symbol: item.symbol,
         name: item.shortName || item.longName || item.symbol,
         price: item.regularMarketPrice || 0,
@@ -120,12 +142,12 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
     };
     
     // Mapping für Indizes
-    const mapIndices = (apiData: any): StockIndex[] => {
+    const mapIndices = (apiData: YahooFinanceApiResponse): StockIndex[] => {
       if (!apiData.quoteResponse || !apiData.quoteResponse.result) {
         return [];
       }
       
-      return apiData.quoteResponse.result.map((item: any) => ({
+      return apiData.quoteResponse.result.map((item: YahooFinanceQuote) => ({
         symbol: item.symbol,
         name: item.shortName || item.longName || item.symbol,
         price: item.regularMarketPrice || 0,
@@ -136,7 +158,7 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
     };
     
     // Mapping für Rohstoffe
-    const mapCommodities = (apiData: any): CommodityData[] => {
+    const mapCommodities = (apiData: YahooFinanceApiResponse): CommodityData[] => {
       if (!apiData.quoteResponse || !apiData.quoteResponse.result) {
         return [];
       }
@@ -149,7 +171,7 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
         'HG=F': 'lb',
       };
       
-      return apiData.quoteResponse.result.map((item: any) => ({
+      return apiData.quoteResponse.result.map((item: YahooFinanceQuote) => ({
         symbol: item.symbol,
         name: item.shortName || item.longName || item.symbol,
         price: item.regularMarketPrice || 0,
@@ -161,12 +183,12 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
     };
     
     // Mapping für Forex
-    const mapForex = (apiData: any): { baseCurrency: string; targetCurrency: string; rate: number; change: number; changePercent: number; lastUpdated: string; }[] => {
+    const mapForex = (apiData: YahooFinanceApiResponse): { baseCurrency: string; targetCurrency: string; rate: number; change: number; changePercent: number; lastUpdated: string; }[] => {
       if (!apiData.quoteResponse || !apiData.quoteResponse.result) {
         return [];
       }
       
-      return apiData.quoteResponse.result.map((item: any) => {
+      return apiData.quoteResponse.result.map((item: YahooFinanceQuote) => {
         const symbolParts = item.symbol.replace('=X', '').split('');
         return {
           baseCurrency: symbolParts.slice(0, 3).join(''),

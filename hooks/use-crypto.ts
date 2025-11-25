@@ -19,6 +19,35 @@ export interface CryptoData {
   lastUpdated: string;
 }
 
+interface BinancePair {
+  symbol: string;
+  lastPrice: string;
+  priceChange: string;
+  priceChangePercent: string;
+  quoteVolume: string;
+}
+
+interface BinanceSymbolInfo {
+  symbol: string;
+  baseAssetPrecision: number;
+}
+
+interface BinanceExchangeInfo {
+  symbols: BinanceSymbolInfo[];
+}
+
+interface CoinGeckoData {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  market_cap: number;
+  market_cap_rank: number;
+  circulating_supply: number;
+  total_supply: number;
+  max_supply: number | null;
+}
+
 // Binance API für Kryptowährungsdaten
 const fetchCryptoData = async (): Promise<CryptoData[]> => {
   try {
@@ -34,42 +63,42 @@ const fetchCryptoData = async (): Promise<CryptoData[]> => {
       throw new Error('Fehler beim Abrufen der Kryptodaten von Binance');
     }
     
-    const exchangeInfoData = await exchangeInfoResponse.json();
-    const cryptoData = await response.json();
+    const exchangeInfoData: BinanceExchangeInfo = await exchangeInfoResponse.json();
+    const cryptoData: BinancePair[] = await response.json();
     
     // Filter für USDT-Paare (die beliebtesten)
-    const usdtPairs = cryptoData.filter((pair: any) => 
+    const usdtPairs = cryptoData.filter((pair: BinancePair) => 
       pair.symbol.endsWith('USDT') && !pair.symbol.includes('UP') && !pair.symbol.includes('DOWN') && !pair.symbol.includes('BEAR') && !pair.symbol.includes('BULL')
     );
     
     // Nach Handelsvolumen sortieren und die Top 20 auswählen
     const topPairs = usdtPairs
-      .sort((a: any, b: any) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
+      .sort((a: BinancePair, b: BinancePair) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
       .slice(0, 20);
     
     // Kryptowährungssymbole für die MarketCap-Daten von CoinGecko
-    const cryptoSymbols = topPairs.map((pair: any) => pair.symbol.replace('USDT', '').toLowerCase());
+    const cryptoSymbols = topPairs.map((pair: BinancePair) => pair.symbol.replace('USDT', '').toLowerCase());
     
     // CoinGecko API für zusätzliche Daten verwenden
     const coinGeckoResponse = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${cryptoSymbols.join(',')}&order=market_cap_desc&per_page=20&page=1&sparkline=false&locale=en`);
-    let coinGeckoData: any[] = [];
+    let coinGeckoData: CoinGeckoData[] = [];
     
     if (coinGeckoResponse.ok) {
       coinGeckoData = await coinGeckoResponse.json();
     }
     
     // Ein Mapping für CoinGecko-Daten erstellen, um einfachen Zugriff zu haben
-    const coinGeckoMap = new Map();
-    coinGeckoData.forEach((coin: any) => {
+    const coinGeckoMap = new Map<string, CoinGeckoData>();
+    coinGeckoData.forEach((coin: CoinGeckoData) => {
       coinGeckoMap.set(coin.symbol.toUpperCase(), coin);
     });
     
     // Informationen aus beiden APIs zusammenführen
-    return topPairs.map((pair: any, index: number) => {
+    return topPairs.map((pair: BinancePair, index: number) => {
       const symbol = pair.symbol.replace('USDT', '');
       const coinGeckoInfo = coinGeckoMap.get(symbol);
       
-      const symbolInfo = exchangeInfoData.symbols.find((s: any) => s.symbol === pair.symbol);
+      const symbolInfo = exchangeInfoData.symbols.find((s: BinanceSymbolInfo) => s.symbol === pair.symbol);
       const baseAssetPrecision = symbolInfo?.baseAssetPrecision || 8;
       
       return {

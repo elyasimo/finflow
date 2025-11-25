@@ -35,9 +35,10 @@ export default function useBinancePortfolio(pollInterval = 10000) {
         });
         setPortfolio(response.data.portfolio || []);
         setError(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Portfolio fetch error:', err);
-        setError(err.response?.data?.message || err.message || 'Failed to fetch portfolio');
+        const error = err as { response?: { data?: { message?: string } }; message?: string };
+        setError(error.response?.data?.message || error.message || 'Failed to fetch portfolio');
         setPortfolio([]);
       } finally {
         setLoading(false);

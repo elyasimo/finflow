@@ -1,5 +1,44 @@
 import axios from 'axios';
 
+// TypeScript interfaces for API responses
+interface AccountApiResponse {
+  id: string;
+  name: string;
+  type: string;
+  currency: string;
+  currentBalanceCents?: number;
+  openingBalanceCents?: number;
+  userId?: string;
+  createdAt?: string;
+}
+
+interface TransactionApiResponse {
+  id: string;
+  accountId: string;
+  type: 'income' | 'expense' | 'transfer';
+  amountCents: number;
+  currency: string;
+  description?: string;
+  categoryId?: string;
+  date: string;
+  createdAt?: string;
+}
+
+interface UpdatePayload {
+  name?: string;
+  type?: string;
+  accountId?: string;
+  budgetId?: string;
+  amountCents?: number;
+  currency?: string;
+  description?: string;
+  categoryId?: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+  period?: string;
+}
+
 // Set the Express backend as the base URL
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081',
@@ -79,7 +118,7 @@ export const accountsApi = {
   list: async () => {
     const response = await api.get('/accounts');
     // Transform backend data to frontend format
-    return { accounts: response.data.map((account: any) => ({
+    return { accounts: response.data.map((account: AccountApiResponse) => ({
       ...account,
       // Keep balance in cents (do NOT divide by 100 here - let the UI handle formatting)
       balance: account.currentBalanceCents || account.openingBalanceCents || 0,
@@ -91,7 +130,7 @@ export const accountsApi = {
   getAll: async () => {
     const response = await api.get('/accounts');
     // Transform backend data to frontend format
-    return response.data.map((account: any) => ({
+    return response.data.map((account: AccountApiResponse) => ({
       ...account,
       // Keep balance in cents (do NOT divide by 100 here - let the UI handle formatting)
       balance: account.currentBalanceCents || account.openingBalanceCents || 0,
@@ -142,7 +181,7 @@ export const accountsApi = {
       'Savings': 'savings',
     };
 
-    const payload: any = {};
+    const payload: UpdatePayload = {};
     if (data.name) payload.name = data.name;
     if (data.type) payload.type = typeMap[data.type] || data.type;
 
@@ -177,7 +216,7 @@ export const budgetsApi = {
   },
   create: async (data: { name?: string; amount: number; currency?: string; startDate?: Date; endDate?: Date; categoryId?: string; period?: string }) => {
     // Convert to backend format
-    const payload: any = {
+    const payload: UpdatePayload = {
       amountCents: Math.round(data.amount * 100),
       currency: data.currency || 'EUR',
       period: data.period || 'monthly', // Default to monthly
@@ -194,7 +233,7 @@ export const budgetsApi = {
   },
   update: async (id: string, data: { name?: string; amount?: number; currency?: string; startDate?: Date; endDate?: Date; categoryId?: string }) => {
     // Convert to backend format
-    const payload: any = {};
+    const payload: UpdatePayload = {};
     if (data.name) payload.name = data.name;
     if (data.amount !== undefined) payload.amountCents = Math.round(data.amount * 100);
     if (data.currency) payload.currency = data.currency;
@@ -216,7 +255,7 @@ export const transactionsApi = {
   list: async (params?: { startDate?: string; endDate?: string; accountId?: string }) => {
     const response = await api.get('/transactions', { params });
     // Transform backend data to frontend format
-    return { transactions: response.data.map((tx: any) => ({
+    return { transactions: response.data.map((tx: TransactionApiResponse) => ({
       ...tx,
       // Convert cents to currency units
       amount: (tx.amountCents || 0) / 100,
@@ -227,7 +266,7 @@ export const transactionsApi = {
   getAll: async () => {
     const response = await api.get('/transactions');
     // Transform backend data to frontend format
-    return response.data.map((tx: any) => ({
+    return response.data.map((tx: TransactionApiResponse) => ({
       ...tx,
       // Convert cents to currency units
       amount: (tx.amountCents || 0) / 100,
@@ -281,7 +320,7 @@ export const transactionsApi = {
     }
   ) => {
     // Transform frontend data to backend format
-    const payload: any = {};
+    const payload: UpdatePayload = {};
     if (data.accountId) payload.accountId = data.accountId;
     if (data.type) payload.type = data.type;
     if (data.amount !== undefined) payload.amountCents = Math.round(data.amount * 100);
@@ -398,7 +437,7 @@ export const tradingAgentApi = {
     return response.data;
   },
 
-  updateAgent: async (id: string, updates: any) => {
+  updateAgent: async (id: string, updates: Record<string, unknown>) => {
     const response = await api.put(`/trading-agents/${id}`, updates);
     return response.data;
   },
@@ -515,7 +554,7 @@ export const backtestingApi = {
 
 // API Keys Management API
 export const apiKeysApi = {
-  storeKeys: async (provider: string, apiKey: string, apiSecret: string, permissions?: any) => {
+  storeKeys: async (provider: string, apiKey: string, apiSecret: string, permissions?: Record<string, boolean>) => {
     const response = await api.post(`/api-keys/${provider}`, {
       apiKey,
       apiSecret,

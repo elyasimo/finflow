@@ -3,8 +3,18 @@ const COINGECKO_API_BASE = 'https://api.coingecko.com/api/v3';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
 
+interface CoinGeckoData {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  market_cap: number;
+  market_cap_rank: number;
+  price_change_percentage_7d_in_currency: number;
+}
+
 // Cache for CoinGecko data
-let coinGeckoCache: any[] = [];
+let coinGeckoCache: CoinGeckoData[] = [];
 let lastCoinGeckoFetch = 0;
 const COINGECKO_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -93,7 +103,7 @@ export async function getCombinedCryptoData() {
       .map(ticker => {
         const symbol = ticker.symbol.replace('USDT', '').toLowerCase();
         const coinGeckoInfo = coinGeckoData.find(
-          (coin: any) => coin.symbol.toLowerCase() === symbol
+          (coin: CoinGeckoData) => coin.symbol.toLowerCase() === symbol
         );
         if (!coinGeckoInfo) {
           console.warn('No CoinGecko match for', symbol, 'Binance:', ticker.symbol);
