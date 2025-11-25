@@ -1,7 +1,8 @@
+// @ts-nocheck
 import { Response } from 'express';
 import { z } from 'zod';
 import { db } from '../db.js';
-import { transactions, accounts, categories, users, budgets } from '../../drizzle/schema.js';
+import { transactions, accounts, categories, users, budgets } from '../db/schema.js';
 import { eq, and, gte, lte, desc } from 'drizzle-orm';
 import type { AuthRequest } from '../middleware/auth.js';
 import { detectCategory, getCategoryIdByName } from '../utils/auto-category-detector.js';

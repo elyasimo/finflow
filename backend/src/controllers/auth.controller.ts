@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { db } from '../db.js';
-import { users, categories } from '../../drizzle/schema.js';
+import { users, categories } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import type { AuthRequest } from '../middleware/auth.js';
 

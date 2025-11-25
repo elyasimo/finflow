@@ -3,9 +3,9 @@ import { Select } from "@/components/ui/select";
 import { TradeMetrics as BaseTradeMetrics } from "@/types/analytics";
 import { EquityCurveChart } from "@/components/analytics/equity-curve-chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-// @ts-ignore
+// @ts-expect-error - jsPDF types are not available
 import jsPDF from 'jspdf';
-// @ts-ignore
+// @ts-expect-error - jspdf-autotable types are not available
 import autoTable from 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 

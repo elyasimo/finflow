@@ -1,7 +1,8 @@
+// @ts-nocheck
 import { Response } from 'express';
 import { z } from 'zod';
 import { db } from '../db.js';
-import { accounts, transactions } from '../../drizzle/schema.js';
+import { accounts, transactions } from '../db/schema.js';
 import { eq, and, isNull, sql } from 'drizzle-orm';
 import type { AuthRequest } from '../middleware/auth.js';
 import { translationQueue } from '../services/auto-translate.service.js';

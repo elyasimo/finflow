@@ -46,7 +46,7 @@ export default function ForgotPassword() {
         <CardHeader>
           <CardTitle>Forgot Password</CardTitle>
           <CardDescription>
-            Enter your email address and we'll send you instructions to reset your password.
+            Enter your email address and we&apos;ll send you instructions to reset your password.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -37,7 +37,7 @@ export function AdvancedOrderDialog({ symbol, currentPrice, onOrderPlaced }: Adv
     try {
       const token = localStorage.getItem('token');
       let endpoint = '';
-      let body: any = {
+      const body: any = {
         symbol,
         side,
         quantity: parseFloat(quantity),

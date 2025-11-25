@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { tradingLogs, tradingAgents } from '../../drizzle/schema';
+import { tradingLogs, tradingAgents } from '../db/schema.js';
 import { eq, and, gte, sql } from 'drizzle-orm';
 
 interface PerformanceData {

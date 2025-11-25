@@ -139,7 +139,7 @@ export default function RiskAnalysisPage() {
               No Risk Analysis Yet
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-center max-w-md mb-4">
-              Click "Calculate Risk Metrics" to analyze your portfolio's risk profile using professional metrics.
+              Click &ldquo;Calculate Risk Metrics&rdquo; to analyze your portfolio&apos;s risk profile using professional metrics.
             </p>
           </CardContent>
         </Card>
@@ -246,7 +246,7 @@ export default function RiskAnalysisPage() {
                           {formatCurrency(metrics.var95)}
                         </div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                          95% chance losses won't exceed this in 1 day
+                          95% chance losses won&apos;t exceed this in 1 day
                         </p>
                       </CardContent>
                     </Card>
@@ -260,7 +260,7 @@ export default function RiskAnalysisPage() {
                           {formatCurrency(metrics.var99)}
                         </div>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                          99% chance losses won't exceed this in 1 day
+                          99% chance losses won&apos;t exceed this in 1 day
                         </p>
                       </CardContent>
                     </Card>

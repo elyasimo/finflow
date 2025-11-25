@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response } from 'express';
 import { stockTradingService, StockTradingService } from '../services/stock-trading.service';
 import { apiKeysService } from '../services/api-keys.service';

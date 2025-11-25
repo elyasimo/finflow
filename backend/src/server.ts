@@ -24,6 +24,7 @@ import { tradingAgentService } from './services/trading-agent.service.js';
 import { webSocketService } from './services/websocket.service.js';
 import { alertsMonitorService } from './services/alerts-monitor.service.js';
 import { db } from './db.js';
+import { sql } from 'drizzle-orm';
 import { runMigrations } from './utils/migrations.js';
 import http from 'http';
 
@@ -65,7 +66,7 @@ const translationController = new TranslationController();
 app.get('/health', async (req, res) => {
   try {
     // Check database connection
-    await db.execute('SELECT 1');
+    await db.execute(sql`SELECT 1`);
     
     res.json({ 
       status: 'ok', 

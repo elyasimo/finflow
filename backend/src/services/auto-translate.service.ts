@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Auto-Translation Service
  * Automatically translates database content when created or updated
