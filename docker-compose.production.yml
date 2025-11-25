@@ -97,9 +97,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    # Coolify will handle port exposure and SSL termination
-    ports:
-      - "8080:8080"
+    # Coolify will handle port exposure and SSL termination via its proxy
+    expose:
+      - "8080"
 
   # Frontend (Next.js)
   web:
@@ -124,9 +124,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    # Coolify will handle port exposure and SSL termination
-    ports:
-      - "3000:3000"
+    # Coolify will handle port exposure and SSL termination via its proxy
+    expose:
+      - "3000"
 
 networks:
   finflow-network:
