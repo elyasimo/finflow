@@ -2,7 +2,7 @@
 import { db } from '../db';
 import { priceAlerts } from '../db/schema.js';
 import { eq, and } from 'drizzle-orm';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { BinanceTradingService } from './binance-trading.service.js';
 import { AlpacaService } from './alpaca.service.js';
 
@@ -52,7 +52,7 @@ export class PriceAlertsService {
    * Create a new price alert
    */
   async createAlert(userId: string, input: CreateAlertInput): Promise<PriceAlert> {
-    const alertId = uuidv4();
+    const alertId = randomUUID();
     
     // Get current price
     let currentPrice = '0';
