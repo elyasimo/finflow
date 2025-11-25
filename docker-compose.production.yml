@@ -90,13 +90,23 @@ services:
       - attachments_data:/app/data/attachments
     networks:
       - finflow-network
-    # Health check disabled - Coolify will handle it via its own monitoring
-    # healthcheck:
-    #   test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
-    #   interval: 15s
-    #   timeout: 5s
-    #   retries: 10
-    #   start_period: 120s
+      - coolify  # Connect to Coolify proxy network
+    labels:
+      # Enable Traefik
+      - "traefik.enable=true"
+      # HTTP Router
+      - "traefik.http.routers.finflow-api.rule=Host(`api.finflowapp.ch`)"
+      - "traefik.http.routers.finflow-api.entrypoints=https"
+      - "traefik.http.routers.finflow-api.tls=true"
+      - "traefik.http.routers.finflow-api.tls.certresolver=letsencrypt"
+      # Service
+      - "traefik.http.services.finflow-api.loadbalancer.server.port=8080"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.finflow-api-http.rule=Host(`api.finflowapp.ch`)"
+      - "traefik.http.routers.finflow-api-http.entrypoints=http"
+      - "traefik.http.routers.finflow-api-http.middlewares=redirect-to-https@file"
+      # Coolify managed
+      - "coolify.managed=true"
     # Coolify will handle port exposure and SSL termination via its proxy
     expose:
       - "8080"
@@ -117,13 +127,23 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     networks:
       - finflow-network
-    # Health check disabled - Coolify will handle it
-    # healthcheck:
-    #   test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
-    #   interval: 15s
-    #   timeout: 5s
-    #   retries: 10
-    #   start_period: 120s
+      - coolify  # Connect to Coolify proxy network
+    labels:
+      # Enable Traefik
+      - "traefik.enable=true"
+      # HTTP Router
+      - "traefik.http.routers.finflow-web.rule=Host(`finflowapp.ch`)"
+      - "traefik.http.routers.finflow-web.entrypoints=https"
+      - "traefik.http.routers.finflow-web.tls=true"
+      - "traefik.http.routers.finflow-web.tls.certresolver=letsencrypt"
+      # Service
+      - "traefik.http.services.finflow-web.loadbalancer.server.port=3000"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.finflow-web-http.rule=Host(`finflowapp.ch`)"
+      - "traefik.http.routers.finflow-web-http.entrypoints=http"
+      - "traefik.http.routers.finflow-web-http.middlewares=redirect-to-https@file"
+      # Coolify managed
+      - "coolify.managed=true"
     # Coolify will handle port exposure and SSL termination via its proxy
     expose:
       - "3000"
@@ -131,6 +151,8 @@ services:
 networks:
   finflow-network:
     driver: bridge
+  coolify:
+    external: true  # Connect to existing Coolify proxy network
 
 volumes:
   postgres_data:
