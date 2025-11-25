@@ -94,6 +94,7 @@ services:
     labels:
       # Enable Traefik
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       # HTTP Router
       - "traefik.http.routers.finflow-api.rule=Host(`api.finflowapp.ch`)"
       - "traefik.http.routers.finflow-api.entrypoints=https"
@@ -137,6 +138,7 @@ services:
     labels:
       # Enable Traefik
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       # HTTP Router
       - "traefik.http.routers.finflow-web.rule=Host(`finflowapp.ch`)"
       - "traefik.http.routers.finflow-web.entrypoints=https"
