@@ -22,7 +22,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 
 # Install ALL dependencies (including devDependencies for build)
-RUN npm ci
+RUN npm install --production=false
 
 # Copy source code
 COPY . .
