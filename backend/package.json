@@ -5,8 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.ts",
+    "build": "tsc --skipLibCheck",
+    "start": "node dist/server.js",
     "migrate": "drizzle-kit push",
     "migrate:generate": "drizzle-kit generate",
     "migrate:drop": "drizzle-kit drop",
@@ -53,6 +53,7 @@
     "@types/node": "^22.9.0",
     "@types/pg": "^8.11.10",
     "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "@vitest/coverage-v8": "^2.1.5",

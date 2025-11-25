@@ -27,11 +27,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
+# Don't build - use tsx directly in production
+# RUN npm run build
 
 # Prune dev dependencies
-RUN npm prune --production
+# RUN npm prune --production
 
 # Stage 2: Production
 FROM node:18-alpine
@@ -55,10 +55,11 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Copy built app from builder
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nodejs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./tsconfig.json
 
 # Create data directories
 RUN mkdir -p /app/data/attachments && \
@@ -75,4 +76,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Start application
-CMD ["node", "dist/server.js"]
+CMD ["npx", "tsx", "src/server.ts"]

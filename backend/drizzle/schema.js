@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.categoriesRelations = exports.transactionsRelations = exports.accountsRelations = exports.usersRelations = exports.encryptedApiKeys = exports.tradingLogs = exports.tradingAgents = exports.goals = exports.attachments = exports.rules = exports.prices = exports.holdings = exports.budgets = exports.transactions = exports.categories = exports.accounts = exports.users = void 0;
+exports.categoriesRelations = exports.transactionsRelations = exports.accountsRelations = exports.usersRelations = exports.priceAlerts = exports.encryptedApiKeys = exports.tradingLogs = exports.tradingAgents = exports.goals = exports.attachments = exports.rules = exports.prices = exports.holdings = exports.budgets = exports.transactions = exports.categories = exports.accounts = exports.users = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const drizzle_orm_1 = require("drizzle-orm");
 // Users table
@@ -188,6 +188,20 @@ exports.encryptedApiKeys = (0, pg_core_1.pgTable)('encrypted_api_keys', {
     apiSecretTag: (0, pg_core_1.text)('api_secret_tag').notNull(),
     permissions: (0, pg_core_1.jsonb)('permissions'), // Optional: store what permissions this key has
     lastUsedAt: (0, pg_core_1.timestamp)('last_used_at', { withTimezone: true }),
+    createdAt: (0, pg_core_1.timestamp)('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: (0, pg_core_1.timestamp)('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+// Price Alerts table
+exports.priceAlerts = (0, pg_core_1.pgTable)('price_alerts', {
+    id: (0, pg_core_1.uuid)('id').defaultRandom().primaryKey(),
+    userId: (0, pg_core_1.uuid)('user_id').references(() => exports.users.id, { onDelete: 'cascade' }).notNull(),
+    asset: (0, pg_core_1.text)('asset').notNull(),
+    alertType: (0, pg_core_1.text)('alert_type').notNull(), // 'above', 'below'
+    targetPrice: (0, pg_core_1.numeric)('target_price', { precision: 28, scale: 10 }).notNull(),
+    currentPrice: (0, pg_core_1.numeric)('current_price', { precision: 28, scale: 10 }),
+    isActive: (0, pg_core_1.boolean)('is_active').notNull().default(true),
+    triggeredAt: (0, pg_core_1.timestamp)('triggered_at', { withTimezone: true }),
+    notificationSent: (0, pg_core_1.boolean)('notification_sent').notNull().default(false),
     createdAt: (0, pg_core_1.timestamp)('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

@@ -16,7 +16,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         email: import("drizzle-orm/pg-core").PgColumn<{
             name: "email";
@@ -32,7 +32,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         passwordHash: import("drizzle-orm/pg-core").PgColumn<{
             name: "password_hash";
@@ -48,7 +48,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         publicKey: import("drizzle-orm/pg-core").PgColumn<{
             name: "public_key";
@@ -64,7 +64,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         defaultCurrency: import("drizzle-orm/pg-core").PgColumn<{
             name: "default_currency";
@@ -80,7 +80,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -96,7 +96,7 @@ export declare const users: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -119,7 +119,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -135,7 +135,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -151,7 +151,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -167,7 +167,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         type: import("drizzle-orm/pg-core").PgColumn<{
             name: "type";
@@ -183,7 +183,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -199,7 +199,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         openingBalanceCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "opening_balance_cents";
@@ -215,7 +215,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         color: import("drizzle-orm/pg-core").PgColumn<{
             name: "color";
@@ -231,7 +231,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         archived: import("drizzle-orm/pg-core").PgColumn<{
             name: "archived";
@@ -247,7 +247,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -263,7 +263,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -279,7 +279,7 @@ export declare const accounts: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -302,7 +302,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -318,7 +318,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -334,7 +334,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -350,7 +350,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         parentId: import("drizzle-orm/pg-core").PgColumn<{
             name: "parent_id";
@@ -366,7 +366,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         icon: import("drizzle-orm/pg-core").PgColumn<{
             name: "icon";
@@ -382,7 +382,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         color: import("drizzle-orm/pg-core").PgColumn<{
             name: "color";
@@ -398,7 +398,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -414,7 +414,7 @@ export declare const categories: import("drizzle-orm/pg-core").PgTableWithColumn
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -437,7 +437,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -453,7 +453,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         accountId: import("drizzle-orm/pg-core").PgColumn<{
             name: "account_id";
@@ -469,7 +469,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         type: import("drizzle-orm/pg-core").PgColumn<{
             name: "type";
@@ -485,7 +485,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         amountCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "amount_cents";
@@ -501,7 +501,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -517,7 +517,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         fxRate: import("drizzle-orm/pg-core").PgColumn<{
             name: "fx_rate";
@@ -533,7 +533,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         date: import("drizzle-orm/pg-core").PgColumn<{
             name: "date";
@@ -549,7 +549,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         description: import("drizzle-orm/pg-core").PgColumn<{
             name: "description";
@@ -565,7 +565,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         descriptionTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "description_translations";
@@ -581,7 +581,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         notes: import("drizzle-orm/pg-core").PgColumn<{
             name: "notes";
@@ -597,7 +597,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         notesTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "notes_translations";
@@ -613,7 +613,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         attachmentRefs: import("drizzle-orm/pg-core").PgColumn<{
             name: "attachment_refs";
@@ -642,9 +642,9 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
                 hasRuntimeDefault: false;
                 enumValues: [string, ...string[]];
                 baseColumn: never;
-                generated: undefined;
+                generated: import("drizzle-orm").GeneratedColumnConfig<string>;
             }, object, object>;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string[]>;
         }, {}, {}>;
         categoryId: import("drizzle-orm/pg-core").PgColumn<{
             name: "category_id";
@@ -660,7 +660,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         tags: import("drizzle-orm/pg-core").PgColumn<{
             name: "tags";
@@ -689,9 +689,9 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
                 hasRuntimeDefault: false;
                 enumValues: [string, ...string[]];
                 baseColumn: never;
-                generated: undefined;
+                generated: import("drizzle-orm").GeneratedColumnConfig<string>;
             }, object, object>;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string[]>;
         }, {}, {}>;
         splitParentId: import("drizzle-orm/pg-core").PgColumn<{
             name: "split_parent_id";
@@ -707,7 +707,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         toAccountId: import("drizzle-orm/pg-core").PgColumn<{
             name: "to_account_id";
@@ -723,7 +723,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -739,7 +739,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -755,7 +755,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         deletedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "deleted_at";
@@ -771,7 +771,7 @@ export declare const transactions: import("drizzle-orm/pg-core").PgTableWithColu
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -794,7 +794,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -810,7 +810,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         categoryId: import("drizzle-orm/pg-core").PgColumn<{
             name: "category_id";
@@ -826,7 +826,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -842,7 +842,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -858,7 +858,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         period: import("drizzle-orm/pg-core").PgColumn<{
             name: "period";
@@ -874,7 +874,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         amountCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "amount_cents";
@@ -890,7 +890,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -906,7 +906,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         startDate: import("drizzle-orm/pg-core").PgColumn<{
             name: "start_date";
@@ -922,7 +922,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         endDate: import("drizzle-orm/pg-core").PgColumn<{
             name: "end_date";
@@ -938,7 +938,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         rollover: import("drizzle-orm/pg-core").PgColumn<{
             name: "rollover";
@@ -954,7 +954,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -970,7 +970,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -986,7 +986,7 @@ export declare const budgets: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1009,7 +1009,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -1025,7 +1025,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         accountId: import("drizzle-orm/pg-core").PgColumn<{
             name: "account_id";
@@ -1041,7 +1041,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         symbol: import("drizzle-orm/pg-core").PgColumn<{
             name: "symbol";
@@ -1057,7 +1057,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         quantity: import("drizzle-orm/pg-core").PgColumn<{
             name: "quantity";
@@ -1073,7 +1073,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         avgCostCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "avg_cost_cents";
@@ -1089,7 +1089,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -1105,7 +1105,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -1121,7 +1121,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -1137,7 +1137,7 @@ export declare const holdings: import("drizzle-orm/pg-core").PgTableWithColumns<
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1160,7 +1160,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         symbol: import("drizzle-orm/pg-core").PgColumn<{
             name: "symbol";
@@ -1176,7 +1176,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         price: import("drizzle-orm/pg-core").PgColumn<{
             name: "price";
@@ -1192,7 +1192,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -1208,7 +1208,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         source: import("drizzle-orm/pg-core").PgColumn<{
             name: "source";
@@ -1224,7 +1224,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         asOf: import("drizzle-orm/pg-core").PgColumn<{
             name: "as_of";
@@ -1240,7 +1240,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -1256,7 +1256,7 @@ export declare const prices: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1279,7 +1279,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -1295,7 +1295,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -1311,7 +1311,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -1327,7 +1327,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         conditions: import("drizzle-orm/pg-core").PgColumn<{
             name: "conditions";
@@ -1343,7 +1343,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         actions: import("drizzle-orm/pg-core").PgColumn<{
             name: "actions";
@@ -1359,7 +1359,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         priority: import("drizzle-orm/pg-core").PgColumn<{
             name: "priority";
@@ -1375,7 +1375,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         enabled: import("drizzle-orm/pg-core").PgColumn<{
             name: "enabled";
@@ -1391,7 +1391,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -1407,7 +1407,7 @@ export declare const rules: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1430,7 +1430,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -1446,7 +1446,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         transactionId: import("drizzle-orm/pg-core").PgColumn<{
             name: "transaction_id";
@@ -1462,7 +1462,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         storageRef: import("drizzle-orm/pg-core").PgColumn<{
             name: "storage_ref";
@@ -1478,7 +1478,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         mimeType: import("drizzle-orm/pg-core").PgColumn<{
             name: "mime_type";
@@ -1494,7 +1494,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         size: import("drizzle-orm/pg-core").PgColumn<{
             name: "size";
@@ -1510,7 +1510,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         checksum: import("drizzle-orm/pg-core").PgColumn<{
             name: "checksum";
@@ -1526,7 +1526,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -1542,7 +1542,7 @@ export declare const attachments: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1565,7 +1565,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -1581,7 +1581,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -1597,7 +1597,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -1613,7 +1613,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         targetAmountCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "target_amount_cents";
@@ -1629,7 +1629,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         currency: import("drizzle-orm/pg-core").PgColumn<{
             name: "currency";
@@ -1645,7 +1645,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         targetDate: import("drizzle-orm/pg-core").PgColumn<{
             name: "target_date";
@@ -1661,7 +1661,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         notes: import("drizzle-orm/pg-core").PgColumn<{
             name: "notes";
@@ -1677,7 +1677,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         notesTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "notes_translations";
@@ -1693,7 +1693,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         progressAuto: import("drizzle-orm/pg-core").PgColumn<{
             name: "progress_auto";
@@ -1709,7 +1709,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -1725,7 +1725,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -1741,7 +1741,7 @@ export declare const goals: import("drizzle-orm/pg-core").PgTableWithColumns<{
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -1764,7 +1764,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -1780,7 +1780,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
@@ -1796,7 +1796,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         nameTranslations: import("drizzle-orm/pg-core").PgColumn<{
             name: "name_translations";
@@ -1812,7 +1812,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         enabled: import("drizzle-orm/pg-core").PgColumn<{
             name: "enabled";
@@ -1828,7 +1828,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
         }, {}, {}>;
         assets: import("drizzle-orm/pg-core").PgColumn<{
             name: "assets";
@@ -1857,9 +1857,9 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
                 hasRuntimeDefault: false;
                 enumValues: [string, ...string[]];
                 baseColumn: never;
-                generated: undefined;
+                generated: import("drizzle-orm").GeneratedColumnConfig<string>;
             }, object, object>;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string[]>;
         }, {}, {}>;
         strategy: import("drizzle-orm/pg-core").PgColumn<{
             name: "strategy";
@@ -1875,7 +1875,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         stopLossPercent: import("drizzle-orm/pg-core").PgColumn<{
             name: "stop_loss_percent";
@@ -1891,7 +1891,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         takeProfitPercent: import("drizzle-orm/pg-core").PgColumn<{
             name: "take_profit_percent";
@@ -1907,7 +1907,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         trailingStopPercent: import("drizzle-orm/pg-core").PgColumn<{
             name: "trailing_stop_percent";
@@ -1923,7 +1923,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         maxDailyTradesCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "max_daily_trades_cents";
@@ -1939,7 +1939,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         maxSingleTradeCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "max_single_trade_cents";
@@ -1955,7 +1955,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         entryPrices: import("drizzle-orm/pg-core").PgColumn<{
             name: "entry_prices";
@@ -1971,7 +1971,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         totalTradesExecuted: import("drizzle-orm/pg-core").PgColumn<{
             name: "total_trades_executed";
@@ -1987,7 +1987,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         totalProfitCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "total_profit_cents";
@@ -2003,7 +2003,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         lastTradeAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "last_trade_at";
@@ -2019,7 +2019,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -2035,7 +2035,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -2051,7 +2051,7 @@ export declare const tradingAgents: import("drizzle-orm/pg-core").PgTableWithCol
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -2074,7 +2074,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         agentId: import("drizzle-orm/pg-core").PgColumn<{
             name: "agent_id";
@@ -2090,7 +2090,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         action: import("drizzle-orm/pg-core").PgColumn<{
             name: "action";
@@ -2106,7 +2106,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         asset: import("drizzle-orm/pg-core").PgColumn<{
             name: "asset";
@@ -2122,7 +2122,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         quantity: import("drizzle-orm/pg-core").PgColumn<{
             name: "quantity";
@@ -2138,7 +2138,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         priceAtAction: import("drizzle-orm/pg-core").PgColumn<{
             name: "price_at_action";
@@ -2154,7 +2154,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         totalValueCents: import("drizzle-orm/pg-core").PgColumn<{
             name: "total_value_cents";
@@ -2170,7 +2170,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<number>;
         }, {}, {}>;
         reason: import("drizzle-orm/pg-core").PgColumn<{
             name: "reason";
@@ -2186,7 +2186,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         orderId: import("drizzle-orm/pg-core").PgColumn<{
             name: "order_id";
@@ -2202,7 +2202,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         status: import("drizzle-orm/pg-core").PgColumn<{
             name: "status";
@@ -2218,7 +2218,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         errorMessage: import("drizzle-orm/pg-core").PgColumn<{
             name: "error_message";
@@ -2234,7 +2234,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -2250,7 +2250,7 @@ export declare const tradingLogs: import("drizzle-orm/pg-core").PgTableWithColum
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";
@@ -2273,7 +2273,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         userId: import("drizzle-orm/pg-core").PgColumn<{
             name: "user_id";
@@ -2289,7 +2289,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         provider: import("drizzle-orm/pg-core").PgColumn<{
             name: "provider";
@@ -2305,7 +2305,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiKeyEncrypted: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_key_encrypted";
@@ -2321,7 +2321,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiKeyIv: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_key_iv";
@@ -2337,7 +2337,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiKeyTag: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_key_tag";
@@ -2353,7 +2353,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiSecretEncrypted: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_secret_encrypted";
@@ -2369,7 +2369,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiSecretIv: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_secret_iv";
@@ -2385,7 +2385,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         apiSecretTag: import("drizzle-orm/pg-core").PgColumn<{
             name: "api_secret_tag";
@@ -2401,7 +2401,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
         }, {}, {}>;
         permissions: import("drizzle-orm/pg-core").PgColumn<{
             name: "permissions";
@@ -2417,7 +2417,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<unknown>;
         }, {}, {}>;
         lastUsedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "last_used_at";
@@ -2433,7 +2433,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "created_at";
@@ -2449,7 +2449,7 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updated_at";
@@ -2465,7 +2465,190 @@ export declare const encryptedApiKeys: import("drizzle-orm/pg-core").PgTableWith
             hasRuntimeDefault: false;
             enumValues: undefined;
             baseColumn: never;
-            generated: undefined;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
+        }, {}, {}>;
+    };
+    dialect: "pg";
+}>;
+export declare const priceAlerts: import("drizzle-orm/pg-core").PgTableWithColumns<{
+    name: "price_alerts";
+    schema: undefined;
+    columns: {
+        id: import("drizzle-orm/pg-core").PgColumn<{
+            name: "id";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgUUID";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: true;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        userId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "user_id";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgUUID";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        asset: import("drizzle-orm/pg-core").PgColumn<{
+            name: "asset";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        alertType: import("drizzle-orm/pg-core").PgColumn<{
+            name: "alert_type";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        targetPrice: import("drizzle-orm/pg-core").PgColumn<{
+            name: "target_price";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgNumeric";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        currentPrice: import("drizzle-orm/pg-core").PgColumn<{
+            name: "current_price";
+            tableName: "price_alerts";
+            dataType: "string";
+            columnType: "PgNumeric";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<string>;
+        }, {}, {}>;
+        isActive: import("drizzle-orm/pg-core").PgColumn<{
+            name: "is_active";
+            tableName: "price_alerts";
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
+        }, {}, {}>;
+        triggeredAt: import("drizzle-orm/pg-core").PgColumn<{
+            name: "triggered_at";
+            tableName: "price_alerts";
+            dataType: "date";
+            columnType: "PgTimestamp";
+            data: Date;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
+        }, {}, {}>;
+        notificationSent: import("drizzle-orm/pg-core").PgColumn<{
+            name: "notification_sent";
+            tableName: "price_alerts";
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<boolean>;
+        }, {}, {}>;
+        createdAt: import("drizzle-orm/pg-core").PgColumn<{
+            name: "created_at";
+            tableName: "price_alerts";
+            dataType: "date";
+            columnType: "PgTimestamp";
+            data: Date;
+            driverParam: string;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
+        }, {}, {}>;
+        updatedAt: import("drizzle-orm/pg-core").PgColumn<{
+            name: "updated_at";
+            tableName: "price_alerts";
+            dataType: "date";
+            columnType: "PgTimestamp";
+            data: Date;
+            driverParam: string;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            generated: import("drizzle-orm").GeneratedColumnConfig<Date>;
         }, {}, {}>;
     };
     dialect: "pg";

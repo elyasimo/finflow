@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { stockTradingService, StockTradingService } from '../services/stock-trading.service';
 import { apiKeysService } from '../services/api-keys.service';
+import { db } from '../db.js';
+import { accounts, transactions } from '../db/schema.js';
+import { eq, and, sql, sum } from 'drizzle-orm';
 
 /**
  * Stock Trading Controller
@@ -14,13 +17,11 @@ export class StockTradingController {
   private async getUserStockService(userId: number): Promise<StockTradingService> {
     try {
       // Try to get user's personal API keys
-      const apiKey = await apiKeysService.getApiKey(userId, 'alpaca', 'api_key');
-      const apiSecret = await apiKeysService.getApiKey(userId, 'alpaca', 'api_secret');
-      const isPaperStr = await apiKeysService.getApiKey(userId, 'alpaca', 'is_paper').catch(() => 'true');
-      const isPaper = isPaperStr === 'true';
-
-      if (apiKey && apiSecret) {
-        return new StockTradingService(apiKey, apiSecret, isPaper);
+      const keys = await apiKeysService.getApiKeys(userId.toString(), 'alpaca');
+      
+      if (keys && keys.apiKey && keys.apiSecret) {
+        // Use paper trading by default for user keys
+        return new StockTradingService(keys.apiKey, keys.apiSecret, true);
       }
     } catch (error) {
       // Fall through to environment keys
@@ -115,10 +116,6 @@ export class StockTradingController {
       const userId = (req as any).userId;
       
       // Calculate portfolio from user's actual accounts in database
-      const db = (await import('../db')).db;
-      const { accounts, transactions } = await import('../../drizzle/schema.js');
-      const { eq, and, sql } = await import('drizzle-orm');
-      
       // Get all user's investment accounts
       const investmentAccounts = await db.select()
         .from(accounts)

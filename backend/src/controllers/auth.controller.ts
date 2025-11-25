@@ -94,7 +94,7 @@ export class AuthController {
       const token = jwt.sign(
         { userId: newUser.id },
         process.env.JWT_SECRET || 'your-super-secret-jwt-key',
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+        { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
       );
 
       res.status(201).json({
@@ -137,7 +137,7 @@ export class AuthController {
       const token = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET || 'your-super-secret-jwt-key',
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+        { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
       );
 
       res.json({
