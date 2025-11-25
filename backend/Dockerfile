@@ -30,8 +30,9 @@ COPY . .
 # Build TypeScript (while we still have typescript & tsc)
 RUN npm run build
 
-# NOW remove dev dependencies for smaller production image
-RUN npm prune --production
+# Keep drizzle-kit for migrations, but remove other dev dependencies
+# We'll do selective pruning instead of full production prune
+RUN npm install drizzle-kit --save
 
 # Stage 2: Production
 FROM node:18-alpine
@@ -58,7 +59,9 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nodejs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nodejs:nodejs /app/drizzle ./drizzle
+COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 COPY --from=builder --chown=nodejs:nodejs /app/start.sh ./start.sh
 
 # Make start script executable (do this before switching to nodejs user)
