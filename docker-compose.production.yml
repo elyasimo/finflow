@@ -19,8 +19,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 60s
     # Security: Only expose port internally, not to host
     # expose:
     #   - "5432"
@@ -93,10 +93,10 @@ services:
       - finflow-network
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 10
+      start_period: 120s
     # Coolify will handle port exposure and SSL termination via its proxy
     expose:
       - "8080"
@@ -120,10 +120,10 @@ services:
       - finflow-network
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 10
+      start_period: 120s
     # Coolify will handle port exposure and SSL termination via its proxy
     expose:
       - "3000"
