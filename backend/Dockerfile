@@ -21,16 +21,16 @@ RUN apk add --no-cache \
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies (including dev for build)
-RUN npm install
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
 
-# Build TypeScript
+# Build TypeScript (while we still have typescript & tsc)
 RUN npm run build
 
-# Prune dev dependencies for smaller image
+# NOW remove dev dependencies for smaller production image
 RUN npm prune --production
 
 # Stage 2: Production
