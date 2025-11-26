@@ -237,8 +237,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
         <List03 items={mappedBudgets} onViewDetailsClick={handleViewBudgetDetails} />
       </div>
 
-      {/* Binance Portfolio Card - Hidden when API key format invalid */}
-      {(!binanceError || !binanceError.toLowerCase().includes('format invalid')) && (
+      {/* Binance Portfolio Card */}
       <div className="bg-white dark:bg-[#232e40] rounded-xl border border-gray-200 dark:border-[#2d3b4e] overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-[#2d3b4e]">
           <div className="flex items-center justify-between">
@@ -375,7 +374,6 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
           </>
         )}
       </div>
-      )}
     </div>
   )
 }
