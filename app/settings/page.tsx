@@ -38,6 +38,12 @@ export default function SettingsPage() {
   const [alpacaIsPaper, setAlpacaIsPaper] = useState(true);
   const [apiKeysLoading, setApiKeysLoading] = useState(false);
 
+  // Binance API Keys state
+  const [binanceApiKey, setBinanceApiKey] = useState('');
+  const [binanceApiSecret, setBinanceApiSecret] = useState('');
+  const [binanceKeysConfigured, setBinanceKeysConfigured] = useState(false);
+  const [binanceApiKeysLoading, setBinanceApiKeysLoading] = useState(false);
+
   // Notification settings (these would be stored in the database in a real app)
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
@@ -64,6 +70,7 @@ export default function SettingsPage() {
       setEmail(user.email || '');
       setDefaultCurrency(user.defaultCurrency || 'EUR');
       loadApiKeys();
+      loadBinanceApiKeysStatus();
     }
   }, [user]);
 
@@ -85,6 +92,23 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Failed to load API keys:', error);
+    }
+  };
+
+  // Load Binance API keys status
+  const loadBinanceApiKeysStatus = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/binance/status`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBinanceKeysConfigured(data.configured || false);
+      }
+    } catch (error) {
+      console.error('Failed to check Binance API keys status:', error);
     }
   };
 
@@ -210,6 +234,69 @@ export default function SettingsPage() {
       toast.error(t('failedToSaveApiKeys') || 'Failed to save API keys');
     } finally {
       setApiKeysLoading(false);
+    }
+  };
+
+  // Handle Binance API keys save
+  const handleSaveBinanceApiKeys = async () => {
+    if (!binanceApiKey || !binanceApiSecret) {
+      toast.error('Please enter both API Key and API Secret');
+      return;
+    }
+
+    setBinanceApiKeysLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/binance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          apiKey: binanceApiKey,
+          apiSecret: binanceApiSecret,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save Binance API keys');
+      }
+
+      toast.success('Binance API keys saved successfully!');
+      setBinanceKeysConfigured(true);
+      // Clear the fields after saving for security
+      setBinanceApiKey('');
+      setBinanceApiSecret('');
+    } catch (error) {
+      console.error('Failed to save Binance API keys:', error);
+      toast.error('Failed to save Binance API keys');
+    } finally {
+      setBinanceApiKeysLoading(false);
+    }
+  };
+
+  // Handle Binance API keys delete
+  const handleDeleteBinanceApiKeys = async () => {
+    setBinanceApiKeysLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/binance`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete Binance API keys');
+      }
+
+      toast.success('Binance API keys deleted successfully!');
+      setBinanceKeysConfigured(false);
+    } catch (error) {
+      console.error('Failed to delete Binance API keys:', error);
+      toast.error('Failed to delete Binance API keys');
+    } finally {
+      setBinanceApiKeysLoading(false);
     }
   };
 
@@ -379,6 +466,85 @@ export default function SettingsPage() {
           
           {/* API Keys Tab */}
           <TabsContent value="apikeys" className="space-y-4">
+            {/* Binance API Keys Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-2xl">₿</span>
+                  Binance API Keys
+                </CardTitle>
+                <CardDescription>
+                  Configure your Binance API keys to view your crypto portfolio. Get your keys from{' '}
+                  <a 
+                    href="https://www.binance.com/en/my/settings/api-management" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    Binance API Management
+                  </a>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {binanceKeysConfigured ? (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
+                    <p className="text-sm text-green-800 dark:text-green-200 flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <strong>Binance API Keys are configured.</strong> Your portfolio data is being fetched securely.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="binanceApiKey">API Key</Label>
+                      <Input
+                        id="binanceApiKey"
+                        type="password"
+                        value={binanceApiKey}
+                        onChange={(e) => setBinanceApiKey(e.target.value)}
+                        placeholder="Enter your Binance API Key"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="binanceApiSecret">API Secret</Label>
+                      <Input
+                        id="binanceApiSecret"
+                        type="password"
+                        value={binanceApiSecret}
+                        onChange={(e) => setBinanceApiSecret(e.target.value)}
+                        placeholder="Enter your Binance API Secret"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    <strong>Security Tips:</strong>
+                  </p>
+                  <ul className="text-sm text-yellow-800 dark:text-yellow-200 list-disc list-inside mt-2 space-y-1">
+                    <li>Only enable "Enable Reading" permission</li>
+                    <li>Do NOT enable trading or withdrawal permissions</li>
+                    <li>Enable IP Whitelist for extra security</li>
+                    <li>Your keys are stored encrypted in our database</li>
+                  </ul>
+                </div>
+              </CardContent>
+              <CardFooter className="flex gap-2">
+                {binanceKeysConfigured ? (
+                  <Button variant="destructive" onClick={handleDeleteBinanceApiKeys} disabled={binanceApiKeysLoading}>
+                    {binanceApiKeysLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Remove API Keys
+                  </Button>
+                ) : (
+                  <Button onClick={handleSaveBinanceApiKeys} disabled={binanceApiKeysLoading}>
+                    {binanceApiKeysLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Save Binance API Keys
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+
+            {/* Alpaca API Keys Card */}
             <Card>
               <CardHeader>
                 <CardTitle>Alpaca API Keys</CardTitle>

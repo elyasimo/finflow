@@ -20,6 +20,7 @@ export default function useBinancePortfolio(pollInterval = 10000) {
   const [portfolio, setPortfolio] = useState<BinancePortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [needsConfiguration, setNeedsConfiguration] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -33,12 +34,27 @@ export default function useBinancePortfolio(pollInterval = 10000) {
             Authorization: `Bearer ${token}`,
           },
         });
-        setPortfolio(response.data.portfolio || []);
-        setError(null);
+        
+        // Check if API keys need configuration
+        if (response.data.needsConfiguration) {
+          setNeedsConfiguration(true);
+          setError(response.data.error || 'Binance API keys not configured');
+          setPortfolio([]);
+        } else {
+          setNeedsConfiguration(false);
+          setPortfolio(response.data.portfolio || []);
+          setError(null);
+        }
       } catch (err: unknown) {
         console.error('Portfolio fetch error:', err);
-        const error = err as { response?: { data?: { message?: string } }; message?: string };
-        setError(error.response?.data?.message || error.message || 'Failed to fetch portfolio');
+        const error = err as { response?: { data?: { message?: string; needsConfiguration?: boolean } }; message?: string };
+        
+        if (error.response?.data?.needsConfiguration) {
+          setNeedsConfiguration(true);
+          setError(error.response?.data?.message || 'Binance API keys not configured');
+        } else {
+          setError(error.response?.data?.message || error.message || 'Failed to fetch portfolio');
+        }
         setPortfolio([]);
       } finally {
         setLoading(false);
@@ -49,5 +65,5 @@ export default function useBinancePortfolio(pollInterval = 10000) {
     return () => clearInterval(interval);
   }, [pollInterval]);
 
-  return { portfolio, loading, error };
+  return { portfolio, loading, error, needsConfiguration };
 } 

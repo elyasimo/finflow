@@ -2,25 +2,32 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import { createHmac } from 'crypto';
+import { apiKeysService } from '../services/api-keys.service.js';
 
 export class MarketsController {
   /**
    * Get Binance portfolio with current prices
+   * Uses user-specific API keys stored in the database
    */
   async getBinancePortfolio(req: Request, res: Response): Promise<void> {
     try {
-      const apiKey = process.env.BINANCE_API_KEY;
-      const apiSecret = process.env.BINANCE_API_SECRET;
-      const useTestnet = process.env.BINANCE_USE_TESTNET === 'true';
+      const userId = (req as any).userId;
       
-      if (!apiKey || !apiSecret) {
-        res.status(500).json({ 
-          error: 'Binance API credentials not configured',
+      // Get user-specific API keys from encrypted storage
+      const userKeys = await apiKeysService.getApiKeys(userId, 'binance');
+      
+      if (!userKeys) {
+        res.status(200).json({ 
+          error: 'Binance API keys not configured. Please add your API keys in Settings → API Keys.',
+          needsConfiguration: true,
           portfolio: [],
           totalValue: 0 
         });
         return;
       }
+      
+      const { apiKey, apiSecret } = userKeys;
+      const useTestnet = process.env.BINANCE_USE_TESTNET === 'true';
 
       const baseURL = useTestnet 
         ? process.env.BINANCE_API_TESTNET_BASE || 'https://testnet.binance.vision'
