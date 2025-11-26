@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import ReactQueryProvider from "@/lib/react-query-provider"
 import { Metadata } from "next"
 import { Providers } from "@/components/providers"
+import CrispChat from "@/components/crisp-chat"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -28,6 +29,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <ReactQueryProvider>
               {children}
+              <CrispChat />
             </ReactQueryProvider>
           </ThemeProvider>
         </Providers>

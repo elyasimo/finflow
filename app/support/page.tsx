@@ -43,6 +43,13 @@ export default function SupportPage() {
     window.location.href = 'mailto:info@finflowapp.ch';
   };
 
+  const handleChatClick = () => {
+    // Open Crisp chat
+    if (typeof window !== 'undefined' && (window as any).$crisp) {
+      (window as any).$crisp.push(['do', 'chat:open']);
+    }
+  };
+
   return (
     <Layout user={user}>
       <div className="p-6 space-y-6">
@@ -96,10 +103,7 @@ export default function SupportPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" variant="outline" onClick={() => {
-                  // In production: Open chat widget like Crisp, Intercom, etc.
-                  alert('Chat wird in Kürze verfügbar sein!');
-                }}>
+                <Button className="w-full" variant="outline" onClick={handleChatClick}>
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Chat öffnen
                 </Button>
