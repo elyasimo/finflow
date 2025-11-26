@@ -598,7 +598,7 @@ export default function AccountsPage() {
                         </div>
                       </div>
                     ) : isBankOrSavings && bankInfo.bankName ? (
-                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-6 relative overflow-hidden rounded-xl shadow-lg`} style={{ minHeight: '260px' }}>
+                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-8 relative overflow-hidden rounded-2xl shadow-2xl`} style={{ width: '100%', aspectRatio: '1.586/1', minHeight: '280px' }}>
                         
                         {/* Card Content */}
                         <div className="relative z-10 h-full flex flex-col justify-between">
@@ -606,7 +606,7 @@ export default function AccountsPage() {
                           <div className="flex items-start justify-between">
                             <div className="flex items-center space-x-3">
                               {/* EMV Chip */}
-                              <div className="w-11 h-9 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-md relative overflow-hidden shadow-md">
+                              <div className="w-14 h-11 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-md relative overflow-hidden shadow-lg">
                                 <div className="absolute inset-1 grid grid-cols-4 gap-[1px]">
                                   {[...Array(16)].map((_, i) => (
                                     <div key={i} className="bg-yellow-600/40 rounded-[1px]"></div>
@@ -614,7 +614,7 @@ export default function AccountsPage() {
                                 </div>
                               </div>
                               {/* Contactless Symbol */}
-                              <svg width="24" height="24" viewBox="0 0 24 24" className={getCardTextColor(bankInfo.bankName)}>
+                              <svg width="32" height="32" viewBox="0 0 24 24" className={getCardTextColor(bankInfo.bankName)}>
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2 0v-15.86c3.95.49 7 3.85 7 7.93s-3.05 7.44-7 7.93z" fill="currentColor" opacity="0.6"/>
                               </svg>
                             </div>
