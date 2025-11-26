@@ -250,35 +250,36 @@ export default function AccountsPage() {
     }
   };
 
-  // Get cash banknote design based on currency
-  const getCashDesign = (currency: string) => {
+  // Get cash banknote design based on currency and account balance
+  // The large denomination number on the visual banknote shows the actual entered balance (major units)
+  const getCashDesign = (currency: string, balanceCents?: number) => {
+    const balanceMajor = Math.round((Number(balanceCents) || 0) / 100);
+    const formattedValue = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(balanceMajor);
+
     switch (currency?.toUpperCase()) {
       case 'CHF':
-        // Swiss 1000 CHF note (purple/violet - Jacob Burckhardt)
         return {
           gradient: 'bg-gradient-to-br from-[#9b4d96] via-[#8b4789] to-[#7a3f7c]',
           textColor: 'text-white',
-          value: '1000',
+          value: formattedValue,
           symbol: 'CHF',
           pattern: 'swiss',
           accent: '#c084bd'
         };
       case 'EUR':
-        // Euro 200€ note (yellow-brown)
         return {
           gradient: 'bg-gradient-to-br from-[#f4e04d] via-[#e8d347] to-[#d4b942]',
           textColor: 'text-gray-900',
-          value: '200',
+          value: formattedValue,
           symbol: '€',
           pattern: 'euro',
           accent: '#c9b037'
         };
       default:
-        // Generic banknote (green)
         return {
           gradient: 'bg-gradient-to-br from-[#2D5F3F] via-[#3A7550] to-[#275040]',
           textColor: 'text-white',
-          value: '100',
+          value: formattedValue,
           symbol: currency || '$',
           pattern: 'generic',
           accent: '#4a9d66'
@@ -408,7 +409,7 @@ export default function AccountsPage() {
                 const bankInfo = extractBankInfo(translatedName);
                 const isBankOrSavings = account.type.toLowerCase() === 'bank' || account.type.toLowerCase() === 'savings';
                 const isCash = account.type.toLowerCase() === 'cash';
-                const cashDesign = isCash ? getCashDesign(account.currency) : null;
+                const cashDesign = isCash ? getCashDesign(account.currency, Number(account.balance)) : null;
                 
                 return (
                   <Card key={account.id} className="overflow-hidden">
