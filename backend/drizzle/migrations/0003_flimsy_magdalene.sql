@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "trading_agents" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
---> statement-breakpoint
+ 
 CREATE TABLE IF NOT EXISTS "trading_logs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"agent_id" uuid NOT NULL,
@@ -32,13 +32,13 @@ CREATE TABLE IF NOT EXISTS "trading_logs" (
 	"error_message" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
---> statement-breakpoint
+ 
 DO $$ BEGIN
  ALTER TABLE "trading_agents" ADD CONSTRAINT "trading_agents_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
---> statement-breakpoint
+ 
 DO $$ BEGIN
  ALTER TABLE "trading_logs" ADD CONSTRAINT "trading_logs_agent_id_trading_agents_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."trading_agents"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
