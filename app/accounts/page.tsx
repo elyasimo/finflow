@@ -598,7 +598,7 @@ export default function AccountsPage() {
                         </div>
                       </div>
                     ) : isBankOrSavings && bankInfo.bankName ? (
-                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-5 relative overflow-hidden rounded-xl`} style={{ minHeight: '220px', aspectRatio: '1.586/1' }}>
+                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-6 relative overflow-hidden rounded-xl shadow-lg`} style={{ minHeight: '260px' }}>
                         
                         {/* Card Content */}
                         <div className="relative z-10 h-full flex flex-col justify-between">
@@ -771,10 +771,10 @@ export default function AccountsPage() {
                           {/* Middle Section: Account Name & Card Number */}
                           <div className="flex-1 flex items-center">
                             <div className="w-full">
-                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
+                              <div className="text-sm uppercase tracking-wider opacity-70 mb-2 font-medium">
                                 {isBankOrSavings && bankInfo.accountName ? bankInfo.accountName : account.name}
                               </div>
-                              <div className="font-mono text-base tracking-[0.2em] opacity-80">
+                              <div className="font-mono text-lg tracking-[0.2em] opacity-80">
                                 •••• •••• •••• {String(account.id).slice(-4).padStart(4, '•')}
                               </div>
                             </div>
@@ -783,10 +783,10 @@ export default function AccountsPage() {
                           {/* Bottom Section: Balance */}
                           <div className="flex items-end justify-between">
                             <div>
-                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
+                              <div className="text-sm uppercase tracking-wider opacity-70 mb-2 font-medium">
                                 {t('balance')}
                               </div>
-                              <div className="text-3xl font-bold tracking-tight">
+                              <div className="text-4xl font-bold tracking-tight">
                                 {new Intl.NumberFormat('de-DE', {
                                   style: 'currency',
                                   currency: account.currency || 'CHF'
