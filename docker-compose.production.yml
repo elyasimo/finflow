@@ -132,6 +132,8 @@ services:
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.finflowapp.ch}
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
     networks:
       - finflow-network
       - coolify  # Connect to Coolify proxy network
