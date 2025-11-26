@@ -21,12 +21,26 @@ else
 fi
 
 echo "✅ PostgreSQL is ready"
-echo "📦 Applying database schema (drizzle-kit push)..."
+echo "📦 Applying database schema (applying SQL migrations from ./drizzle/migrations)..."
 
-# Run drizzle migrations non-interactively; fail if the migration command fails
-if ! npx drizzle-kit push --config=./drizzle.config.ts --yes; then
-  echo "❌ drizzle-kit push failed"
-  exit 1
+# If drizzle migrations exist as SQL files, apply them with psql after removing any
+# interactive markers ("--> statement-breakpoint") that the generator may have inserted.
+if [ -d "./drizzle/migrations" ]; then
+  for f in ./drizzle/migrations/*.sql; do
+    [ -e "$f" ] || continue
+    echo "Applying migration: $f"
+    # remove any statement-breakpoint markers then execute
+    sed '/statement-breakpoint/d' "$f" | psql "$DATABASE_URL" || {
+      echo "❌ applying $f failed"
+      exit 1
+    }
+  done
+else
+  echo "No migration directory found, attempting drizzle-kit push as fallback"
+  if ! npx drizzle-kit push --config=./drizzle.config.ts; then
+    echo "❌ drizzle-kit push failed"
+    exit 1
+  fi
 fi
 
 echo "✅ Migrations completed"
