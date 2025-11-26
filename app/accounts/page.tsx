@@ -299,31 +299,35 @@ export default function AccountsPage() {
                 {t('addAccount')}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>{t('create')} {t('account')}</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-2xl">{t('create')} {t('account')}</DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground">
                   {t('addAccount')}
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
+              <div className="space-y-6 py-4">
+                {/* Account Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">
                     {t('name')}
                   </Label>
                   <Input
                     id="name"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    className="col-span-3"
+                    placeholder={t('accountName') || 'z.B. Hauptkonto'}
+                    className="h-11"
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">
+
+                {/* Account Type */}
+                <div className="space-y-2">
+                  <Label htmlFor="type" className="text-sm font-medium">
                     {t('type')}
                   </Label>
                   <Select value={accountType} onValueChange={setAccountType}>
-                    <SelectTrigger className="col-span-3">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder={t('selectAccountType')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,13 +339,15 @@ export default function AccountsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Bank Selection (conditional) */}
                 {(accountType === 'Bank' || accountType === 'Savings') && (
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="bankName" className="text-right">
+                  <div className="space-y-2">
+                    <Label htmlFor="bankName" className="text-sm font-medium">
                       Bank
                     </Label>
                     <Select value={bankName} onValueChange={setBankName}>
-                      <SelectTrigger className="col-span-3">
+                      <SelectTrigger className="h-11">
                         <SelectValue placeholder="Bank auswählen (optional)" />
                       </SelectTrigger>
                       <SelectContent>
@@ -355,37 +361,57 @@ export default function AccountsPage() {
                     </Select>
                   </div>
                 )}
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="currency" className="text-right">
-                    {t('currency')}
-                  </Label>
-                  <Select value={accountCurrency} onValueChange={setAccountCurrency}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="EUR">€ EUR - Euro</SelectItem>
-                      <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
-                      <SelectItem value="USD">$ USD - US Dollar</SelectItem>
-                      <SelectItem value="MAD">MAD - Moroccan Dirham</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="balance" className="text-right">
-                    {t('balance')}
-                  </Label>
-                  <Input
-                    id="balance"
-                    type="number"
-                    value={accountBalance}
-                    onChange={(e) => setAccountBalance(e.target.value)}
-                    className="col-span-3"
-                  />
+
+                {/* Currency and Balance - Side by Side */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currency" className="text-sm font-medium">
+                      {t('currency')}
+                    </Label>
+                    <Select value={accountCurrency} onValueChange={setAccountCurrency}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="EUR">€ EUR</SelectItem>
+                        <SelectItem value="CHF">CHF</SelectItem>
+                        <SelectItem value="USD">$ USD</SelectItem>
+                        <SelectItem value="MAD">MAD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="balance" className="text-sm font-medium">
+                      {t('balance')}
+                    </Label>
+                    <Input
+                      id="balance"
+                      type="number"
+                      step="0.01"
+                      value={accountBalance}
+                      onChange={(e) => setAccountBalance(e.target.value)}
+                      placeholder="0.00"
+                      className="h-11"
+                    />
+                  </div>
                 </div>
               </div>
-              <DialogFooter>
-                <Button type="submit" onClick={handleCreateAccount} disabled={isCreating}>
+              <DialogFooter className="gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsCreateDialogOpen(false)}
+                  className="flex-1"
+                >
+                  {t('cancel')}
+                </Button>
+                <Button 
+                  type="submit" 
+                  onClick={handleCreateAccount} 
+                  disabled={isCreating || !accountName.trim() || !accountType}
+                  className="flex-1"
+                >
                   {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   {t('create')}
                 </Button>
