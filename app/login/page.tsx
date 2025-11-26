@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { FinflowLogo } from '@/components/icons/finflow-logo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -24,6 +25,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-6">
+            <FinflowLogo size="lg" variant="full" />
+          </div>
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
           <CardDescription>Enter your email and password to login to your account</CardDescription>
         </CardHeader>
