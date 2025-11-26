@@ -155,7 +155,7 @@ services:
       # Coolify managed
       - "coolify.managed=true"
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/login"]
       interval: 30s
       timeout: 10s
       retries: 3
