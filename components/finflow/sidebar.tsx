@@ -33,11 +33,11 @@ import {
 
 import Link from "next/link"
 import { useState } from "react"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useAuth } from "@/hooks/use-auth"
+import { FinflowLogo } from "@/components/icons/finflow-logo"
 import {
   Popover,
   PopoverContent,
@@ -187,21 +187,10 @@ export default function Sidebar({ user }: SidebarProps) {
       >
         <div className="h-full flex flex-col">
           <Link
-            href="/"
-            className="h-16 px-6 flex items-center border-b border-gray-200 dark:border-[#232e40]"
+            href="/dashboard"
+            className="flex items-center px-6 py-4 border-b border-gray-200 dark:border-[#232e40]"
           >
-            <div className="flex items-center gap-3">
-              <Image
-                src="/logo.svg"
-                alt="Logo"
-                width={32}
-                height={32}
-                className="flex-shrink-0"
-              />
-              <span className="text-lg font-semibold hover:cursor-pointer text-gray-900 dark:text-white">
-                Financial Manager
-              </span>
-            </div>
+            <FinflowLogo size="md" variant="full" />
           </Link>
 
           <div className="flex-1 overflow-y-auto py-4 px-4">
