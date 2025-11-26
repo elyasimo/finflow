@@ -316,7 +316,7 @@ export default function AccountsPage() {
                     id="name"
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
-                    placeholder={t('accountName') || 'z.B. Hauptkonto'}
+                    placeholder="z.B. Hauptkonto"
                     className="h-11"
                   />
                 </div>
