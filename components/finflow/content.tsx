@@ -238,7 +238,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
       </div>
 
       {/* Binance Portfolio Card - Only shown when no API key format error */}
-      {(!binanceError || !binanceError.toLowerCase().includes('format')) && (
+      {(!binanceError || (binanceError && !binanceError.toLowerCase().includes('format') && !binanceError.toLowerCase().includes('invalid'))) && (
       <div className="bg-white dark:bg-[#232e40] rounded-xl border border-gray-200 dark:border-[#2d3b4e] overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-[#2d3b4e]">
           <div className="flex items-center justify-between">
