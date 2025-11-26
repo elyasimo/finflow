@@ -66,7 +66,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/auth/preferences`, {
-        method: 'GET',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,

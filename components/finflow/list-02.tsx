@@ -1,5 +1,6 @@
 'use client'
 
+import React from "react"
 import { cn } from "@/lib/utils"
 import {
   ArrowUpRight,
@@ -18,7 +19,7 @@ interface Transaction {
   amount: string
   type: "incoming" | "outgoing"
   category: string
-  icon: LucideIcon
+  icon: LucideIcon | React.FC | (() => JSX.Element)
   timestamp: string
   status: "completed" | "pending" | "failed"
 }
@@ -139,7 +140,15 @@ export default function List02({ transactions = TRANSACTIONS, className, onViewA
                   "border border-zinc-200 dark:border-[#2d3b4e]",
                 )}
               >
-                <transaction.icon className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
+                {typeof transaction.icon === 'function' && transaction.icon.name ? (
+                  // Lucide Icon with className support
+                  <transaction.icon className="w-4 h-4 text-zinc-900 dark:text-zinc-100" />
+                ) : (
+                  // Custom React component (transaction icons)
+                  <div className="w-4 h-4 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                    {React.createElement(transaction.icon as React.FC)}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 flex items-center justify-between min-w-0">
