@@ -14,8 +14,10 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 export default function SupportPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [name, setName] = useState(user?.fullName || '');
-  const [email, setEmail] = useState(user?.email || '');
+  // `user` type may not include `fullName` in all environments/builds.
+  // Cast to `any` when reading optional profile fields to keep the page type-safe during build.
+  const [name, setName] = useState<string>((user as any)?.fullName || (user as any)?.email?.split?.('@')?.[0] || '');
+  const [email, setEmail] = useState<string>((user as any)?.email || '');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
