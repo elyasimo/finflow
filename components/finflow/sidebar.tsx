@@ -271,6 +271,9 @@ export default function Sidebar({ user }: SidebarProps) {
               <NavItem href="/settings" icon={Settings}>
                 {t('settings')}
               </NavItem>
+              <NavItem href="/support" icon={HelpCircle}>
+                {t('support')}
+              </NavItem>
             </div>
           </div>
 
