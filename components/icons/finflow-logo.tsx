@@ -19,7 +19,7 @@ export const FinflowLogo: React.FC<LogoProps> = ({
 
   const currentSize = sizes[size];
 
-  // Icon Only - Modern F with flow waves
+  // Icon Only - Modern FF Logo with flow effect
   const IconSvg = () => (
     <svg
       width={currentSize.width}
@@ -35,49 +35,52 @@ export const FinflowLogo: React.FC<LogoProps> = ({
           <stop offset="50%" stopColor="#8b5cf6" />
           <stop offset="100%" stopColor="#a855f7" />
         </linearGradient>
-        <linearGradient id="finflow-gradient-light" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#818cf8" />
-          <stop offset="100%" stopColor="#c4b5fd" />
+        <linearGradient id="finflow-gradient-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#818cf8" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#c4b5fd" stopOpacity="0.2" />
         </linearGradient>
       </defs>
       
-      {/* Background Circle */}
-      <circle cx="24" cy="24" r="23" fill="url(#finflow-gradient)" opacity="0.1" />
+      {/* Glow effect background */}
+      <circle cx="24" cy="24" r="22" fill="url(#finflow-gradient-glow)" />
       
-      {/* Flow Waves (background) */}
+      {/* First F - Bold and Modern */}
       <path
-        d="M8 28 Q14 24, 20 28 T32 28 T44 28"
-        stroke="url(#finflow-gradient-light)"
-        strokeWidth="2"
-        fill="none"
-        opacity="0.4"
-      />
-      <path
-        d="M8 34 Q14 30, 20 34 T32 34 T44 34"
-        stroke="url(#finflow-gradient-light)"
-        strokeWidth="2"
-        fill="none"
-        opacity="0.3"
-      />
-      
-      {/* Stylized F */}
-      <path
-        d="M16 12 L28 12 L28 15 L20 15 L20 22 L26 22 L26 25 L20 25 L20 36"
-        stroke="url(#finflow-gradient)"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      
-      {/* Flowing Arrow */}
-      <path
-        d="M28 24 L34 24 L32 22 M34 24 L32 26"
+        d="M14 10 L26 10 L26 13 L18 13 L18 21 L24 21 L24 24 L18 24 L18 36"
         stroke="url(#finflow-gradient)"
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
+      />
+      
+      {/* Second F - Overlapping with flow effect */}
+      <path
+        d="M22 12 L34 12 L34 15 L26 15 L26 23 L32 23 L32 26 L26 26 L26 38"
+        stroke="url(#finflow-gradient)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        opacity="0.7"
+      />
+      
+      {/* Flow lines connecting the F's */}
+      <path
+        d="M20 18 Q22 18, 24 16"
+        stroke="url(#finflow-gradient)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.4"
+      />
+      <path
+        d="M20 28 Q23 28, 26 26"
+        stroke="url(#finflow-gradient)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.4"
       />
     </svg>
   );
