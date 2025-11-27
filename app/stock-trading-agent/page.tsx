@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,7 @@ import { stockTradingApi } from '@/lib/api/stock-trading';
 import { formatCurrency } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StockQuote {
   symbol: string;
@@ -101,6 +103,8 @@ export default function StockTradingAgentPage() {
   const { currency } = useCurrency();
   const { convert, convertAndFormat } = useExchangeRates();
   const { t } = useLanguage();
+  const router = useRouter();
+  const isMobile = useIsMobile();
   const [portfolio, setPortfolio] = useState<PortfolioSummary | null>(null);
   const [stocks, setStocks] = useState<any[]>([]);
   const [quotes, setQuotes] = useState<StockQuote[]>([]);
@@ -121,6 +125,13 @@ export default function StockTradingAgentPage() {
   const [strategy, setStrategy] = useState<'conservative' | 'moderate' | 'aggressive'>('moderate');
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  // Redirect mobile users to mobile version
+  useEffect(() => {
+    if (isMobile) {
+      router.replace('/stock-trading-agent/mobile');
+    }
+  }, [isMobile, router]);
 
   useEffect(() => {
     loadData();

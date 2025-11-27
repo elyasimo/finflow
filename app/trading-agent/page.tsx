@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +45,7 @@ import { tradingAgentApi } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import CryptoSelector from '@/components/trading/CryptoSelector';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TradingAgent {
   id: string;
@@ -89,6 +91,8 @@ export default function TradingAgentPage() {
   const { t } = useLanguage();
   const { currency } = useCurrency();
   const { convertAndFormat } = useExchangeRates();
+  const router = useRouter();
+  const isMobile = useIsMobile();
   const [agents, setAgents] = useState<TradingAgent[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [totalValueEur, setTotalValueEur] = useState(0);
@@ -98,6 +102,13 @@ export default function TradingAgentPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
+
+  // Redirect mobile users to mobile version
+  useEffect(() => {
+    if (isMobile) {
+      router.replace('/trading-agent/mobile');
+    }
+  }, [isMobile, router]);
 
   // New agent form state
   const [newAgentName, setNewAgentName] = useState('Mein Trading Agent');

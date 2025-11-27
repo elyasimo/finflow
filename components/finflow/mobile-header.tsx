@@ -1,6 +1,7 @@
 "use client"
 
-import { Bell, Moon, Sun } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Bell, Moon, Sun, Home, Globe, Coins, ChevronDown } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useCurrency } from './CurrencyContext'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
@@ -23,6 +24,10 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const { currency: selectedCurrency, updateCurrencyInBackend } = useCurrency()
   const { language, setLanguage, t } = useLanguage()
   const { theme, setTheme } = useTheme()
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+  const [showCurrencyMenu, setShowCurrencyMenu] = useState(false)
+  const langRef = useRef<HTMLDivElement>(null)
+  const currRef = useRef<HTMLDivElement>(null)
 
   const currencyOptions = [
     { code: 'USD', label: '$', flag: '🇺🇸' },
@@ -38,13 +43,32 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
     { code: 'ar', label: 'AR', flag: '🇲🇦' },
   ]
 
-  const handleCurrencyChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCurrency = e.target.value
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setShowLanguageMenu(false)
+      }
+      if (currRef.current && !currRef.current.contains(e.target as Node)) {
+        setShowCurrencyMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleCurrencyChange = async (newCurrency: string) => {
     try {
       await updateCurrencyInBackend(newCurrency)
+      setShowCurrencyMenu(false)
     } catch (error) {
       console.error('Failed to update currency:', error)
     }
+  }
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang as any)
+    setShowLanguageMenu(false)
   }
 
   const currentCurrency = currencyOptions.find(c => c.code === selectedCurrency)
@@ -52,50 +76,89 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#0f1623]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50">
-      <div className="flex items-center justify-between px-4 h-14">
-        {/* Left: Greeting or Logo */}
-        <div className="flex items-center gap-3">
-          {showLogo ? (
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <FinflowLogo size="sm" variant="icon" />
-              <span className="font-semibold text-gray-900 dark:text-white">
-                {t('dashboard')}
-              </span>
-            </Link>
-          ) : (
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between px-3 h-14">
+        {/* Left: Home Icon + Logo */}
+        <div className="flex items-center gap-2">
+          <Link 
+            href="/dashboard" 
+            className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          >
+            <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          </Link>
+          {showLogo && (
+            <FinflowLogo size="sm" variant="icon" />
+          )}
+          {!showLogo && title && (
+            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[100px]">
               {title}
             </h1>
           )}
         </div>
 
-        {/* Right: Actions */}
+        {/* Right: Compact Actions */}
         <div className="flex items-center gap-1">
-          {/* Language/Currency Combined Selector */}
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#1a2332] rounded-full p-1">
-            <select
-              value={language}
-              onChange={e => setLanguage(e.target.value as any)}
-              className="h-7 w-14 px-1 rounded-full bg-transparent text-gray-700 dark:text-gray-200 text-xs font-medium focus:outline-none cursor-pointer appearance-none text-center"
+          {/* Language Icon with Dropdown */}
+          <div ref={langRef} className="relative">
+            <button
+              onClick={() => {
+                setShowLanguageMenu(!showLanguageMenu)
+                setShowCurrencyMenu(false)
+              }}
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
             >
-              {languageOptions.map(opt => (
-                <option key={opt.code} value={opt.code}>
-                  {opt.flag}
-                </option>
-              ))}
-            </select>
+              <Globe className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            </button>
+            
+            {showLanguageMenu && (
+              <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-50 min-w-[120px]">
+                {languageOptions.map(opt => (
+                  <button
+                    key={opt.code}
+                    onClick={() => handleLanguageChange(opt.code)}
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
+                      language === opt.code 
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                        : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    <span className="text-base">{opt.flag}</span>
+                    <span className="font-medium">{opt.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
-
-            <select
-              value={selectedCurrency}
-              onChange={handleCurrencyChange}
-              className="h-7 w-14 px-1 rounded-full bg-transparent text-gray-700 dark:text-gray-200 text-xs font-medium focus:outline-none cursor-pointer appearance-none text-center"
+          {/* Currency Icon with Dropdown */}
+          <div ref={currRef} className="relative">
+            <button
+              onClick={() => {
+                setShowCurrencyMenu(!showCurrencyMenu)
+                setShowLanguageMenu(false)
+              }}
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
             >
-              {currencyOptions.map(opt => (
-                <option key={opt.code} value={opt.code}>{opt.code}</option>
-              ))}
-            </select>
+              <Coins className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            </button>
+            
+            {showCurrencyMenu && (
+              <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-50 min-w-[120px]">
+                {currencyOptions.map(opt => (
+                  <button
+                    key={opt.code}
+                    onClick={() => handleCurrencyChange(opt.code)}
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
+                      selectedCurrency === opt.code 
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                        : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    <span className="text-base">{opt.flag}</span>
+                    <span className="font-medium">{opt.code}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Notifications */}
