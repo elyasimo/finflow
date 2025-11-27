@@ -117,7 +117,7 @@ export default function List02({ transactions = TRANSACTIONS, className, onViewA
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             {t('recentActivity')}
-            <span className="text-xs font-normal text-zinc-600 dark:text-zinc-400 ml-1">(23 {t('transactions').toLowerCase()})</span>
+            <span className="text-xs font-normal text-zinc-600 dark:text-zinc-400 ml-1">(23 {(t('transactions') || 'transactions').toLowerCase()})</span>
           </h2>
           <span className="text-xs text-zinc-600 dark:text-zinc-400">{t('thisMonth')}</span>
         </div>

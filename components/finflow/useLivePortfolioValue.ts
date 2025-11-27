@@ -13,7 +13,7 @@ export function useLivePortfolioValue(assets: PortfolioAsset[], maxPoints = 100)
   useEffect(() => {
     if (!assets || !assets.length) return;
     const streams = assets
-      .map((a: PortfolioAsset) => `${a.symbol.toLowerCase()}usdt@trade`)
+      .map((a: PortfolioAsset) => `${(a.symbol || '').toLowerCase()}usdt@trade`)
       .join('/');
     const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
 

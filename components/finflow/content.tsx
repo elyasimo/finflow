@@ -61,7 +61,8 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
   }));
 
   // Map account type to the expected type in List01
-  function mapAccountType(type: string): "savings" | "checking" | "investment" | "debt" {
+  function mapAccountType(type: string | null | undefined): "savings" | "checking" | "investment" | "debt" {
+    if (!type) return 'savings';
     switch (type.toLowerCase()) {
       case 'bank':
         return 'checking';
