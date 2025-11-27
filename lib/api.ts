@@ -1,5 +1,50 @@
 import axios from 'axios';
 
+// Determine API URL based on environment
+function getApiUrl(): string {
+  // Check environment variable first
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    console.log('[API] Using env NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // In browser, check the current URL
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    console.log('[API] Detecting environment - hostname:', hostname, 'protocol:', protocol);
+    
+    // Production domain (web or Capacitor WebView loading finflowapp.ch)
+    if (hostname === 'finflowapp.ch' || hostname.endsWith('.finflowapp.ch')) {
+      console.log('[API] Detected production domain, using https://api.finflowapp.ch');
+      return 'https://api.finflowapp.ch';
+    }
+    
+    // Capacitor native app with capacitor:// protocol
+    if (protocol === 'capacitor:' || protocol === 'ionic:') {
+      console.log('[API] Detected Capacitor app, using https://api.finflowapp.ch');
+      return 'https://api.finflowapp.ch';
+    }
+    
+    // Check if we're in a WebView loading a remote URL
+    // Capacitor sets some specific user agent or we can check the URL being loaded
+    try {
+      // @ts-ignore - Capacitor may be available
+      if (window.Capacitor?.isNativePlatform?.()) {
+        console.log('[API] Detected Capacitor native platform, using https://api.finflowapp.ch');
+        return 'https://api.finflowapp.ch';
+      }
+    } catch {
+      // Capacitor not available
+    }
+  }
+  
+  // Default to local development
+  console.log('[API] Defaulting to local development: http://localhost:8081');
+  return 'http://localhost:8081';
+}
+
 // TypeScript interfaces for API responses
 interface AccountApiResponse {
   id: string;
@@ -41,8 +86,9 @@ interface UpdatePayload {
 
 // Set the Express backend as the base URL
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081',
+  baseURL: getApiUrl(),
   withCredentials: false, // JWT auth via headers, not cookies
+  timeout: 30000, // 30 second timeout
 });
 
 // Add request interceptor to include auth token

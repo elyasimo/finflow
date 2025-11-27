@@ -1,21 +1,26 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 /**
- * Capacitor Configuration
- * Currently set to PRODUCTION mode
+ * Development configuration for Capacitor
+ * Uses local Next.js dev server instead of production URL
+ * 
+ * Usage: 
+ *   npm run ios:dev   - Start local dev and open in simulator
+ *   npm run ios:prod  - Use production URL
  */
 const config: CapacitorConfig = {
   appId: 'ch.finflowapp',
   appName: 'FinFlow',
   webDir: 'out',
   server: {
-    // Production URL
-    url: 'https://finflowapp.ch',
-    cleartext: false,
+    // For local development, use your Mac's IP
+    // The iOS simulator can access localhost directly
+    url: 'http://127.0.0.1:3000',
+    cleartext: true, // Allow HTTP for local dev
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 1000, // Faster for dev
       launchAutoHide: true,
       backgroundColor: '#0a0a0a',
       showSpinner: false,
@@ -31,9 +36,6 @@ const config: CapacitorConfig = {
       style: 'dark',
       resizeOnFullScreen: true,
     },
-    PushNotifications: {
-      presentationOptions: ['badge', 'sound', 'alert'],
-    },
   },
   ios: {
     scheme: 'FinFlow',
@@ -43,9 +45,9 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#0a0a0a',
-    allowMixedContent: false,
+    allowMixedContent: true, // Allow HTTP for dev
     captureInput: true,
-    webContentsDebuggingEnabled: false,
+    webContentsDebuggingEnabled: true, // Enable debugging
   },
 };
 

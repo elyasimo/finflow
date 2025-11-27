@@ -1,7 +1,7 @@
 'use client';
 
 // Biometric Service - Only works in native Capacitor apps
-// All Capacitor imports are done dynamically to prevent SSR issues
+// This file is safe for SSR - all Capacitor code is loaded only at runtime
 
 export interface BiometricAuthResult {
   success: boolean;
@@ -14,82 +14,95 @@ export interface BiometricAvailability {
   errorMessage?: string;
 }
 
-// Check if we're in browser environment
-const isBrowser = typeof window !== 'undefined';
+// Safe browser check
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof document !== 'undefined';
+}
+
+// Dynamically load a module only in browser - uses Function constructor to avoid static analysis
+async function dynamicImport<T>(moduleName: string): Promise<T | null> {
+  if (!isBrowser()) return null;
+  
+  try {
+    // Use Function constructor to avoid webpack/next.js static analysis
+    const importFn = new Function('specifier', 'return import(specifier)');
+    return await importFn(moduleName);
+  } catch {
+    return null;
+  }
+}
 
 class BiometricService {
-  private Capacitor: any = null;
-  private NativeBiometric: any = null;
-  private BiometryType: any = null;
-  private Haptics: any = null;
-  private ImpactStyle: any = null;
-  private initialized = false;
+  private modules: {
+    Capacitor: any;
+    NativeBiometric: any;
+    BiometryType: any;
+    Haptics: any;
+    ImpactStyle: any;
+  } | null = null;
+  
   private initPromise: Promise<boolean> | null = null;
 
   /**
-   * Initialize Capacitor modules lazily
+   * Initialize Capacitor modules lazily (only in browser/native)
    */
   private async init(): Promise<boolean> {
-    // Return cached result if already initialized
-    if (this.initialized) {
-      return this.isNativePlatform();
+    if (!isBrowser()) return false;
+    
+    if (this.modules !== null) {
+      return this.isNative();
     }
 
-    // If initialization is in progress, wait for it
     if (this.initPromise) {
       return this.initPromise;
     }
 
-    // Start initialization
     this.initPromise = this.loadModules();
     return this.initPromise;
   }
 
   private async loadModules(): Promise<boolean> {
-    if (!isBrowser) {
-      this.initialized = true;
-      return false;
-    }
-
     try {
-      // Dynamic import - these will only load in the browser
-      const capacitorCore = await import('@capacitor/core').catch(() => null);
+      // Load Capacitor core
+      const capacitorCore = await dynamicImport<any>('@capacitor/core');
+      if (!capacitorCore?.Capacitor) {
+        this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
+        return false;
+      }
+
+      const Capacitor = capacitorCore.Capacitor;
       
-      if (capacitorCore) {
-        this.Capacitor = capacitorCore.Capacitor;
+      // Only load native modules if actually on native platform
+      if (!Capacitor.isNativePlatform()) {
+        this.modules = { Capacitor, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
+        return false;
       }
 
-      // Only load other modules if we're on a native platform
-      if (this.Capacitor && this.Capacitor.isNativePlatform()) {
-        const [biometric, haptics] = await Promise.all([
-          import('capacitor-native-biometric').catch(() => null),
-          import('@capacitor/haptics').catch(() => null),
-        ]);
+      // Load biometric and haptics modules
+      const [biometric, haptics] = await Promise.all([
+        dynamicImport<any>('capacitor-native-biometric'),
+        dynamicImport<any>('@capacitor/haptics'),
+      ]);
 
-        if (biometric) {
-          this.NativeBiometric = biometric.NativeBiometric;
-          this.BiometryType = biometric.BiometryType;
-        }
+      this.modules = {
+        Capacitor,
+        NativeBiometric: biometric?.NativeBiometric || null,
+        BiometryType: biometric?.BiometryType || null,
+        Haptics: haptics?.Haptics || null,
+        ImpactStyle: haptics?.ImpactStyle || null,
+      };
 
-        if (haptics) {
-          this.Haptics = haptics.Haptics;
-          this.ImpactStyle = haptics.ImpactStyle;
-        }
-      }
-
-      this.initialized = true;
-      return this.isNativePlatform();
+      return true;
     } catch (error) {
-      console.warn('Capacitor modules not available:', error);
-      this.initialized = true;
+      console.warn('[BiometricService] Failed to load modules:', error);
+      this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
       return false;
     }
   }
 
-  private isNativePlatform(): boolean {
-    if (!isBrowser || !this.Capacitor) return false;
+  private isNative(): boolean {
     try {
-      return this.Capacitor.isNativePlatform();
+      return this.modules?.Capacitor?.isNativePlatform() || false;
     } catch {
       return false;
     }
@@ -99,9 +112,9 @@ class BiometricService {
    * Check if biometric authentication is available
    */
   async isAvailable(): Promise<BiometricAvailability> {
-    const native = await this.init();
+    await this.init();
 
-    if (!native || !this.NativeBiometric) {
+    if (!this.modules?.NativeBiometric) {
       return {
         available: false,
         biometryType: 'none',
@@ -110,15 +123,16 @@ class BiometricService {
     }
 
     try {
-      const result = await this.NativeBiometric.isAvailable();
+      const result = await this.modules.NativeBiometric.isAvailable();
+      const BiometryType = this.modules.BiometryType;
 
       let biometryType: 'face' | 'fingerprint' | 'none' = 'none';
 
-      if (this.BiometryType && (result.biometryType === this.BiometryType.FACE_ID ||
-          result.biometryType === this.BiometryType.FACE_AUTHENTICATION)) {
+      if (BiometryType && (result.biometryType === BiometryType.FACE_ID ||
+          result.biometryType === BiometryType.FACE_AUTHENTICATION)) {
         biometryType = 'face';
-      } else if (this.BiometryType && (result.biometryType === this.BiometryType.TOUCH_ID ||
-                 result.biometryType === this.BiometryType.FINGERPRINT)) {
+      } else if (BiometryType && (result.biometryType === BiometryType.TOUCH_ID ||
+                 result.biometryType === BiometryType.FINGERPRINT)) {
         biometryType = 'fingerprint';
       }
 
@@ -140,9 +154,9 @@ class BiometricService {
    * Authenticate user with biometrics (Face ID / Touch ID)
    */
   async authenticate(reason?: string): Promise<BiometricAuthResult> {
-    const native = await this.init();
+    await this.init();
 
-    if (!native || !this.NativeBiometric) {
+    if (!this.modules?.NativeBiometric) {
       return {
         success: false,
         error: 'Biometric authentication is only available in the native app',
@@ -152,7 +166,7 @@ class BiometricService {
     try {
       await this.hapticFeedback('medium');
 
-      await this.NativeBiometric.verifyIdentity({
+      await this.modules.NativeBiometric.verifyIdentity({
         reason: reason || 'Bitte authentifizieren Sie sich',
         title: 'FinFlow Login',
         subtitle: 'Verwenden Sie Face ID oder Touch ID',
@@ -177,11 +191,11 @@ class BiometricService {
    * Store credentials securely
    */
   async saveCredentials(username: string, password: string): Promise<boolean> {
-    const native = await this.init();
-    if (!native || !this.NativeBiometric) return false;
+    await this.init();
+    if (!this.modules?.NativeBiometric) return false;
 
     try {
-      await this.NativeBiometric.setCredentials({
+      await this.modules.NativeBiometric.setCredentials({
         username,
         password,
         server: 'finflowapp.ch',
@@ -197,11 +211,11 @@ class BiometricService {
    * Retrieve stored credentials
    */
   async getCredentials(): Promise<{ username: string; password: string } | null> {
-    const native = await this.init();
-    if (!native || !this.NativeBiometric) return null;
+    await this.init();
+    if (!this.modules?.NativeBiometric) return null;
 
     try {
-      const credentials = await this.NativeBiometric.getCredentials({
+      const credentials = await this.modules.NativeBiometric.getCredentials({
         server: 'finflowapp.ch',
       });
       return {
@@ -218,11 +232,11 @@ class BiometricService {
    * Delete stored credentials
    */
   async deleteCredentials(): Promise<boolean> {
-    const native = await this.init();
-    if (!native || !this.NativeBiometric) return false;
+    await this.init();
+    if (!this.modules?.NativeBiometric) return false;
 
     try {
-      await this.NativeBiometric.deleteCredentials({
+      await this.modules.NativeBiometric.deleteCredentials({
         server: 'finflowapp.ch',
       });
       return true;
@@ -236,37 +250,38 @@ class BiometricService {
    * Provide haptic feedback
    */
   async hapticFeedback(style: 'light' | 'medium' | 'heavy' | 'success' | 'error'): Promise<void> {
-    // Don't wait for init for haptics - it's non-critical
-    if (!isBrowser || !this.Haptics || !this.ImpactStyle) return;
+    if (!isBrowser() || !this.modules?.Haptics || !this.modules?.ImpactStyle) return;
 
     try {
+      const { Haptics, ImpactStyle } = this.modules;
+      
       switch (style) {
         case 'light':
-          await this.Haptics.impact({ style: this.ImpactStyle.Light });
+          await Haptics.impact({ style: ImpactStyle.Light });
           break;
         case 'medium':
-          await this.Haptics.impact({ style: this.ImpactStyle.Medium });
+          await Haptics.impact({ style: ImpactStyle.Medium });
           break;
         case 'heavy':
-          await this.Haptics.impact({ style: this.ImpactStyle.Heavy });
+          await Haptics.impact({ style: ImpactStyle.Heavy });
           break;
         case 'success':
-          await this.Haptics.notification({ type: 'success' as any });
+          await Haptics.notification({ type: 'success' as any });
           break;
         case 'error':
-          await this.Haptics.notification({ type: 'error' as any });
+          await Haptics.notification({ type: 'error' as any });
           break;
       }
     } catch {
-      // Silently fail
+      // Silently fail - haptics are non-critical
     }
   }
 
   /**
-   * Check if running in native app (synchronous)
+   * Check if running in native app
    */
   isNativeApp(): boolean {
-    return this.isNativePlatform();
+    return this.isNative();
   }
 }
 

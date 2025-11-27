@@ -1,15 +1,11 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-/**
- * Capacitor Configuration
- * Currently set to PRODUCTION mode
- */
 const config: CapacitorConfig = {
   appId: 'ch.finflowapp',
   appName: 'FinFlow',
   webDir: 'out',
   server: {
-    // Production URL
+    // For production, use the hosted URL
     url: 'https://finflowapp.ch',
     cleartext: false,
   },
@@ -18,6 +14,8 @@ const config: CapacitorConfig = {
       launchShowDuration: 2000,
       launchAutoHide: true,
       backgroundColor: '#0a0a0a',
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
