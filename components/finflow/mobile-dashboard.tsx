@@ -170,7 +170,7 @@ export default function MobileDashboard({
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">{t('accounts')}</h2>
           <Link href="/accounts" className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
-            {t('viewAll')} <ChevronRight className="w-4 h-4" />
+            {t('seeAll')} <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
         
@@ -214,7 +214,7 @@ export default function MobileDashboard({
         <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-[#232e40]">
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">{t('recentTransactions')}</h2>
           <Link href="/transactions" className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
-            {t('viewAll')} <ChevronRight className="w-4 h-4" />
+            {t('seeAll')} <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
         
@@ -268,14 +268,12 @@ export default function MobileDashboard({
       {/* Budgets */}
       {budgets.length > 0 && (
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-gray-100 dark:border-[#232e40] overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-[#232e40]">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white">{t('budgets')}</h2>
-            <Link href="/budgets" className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
-              {t('viewAll')} <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          
-          <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-[#232e40]">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-white">{t('budgets')}</h2>
+          <Link href="/budgets" className="text-sm text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
+            {t('seeAll')} <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>          <div className="p-4 space-y-4">
             {budgets.slice(0, 3).map((budget) => {
               const progress = budget.amount > 0 ? Math.min((budget.spent / budget.amount) * 100, 100) : 0
               const isOverBudget = progress >= 100
