@@ -438,51 +438,44 @@ export default function AccountsPage() {
                 const cashDesign = isCash ? getCashDesign(account.currency, Number(account.balance)) : null;
                 
                 return (
-                  <Card key={account.id} className="overflow-hidden">
-                    {/* Realistic Banknote Design for Cash */}
+                  <Card key={account.id} className="overflow-hidden" style={{ minHeight: '200px' }}>
+                    {/* Compact Banknote Design for Cash */}
                     {isCash && cashDesign ? (
-                      <div className={`${cashDesign.gradient} ${cashDesign.textColor} p-6 relative overflow-hidden rounded-xl shadow-2xl border-2 border-white/20`} style={{ minHeight: '220px', aspectRatio: '1.586/1' }}>
-                        {/* Holographic/Security Pattern */}
-                        <div className="absolute inset-0 opacity-5">
+                      <div className={`${cashDesign.gradient} ${cashDesign.textColor} p-4 relative overflow-hidden rounded-xl shadow-2xl border-2 border-white/20 h-full`}>
+                        {/* Subtle Security Pattern */}
+                        <div className="absolute inset-0 opacity-[0.03]">
                           <div className="absolute inset-0" style={{
-                            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)`,
+                            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 8px, currentColor 8px, currentColor 9px)`,
                           }}></div>
                         </div>
                         
-                        {/* Watermark effect */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5">
-                          <div className="text-[120px] font-bold">{cashDesign.value}</div>
+                        {/* Small Watermark effect */}
+                        <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-[0.08]">
+                          <div className="text-4xl font-bold">{cashDesign.symbol}</div>
                         </div>
 
                         {/* Banknote Content */}
                         <div className="relative z-10 h-full flex flex-col justify-between">
-                          {/* Top Section: Large denomination */}
+                          {/* Top Section: Compact denomination */}
                           <div className="flex items-start justify-between">
-                            <div className="flex flex-col">
-                              <div className="text-7xl font-bold tracking-tighter leading-none mb-2" style={{ 
-                                textShadow: '2px 2px 4px rgba(0,0,0,0.2)',
-                                fontFamily: 'serif'
-                              }}>
+                            <div className="flex items-center gap-2">
+                              <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'serif' }}>
                                 {cashDesign.value}
                               </div>
-                              <div className="text-2xl font-bold tracking-wider" style={{ fontFamily: 'serif' }}>
+                              <div className="text-sm font-bold tracking-wider opacity-80" style={{ fontFamily: 'serif' }}>
                                 {cashDesign.symbol}
-                              </div>
-                              {/* Small security text */}
-                              <div className="text-[10px] mt-1 opacity-60 uppercase tracking-widest">
-                                {account.currency === 'CHF' ? 'Schweizerische Nationalbank' : account.currency === 'EUR' ? 'European Central Bank' : 'Central Bank'}
                               </div>
                             </div>
                             
                             {/* Action Buttons */}
-                            <div className="flex space-x-1">
+                            <div className="flex space-x-0.5">
                               <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
                                 setIsEditDialogOpen(open);
                                 if (open) setSelectedAccount(account);
                               }}>
                                 <DialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" className={`h-8 w-8 ${cashDesign.textColor} hover:bg-black/20 backdrop-blur-sm rounded-full`}>
-                                    <Edit className="h-4 w-4" />
+                                  <Button variant="ghost" size="icon" className={`h-7 w-7 ${cashDesign.textColor} hover:bg-black/20 backdrop-blur-sm rounded-full`}>
+                                    <Edit className="h-3.5 w-3.5" />
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent>
@@ -539,8 +532,8 @@ export default function AccountsPage() {
                               </Dialog>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" className={`h-8 w-8 ${cashDesign.textColor} hover:bg-red-500/20`} onClick={() => setSelectedAccount(account)}>
-                                    <Trash2 className="h-4 w-4" />
+                                  <Button variant="ghost" size="icon" className={`h-7 w-7 ${cashDesign.textColor} hover:bg-red-500/20`} onClick={() => setSelectedAccount(account)}>
+                                    <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -559,27 +552,26 @@ export default function AccountsPage() {
                             </div>
                           </div>
 
-                          {/* Middle: Account Name with decorative elements */}
+                          {/* Middle: Account Name - compact design */}
                           <div className="flex-1 flex items-center justify-center">
-                            <div className="text-center">
-                              {/* Decorative circle with value */}
-                              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-4 mb-2" style={{
-                                borderColor: cashDesign.accent,
-                                backgroundColor: `${cashDesign.accent}20`
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{
+                                backgroundColor: `${cashDesign.accent}30`,
+                                border: `2px solid ${cashDesign.accent}`
                               }}>
-                                <span className="text-2xl font-bold">{cashDesign.value}</span>
+                                {cashDesign.value}
                               </div>
-                              <div className="text-base font-semibold tracking-wide uppercase opacity-90 mt-2">
+                              <span className="text-sm font-semibold uppercase tracking-wide opacity-90">
                                 {translatedName}
-                              </div>
+                              </span>
                             </div>
                           </div>
 
                           {/* Bottom: Balance + Serial Number Style */}
-                          <div className="flex items-end justify-between">
+                          <div className="flex items-end justify-between pt-1">
                             <div>
-                              <div className="text-xs uppercase tracking-wider opacity-60 mb-1">{t('balance')}</div>
-                              <div className="text-2xl font-bold tracking-tight">
+                              <div className="text-[10px] uppercase tracking-wider opacity-60 mb-0.5">SALDO</div>
+                              <div className="text-xl font-bold">
                                 {new Intl.NumberFormat('de-DE', {
                                   style: 'currency',
                                   currency: account.currency || 'CHF'
@@ -587,54 +579,51 @@ export default function AccountsPage() {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs uppercase tracking-[0.15em] font-bold opacity-70 mb-1">
+                              <div className="text-[10px] uppercase tracking-[0.1em] font-bold opacity-50">
                                 CASH
-                              </div>
-                              <div className="text-[10px] opacity-50 font-mono tracking-wider">
-                                {account.id.slice(-8).toUpperCase()}
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     ) : isBankOrSavings && bankInfo.bankName ? (
-                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-6 relative overflow-hidden rounded-xl shadow-2xl`} style={{ minHeight: '220px', aspectRatio: '1.586/1' }}>
+                      <div className={`${getBankGradient(bankInfo.bankName)} ${getCardTextColor(bankInfo.bankName)} p-4 relative overflow-hidden rounded-xl shadow-2xl h-full`}>
                         
                         {/* Card Content */}
                         <div className="relative z-10 h-full flex flex-col justify-between">
                           {/* Top Row: Chip + Contactless + Bank Logo */}
                           <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-2">
                               {/* EMV Chip */}
-                              <div className="w-11 h-9 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-md relative overflow-hidden shadow-md">
-                                <div className="absolute inset-1 grid grid-cols-4 gap-[1px]">
+                              <div className="w-10 h-7 bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 rounded-md relative overflow-hidden shadow-md">
+                                <div className="absolute inset-0.5 grid grid-cols-4 gap-[1px]">
                                   {[...Array(16)].map((_, i) => (
                                     <div key={i} className="bg-yellow-600/40 rounded-[1px]"></div>
                                   ))}
                                 </div>
                               </div>
                               {/* Contactless Symbol */}
-                              <svg width="24" height="24" viewBox="0 0 24 24" className={getCardTextColor(bankInfo.bankName)}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" className={getCardTextColor(bankInfo.bankName)}>
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2 0v-15.86c3.95.49 7 3.85 7 7.93s-3.05 7.44-7 7.93z" fill="currentColor" opacity="0.6"/>
                               </svg>
                             </div>
                             
                             {/* Bank Logo + Action Buttons */}
-                            <div className="flex items-start space-x-2">
+                            <div className="flex items-start space-x-1">
                               {/* Bank Logo - Direct integration without white background */}
                               {bankInfo.IconComponent && (
-                                <div className="h-6 flex items-center justify-center opacity-90">
+                                <div className="h-5 flex items-center justify-center opacity-90">
                                   <bankInfo.IconComponent />
                                 </div>
                               )}
-                              <div className="flex space-x-1">
+                              <div className="flex space-x-0.5">
                                 <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
                                   setIsEditDialogOpen(open);
                                   if (open) setSelectedAccount(account);
                                 }}>
                                   <DialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className={`h-8 w-8 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
-                                      <Edit className="h-4 w-4" />
+                                    <Button variant="ghost" size="icon" className={`h-7 w-7 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
+                                      <Edit className="h-3.5 w-3.5" />
                                     </Button>
                                   </DialogTrigger>
                               <DialogContent>
@@ -742,8 +731,8 @@ export default function AccountsPage() {
                                   if (open) setSelectedAccount(account);
                                 }}>
                                   <DialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className={`h-8 w-8 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
-                                      <Trash2 className="h-4 w-4" />
+                                    <Button variant="ghost" size="icon" className={`h-7 w-7 ${getCardTextColor(bankInfo.bankName)} hover:bg-white/20 backdrop-blur-sm`}>
+                                      <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                   </DialogTrigger>
                               <DialogContent>
@@ -769,54 +758,54 @@ export default function AccountsPage() {
                           </div>
                           
                           {/* Middle Section: Account Name & Card Number */}
-                          <div className="flex-1 flex items-center">
-                            <div className="w-full">
-                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
-                                {isBankOrSavings && bankInfo.accountName ? bankInfo.accountName : account.name}
-                              </div>
-                              <div className="font-mono text-sm tracking-[0.2em] opacity-80">
-                                •••• •••• •••• {String(account.id).slice(-4).padStart(4, '•')}
-                              </div>
+                          <div className="py-3">
+                            <div className="text-sm font-semibold mb-1">
+                              {isBankOrSavings && bankInfo.accountName ? bankInfo.accountName : account.name}
+                            </div>
+                            <div className="font-mono text-xs tracking-[0.15em] opacity-70">
+                              •••• •••• •••• {String(account.id).slice(-4).padStart(4, '•')}
                             </div>
                           </div>
                           
                           {/* Bottom Section: Balance */}
-                          <div className="flex items-end justify-between">
+                          <div className="flex items-end justify-between pt-2">
                             <div>
-                              <div className="text-xs uppercase tracking-wider opacity-70 mb-1 font-medium">
-                                {t('balance')}
+                              <div className="text-[10px] uppercase tracking-wider opacity-60 mb-0.5 font-medium">
+                                SALDO
                               </div>
-                              <div className="text-2xl font-bold tracking-tight">
+                              <div className="text-xl font-bold">
                                 {new Intl.NumberFormat('de-DE', {
                                   style: 'currency',
                                   currency: account.currency || 'CHF'
                                 }).format((Number(account.balance) || 0) / 100)}
                               </div>
                             </div>
-                            <div className="text-xs uppercase tracking-[0.15em] font-bold opacity-60">
+                            <div className="text-[10px] uppercase tracking-[0.1em] font-bold opacity-50">
                               DEBIT
                             </div>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      /* Regular Account Card */
-                      <>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <div className="flex items-center space-x-2">
-                            {getAccountIcon(account.type)}
-                            <CardTitle className="text-sm font-medium">
-                              {translatedName}
-                            </CardTitle>
-                          </div>
-                          <div className="flex space-x-2">
+                      /* Regular Account Card (Investment, Credit Card, etc.) */
+                      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 text-white p-4 relative overflow-hidden rounded-xl shadow-2xl h-full">
+                        <div className="relative z-10 h-full flex flex-col justify-between">
+                          {/* Top Row: Icon + Name + Actions */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-2">
+                              <div className="p-2 bg-white/10 rounded-lg">
+                                {getAccountIcon(account.type)}
+                              </div>
+                              <span className="text-sm font-medium opacity-80">{account.type}</span>
+                            </div>
+                            <div className="flex space-x-0.5">
                       <Dialog open={isEditDialogOpen && selectedAccount?.id === account.id} onOpenChange={(open) => {
                         setIsEditDialogOpen(open);
                         if (open) setSelectedAccount(account);
                       }}>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="icon">
-                            <Edit className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20">
+                            <Edit className="h-3.5 w-3.5" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
@@ -924,8 +913,8 @@ export default function AccountsPage() {
                         if (open) setSelectedAccount(account);
                       }}>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="icon">
-                            <Trash2 className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20">
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
@@ -947,17 +936,28 @@ export default function AccountsPage() {
                         </DialogContent>
                       </Dialog>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
+                          </div>
+                          
+                          {/* Middle: Account Name */}
+                          <div className="py-3">
+                            <div className="text-sm font-semibold mb-1">{translatedName}</div>
+                          </div>
+                          
+                          {/* Bottom: Balance */}
+                          <div className="flex items-end justify-between pt-2">
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider opacity-60 mb-0.5">SALDO</div>
+                              <div className="text-xl font-bold">
                       {new Intl.NumberFormat('de-DE', {
                         style: 'currency',
                         currency: account.currency || 'EUR'
                       }).format((Number(account.balance) || 0) / 100)}
                     </div>
-                    <p className="text-xs text-muted-foreground">{account.type}</p>
-                  </CardContent>
-                </>
+                            </div>
+                            <div className="text-[10px] uppercase opacity-50">{account.type}</div>
+                          </div>
+                        </div>
+                      </div>
               )}
             </Card>
           );

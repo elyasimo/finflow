@@ -93,5 +93,18 @@ export class EncryptionService {
   }
 }
 
-// Singleton instance
-export const encryptionService = new EncryptionService();
+// Lazy singleton instance - only created when first accessed
+let _encryptionService: EncryptionService | null = null;
+
+export function getEncryptionService(): EncryptionService {
+  if (!_encryptionService) {
+    _encryptionService = new EncryptionService();
+  }
+  return _encryptionService;
+}
+
+// For backwards compatibility - but this getter ensures lazy initialization
+export const encryptionService = {
+  encrypt: (text: string) => getEncryptionService().encrypt(text),
+  decrypt: (encrypted: string, iv: string, tag: string) => getEncryptionService().decrypt(encrypted, iv, tag),
+};

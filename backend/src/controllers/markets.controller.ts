@@ -14,7 +14,19 @@ export class MarketsController {
       const userId = (req as any).userId;
       
       // Get user-specific API keys from encrypted storage
-      const userKeys = await apiKeysService.getApiKeys(userId, 'binance');
+      let userKeys = null;
+      try {
+        userKeys = await apiKeysService.getApiKeys(userId, 'binance');
+      } catch (encryptionError) {
+        console.error('Encryption service error:', encryptionError);
+        res.status(200).json({ 
+          error: 'Encryption service not available. Please configure ENCRYPTION_MASTER_KEY.',
+          needsConfiguration: true,
+          portfolio: [],
+          totalValue: 0 
+        });
+        return;
+      }
       
       if (!userKeys) {
         res.status(200).json({ 

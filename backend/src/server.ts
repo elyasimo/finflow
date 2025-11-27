@@ -1,8 +1,11 @@
+// Load environment variables FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import { AuthController } from './controllers/auth.controller.js';
 import { AccountsController } from './controllers/accounts.controller.js';
 import { TransactionsController } from './controllers/transactions.controller.js';
@@ -28,8 +31,6 @@ import { sql } from 'drizzle-orm';
 // Migrations now handled by start.sh using drizzle-kit push
 // import { runMigrations } from './utils/migrations.js';
 import http from 'http';
-
-dotenv.config();
 
 const app = express();
 const port = process.env.API_PORT || 8080;
