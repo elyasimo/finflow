@@ -409,7 +409,7 @@ export default function MobileDashboard({
               </Link>
             </div>
           ) : (
-            <div className="space-y-0">
+            <div className="space-y-3">
               {recentTransactions.map((transaction) => (
                 <TransactionCard
                   key={transaction.id}

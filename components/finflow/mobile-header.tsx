@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Bell, Moon, Sun, Home, Globe, Coins, ChevronDown } from "lucide-react"
+import { Bell, Moon, Sun, Home, Globe, Coins, ChevronLeft } from "lucide-react"
 import { useTheme } from "next-themes"
+import { usePathname, useRouter } from "next/navigation"
 import { useCurrency } from './CurrencyContext'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { FinflowLogo } from "@/components/icons/finflow-logo"
@@ -24,10 +25,16 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const { currency: selectedCurrency, updateCurrencyInBackend } = useCurrency()
   const { language, setLanguage, t } = useLanguage()
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
+  const router = useRouter()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   const currRef = useRef<HTMLDivElement>(null)
+
+  // Check if we're on dashboard or a sub-page
+  const isDashboard = pathname === '/dashboard' || pathname === '/'
+  const canGoBack = !isDashboard
 
   const currencyOptions = [
     { code: 'USD', label: '$', flag: '🇺🇸' },
@@ -77,20 +84,29 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#0f1623]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50">
       <div className="flex items-center justify-between px-3 h-14">
-        {/* Left: Home Icon + Logo */}
+        {/* Left: Back/Home Icon + Title */}
         <div className="flex items-center gap-2">
-          <Link 
-            href="/dashboard" 
-            className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-          >
-            <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          </Link>
-          {showLogo && (
+          {canGoBack ? (
+            <button 
+              onClick={() => router.back()}
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button>
+          ) : (
+            <Link 
+              href="/dashboard" 
+              className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+            >
+              <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </Link>
+          )}
+          {showLogo && !canGoBack && (
             <FinflowLogo size="sm" variant="icon" />
           )}
-          {!showLogo && title && (
-            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[100px]">
-              {title}
+          {(title || canGoBack) && (
+            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">
+              {title || t('dashboard')}
             </h1>
           )}
         </div>

@@ -114,11 +114,11 @@ export default function MobileAccounts({
   }
 
   const accountTypes = [
-    { id: 'all', label: 'Alle' },
-    { id: 'bank', label: 'Bank' },
-    { id: 'savings', label: 'Sparen' },
-    { id: 'cash', label: 'Bargeld' },
-    { id: 'investment', label: 'Investment' },
+    { id: 'all', label: 'Alle', icon: Wallet },
+    { id: 'bank', label: 'Bank', icon: Building2 },
+    { id: 'savings', label: 'Sparen', icon: PiggyBank },
+    { id: 'cash', label: 'Bargeld', icon: Banknote },
+    { id: 'investment', label: 'Investment', icon: TrendingUp },
   ]
 
   return (
@@ -154,22 +154,26 @@ export default function MobileAccounts({
 
       {/* Main Content */}
       <div className="px-5 py-6 space-y-6">
-        {/* Filter Pills - Segmented Control */}
+        {/* Filter Pills - Icon Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-          {accountTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setSelectedType(type.id)}
-              className={cn(
-                "px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all",
-                selectedType === type.id
-                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
-                  : "bg-white dark:bg-[#1a2332] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800"
-              )}
-            >
-              {type.label}
-            </button>
-          ))}
+          {accountTypes.map((type) => {
+            const TypeIcon = type.icon
+            return (
+              <button
+                key={type.id}
+                onClick={() => setSelectedType(type.id)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+                  selectedType === type.id
+                    ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                    : "bg-white dark:bg-[#1a2332] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800"
+                )}
+              >
+                <TypeIcon className="w-4 h-4" />
+                {type.label}
+              </button>
+            )
+          })}
         </div>
 
         {/* Accounts List */}
@@ -271,14 +275,6 @@ export default function MobileAccounts({
         {/* Bottom spacing */}
         <div className="h-32" />
       </div>
-
-      {/* Floating Action Button */}
-      <button
-        onClick={onAddAccount}
-        className="fixed bottom-28 right-5 w-14 h-14 bg-blue-500 rounded-full shadow-xl shadow-blue-500/40 flex items-center justify-center z-20 active:scale-95 transition-transform"
-      >
-        <Plus className="w-6 h-6 text-white" />
-      </button>
 
       {/* Bottom Navigation */}
       <MobileBottomNav />

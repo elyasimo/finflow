@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
@@ -11,6 +12,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
+import MobileMenu from "./mobile-menu"
 
 interface NavItem {
   href: string
@@ -53,6 +55,15 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   const pathname = usePathname()
   const { t } = useLanguage()
+  const [showMenu, setShowMenu] = useState(false)
+
+  const handleMenuClick = () => {
+    if (onMenuClick) {
+      onMenuClick()
+    } else {
+      setShowMenu(true)
+    }
+  }
 
   const isActive = (item: NavItem) => {
     if (item.matchPaths) {
@@ -99,15 +110,23 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
           })}
           
           {/* Menu button */}
-          <Link
-            href="/settings"
+          <button
+            onClick={handleMenuClick}
             className="flex-1 flex flex-col items-center justify-center gap-1 min-h-[72px] px-2 rounded-xl mx-0.5 text-gray-500 dark:text-gray-400 transition-all active:scale-95"
           >
             <MenuIcon className="h-6 w-6" />
             <span className="text-[11px] font-medium leading-tight">{t('more')}</span>
-          </Link>
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu - Only shown when no external handler */}
+      {!onMenuClick && (
+        <MobileMenu 
+          isOpen={showMenu} 
+          onClose={() => setShowMenu(false)} 
+        />
+      )}
     </nav>
   )
 }
