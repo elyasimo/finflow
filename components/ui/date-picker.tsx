@@ -22,12 +22,19 @@ export interface DatePickerProps {
 export function DatePicker({ date, selected, onSelect, disabled }: DatePickerProps) {
   // Support both 'date' and 'selected' props for compatibility
   const selectedDate = date || selected;
+  const [open, setOpen] = React.useState(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
           className={cn(
             "w-full justify-start text-left font-normal",
             !selectedDate && "text-muted-foreground"
@@ -37,11 +44,14 @@ export function DatePicker({ date, selected, onSelect, disabled }: DatePickerPro
           {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className="w-auto p-0" onOpenAutoFocus={(e) => e.preventDefault()}>
         <Calendar
           mode="single"
           selected={selectedDate}
-          onSelect={(date) => onSelect(date)}
+          onSelect={(date) => {
+            onSelect(date);
+            setOpen(false);
+          }}
           disabled={disabled}
           initialFocus
         />
