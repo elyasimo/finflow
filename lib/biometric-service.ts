@@ -1,9 +1,51 @@
-import { Capacitor } from '@capacitor/core';
-import { NativeBiometric, AvailableResult, BiometryType } from 'capacitor-native-biometric';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+// Capacitor imports - only import on client side
+let Capacitor: any = null;
+let NativeBiometric: any = null;
+let BiometryType: any = null;
+let Haptics: any = null;
+let ImpactStyle: any = null;
 
-// Check if we're running in native app or web
-const isNative = Capacitor.isNativePlatform();
+// Check if we're in browser environment
+const isBrowser = typeof window !== 'undefined';
+
+// Lazy load Capacitor modules only in browser
+async function loadCapacitorModules() {
+  if (!isBrowser) return false;
+  
+  try {
+    if (!Capacitor) {
+      const capacitorCore = await import('@capacitor/core');
+      Capacitor = capacitorCore.Capacitor;
+    }
+    
+    if (!NativeBiometric) {
+      const biometric = await import('capacitor-native-biometric');
+      NativeBiometric = biometric.NativeBiometric;
+      BiometryType = biometric.BiometryType;
+    }
+    
+    if (!Haptics) {
+      const haptics = await import('@capacitor/haptics');
+      Haptics = haptics.Haptics;
+      ImpactStyle = haptics.ImpactStyle;
+    }
+    
+    return true;
+  } catch (error) {
+    console.warn('Capacitor modules not available:', error);
+    return false;
+  }
+}
+
+// Check if we're running in native app
+function isNative(): boolean {
+  if (!isBrowser || !Capacitor) return false;
+  try {
+    return Capacitor.isNativePlatform();
+  } catch {
+    return false;
+  }
+}
 
 export interface BiometricAuthResult {
   success: boolean;
@@ -17,11 +59,24 @@ export interface BiometricAvailability {
 }
 
 class BiometricService {
+  private initialized = false;
+
+  /**
+   * Initialize Capacitor modules
+   */
+  private async init(): Promise<boolean> {
+    if (this.initialized) return isNative();
+    this.initialized = await loadCapacitorModules();
+    return isNative();
+  }
+
   /**
    * Check if biometric authentication is available
    */
   async isAvailable(): Promise<BiometricAvailability> {
-    if (!isNative) {
+    const native = await this.init();
+    
+    if (!native || !NativeBiometric) {
       return {
         available: false,
         biometryType: 'none',
@@ -30,15 +85,15 @@ class BiometricService {
     }
 
     try {
-      const result: AvailableResult = await NativeBiometric.isAvailable();
+      const result = await NativeBiometric.isAvailable();
       
       let biometryType: 'face' | 'fingerprint' | 'none' = 'none';
       
-      if (result.biometryType === BiometryType.FACE_ID || 
-          result.biometryType === BiometryType.FACE_AUTHENTICATION) {
+      if (BiometryType && (result.biometryType === BiometryType.FACE_ID || 
+          result.biometryType === BiometryType.FACE_AUTHENTICATION)) {
         biometryType = 'face';
-      } else if (result.biometryType === BiometryType.TOUCH_ID || 
-                 result.biometryType === BiometryType.FINGERPRINT) {
+      } else if (BiometryType && (result.biometryType === BiometryType.TOUCH_ID || 
+                 result.biometryType === BiometryType.FINGERPRINT)) {
         biometryType = 'fingerprint';
       }
 
@@ -60,7 +115,9 @@ class BiometricService {
    * Authenticate user with biometrics (Face ID / Touch ID)
    */
   async authenticate(reason?: string): Promise<BiometricAuthResult> {
-    if (!isNative) {
+    const native = await this.init();
+    
+    if (!native || !NativeBiometric) {
       return {
         success: false,
         error: 'Biometric authentication is only available in the native app',
@@ -100,7 +157,8 @@ class BiometricService {
    * Store credentials securely using biometric-protected keychain
    */
   async saveCredentials(username: string, password: string): Promise<boolean> {
-    if (!isNative) return false;
+    const native = await this.init();
+    if (!native || !NativeBiometric) return false;
 
     try {
       await NativeBiometric.setCredentials({
@@ -119,7 +177,8 @@ class BiometricService {
    * Retrieve stored credentials after biometric verification
    */
   async getCredentials(): Promise<{ username: string; password: string } | null> {
-    if (!isNative) return null;
+    const native = await this.init();
+    if (!native || !NativeBiometric) return null;
 
     try {
       const credentials = await NativeBiometric.getCredentials({
@@ -139,7 +198,8 @@ class BiometricService {
    * Delete stored credentials
    */
   async deleteCredentials(): Promise<boolean> {
-    if (!isNative) return false;
+    const native = await this.init();
+    if (!native || !NativeBiometric) return false;
 
     try {
       await NativeBiometric.deleteCredentials({
@@ -156,7 +216,8 @@ class BiometricService {
    * Provide haptic feedback
    */
   async hapticFeedback(style: 'light' | 'medium' | 'heavy' | 'success' | 'error'): Promise<void> {
-    if (!isNative) return;
+    const native = await this.init();
+    if (!native || !Haptics || !ImpactStyle) return;
 
     try {
       switch (style) {
@@ -185,7 +246,16 @@ class BiometricService {
    * Check if running in native app
    */
   isNativeApp(): boolean {
-    return isNative;
+    if (!isBrowser) return false;
+    // Try to check synchronously if already loaded
+    if (Capacitor) {
+      try {
+        return Capacitor.isNativePlatform();
+      } catch {
+        return false;
+      }
+    }
+    return false;
   }
 }
 
