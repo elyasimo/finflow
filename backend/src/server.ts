@@ -37,9 +37,30 @@ const port = process.env.API_PORT || 8080;
 
 // Middleware
 app.use(helmet());
+
+// CORS configuration - support both web and native app origins
+const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'];
+// Add Capacitor origins for iOS/Android native apps
+corsOrigins.push('capacitor://localhost', 'ionic://localhost', 'http://localhost');
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin is in allowed list
+      if (corsOrigins.some(allowed => origin === allowed || origin.startsWith(allowed.replace('*', '')))) {
+        return callback(null, true);
+      }
+      
+      // Also allow any finflowapp.ch subdomain
+      if (origin.endsWith('.finflowapp.ch') || origin === 'https://finflowapp.ch') {
+        return callback(null, true);
+      }
+      
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   }),
 );

@@ -10,8 +10,13 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Application error:', error);
+    // Log the error to an error reporting service with better serialization
+    console.error('Application error:', {
+      message: error?.message,
+      name: error?.name,
+      stack: error?.stack,
+      digest: error?.digest,
+    });
   }, [error]);
 
   return (
