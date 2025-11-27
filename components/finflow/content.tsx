@@ -62,7 +62,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
 
   // Map account type to the expected type in List01
   function mapAccountType(type: string | null | undefined): "savings" | "checking" | "investment" | "debt" {
-    if (!type) return 'savings';
+    if (!type || typeof type !== 'string') return 'savings';
     switch (type.toLowerCase()) {
       case 'bank':
         return 'checking';
@@ -247,7 +247,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
           description: getTranslatedText(t.description, t.descriptionTranslations, language),
           amount: Number(t.amount),
           type: t.type as 'income' | 'expense',
-          category: t.category,
+          category: typeof t.category === 'object' ? t.category?.name : t.category,
           transactionDate: t.transactionDate,
           currency: t.currency || userCurrency,
         }))}

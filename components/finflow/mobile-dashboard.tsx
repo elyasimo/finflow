@@ -101,8 +101,12 @@ export default function MobileDashboard({
     [transactions]
   )
 
-  const getCategoryStyle = (category?: string) => {
-    const key = category?.toLowerCase() || 'default'
+  const getCategoryStyle = (category?: string | { name?: string }) => {
+    // Handle both string and object category types
+    const categoryName = typeof category === 'string' 
+      ? category 
+      : (category?.name || '')
+    const key = categoryName?.toLowerCase() || 'default'
     return categoryStyles[key] || categoryStyles.default
   }
 
