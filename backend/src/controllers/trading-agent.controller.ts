@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import { tradingAgentService } from '../services/trading-agent.service';
 import { binanceTradingService } from '../services/binance-trading.service';
+import { apiKeysService } from '../services/api-keys.service.js';
 import { SUPPORTED_CRYPTOCURRENCIES, getCryptocurrenciesByCategory, getCryptocurrenciesByRisk } from '../config/supported-cryptocurrencies';
 
 export class TradingAgentController {
@@ -40,19 +41,20 @@ export class TradingAgentController {
         return;
       }
 
-      // Get current prices as entry prices
-      const prices = await binanceTradingService.getPrices(assets, 'EUR');
+      // Entry prices will be set when the agent first runs with valid API keys
       const entryPrices: Record<string, number> = {};
 
-      // Get current balances to set entry prices for existing holdings
-      const balances = await binanceTradingService.getBalances();
-      for (const asset of assets) {
-        const priceData = prices.get(asset);
-        const balance = balances.find(b => b.asset === asset);
-
-        if (priceData && balance && parseFloat(balance.free) > 0) {
-          entryPrices[asset] = priceData.price;
+      // Try to get current prices (public API - no keys needed)
+      try {
+        const prices = await binanceTradingService.getPrices(assets, 'EUR');
+        for (const asset of assets) {
+          const priceData = prices.get(asset);
+          if (priceData) {
+            entryPrices[asset] = priceData.price;
+          }
         }
+      } catch (priceError) {
+        console.log('Could not fetch initial prices, will be set on first run');
       }
 
       const agentId = await tradingAgentService.createAgent(userId, {
@@ -262,8 +264,44 @@ export class TradingAgentController {
     try {
       const userId = (req as any).userId;
 
-      // Get balances and prices
-      const balances = await binanceTradingService.getBalances();
+      // Get user's agents first
+      const agents = await tradingAgentService.getUserAgents(userId);
+
+      // Try to get balances using user-specific API keys
+      let balances: Array<{ asset: string; free: string; locked: string }> = [];
+      let hasApiKeys = false;
+
+      try {
+        // Check if user has API keys configured
+        const userApiKeys = await apiKeysService.getUserApiKeys(userId, 'binance');
+        if (userApiKeys) {
+          hasApiKeys = true;
+          // Create a temporary service with user's keys
+          const { BinanceTradingService } = await import('../services/binance-trading.service.js');
+          const userBinanceService = new BinanceTradingService(userApiKeys.apiKey, userApiKeys.apiSecret);
+          balances = await userBinanceService.getBalances();
+        }
+      } catch (apiKeyError) {
+        console.log('Could not fetch balances - user may not have API keys configured');
+      }
+
+      // If no balances, return empty portfolio with just agents info
+      if (balances.length === 0) {
+        res.json({
+          portfolio: [],
+          totalValueEur: 0,
+          agents: agents.map(a => ({
+            id: a.id,
+            name: a.name,
+            enabled: a.enabled,
+            assets: a.assets,
+            strategy: a.strategy,
+          })),
+          hasApiKeys,
+        });
+        return;
+      }
+
       const assets = balances
         .filter(b => !['EUR', 'USDT', 'BUSD'].includes(b.asset))
         .map(b => b.asset);
@@ -272,13 +310,19 @@ export class TradingAgentController {
         res.json({
           portfolio: [],
           totalValueEur: 0,
-          agents: [],
+          agents: agents.map(a => ({
+            id: a.id,
+            name: a.name,
+            enabled: a.enabled,
+            assets: a.assets,
+            strategy: a.strategy,
+          })),
+          hasApiKeys,
         });
         return;
       }
 
       const prices = await binanceTradingService.getPrices(assets, 'EUR');
-      const agents = await tradingAgentService.getUserAgents(userId);
 
       const portfolio = balances
         .filter(b => parseFloat(b.free) > 0 || parseFloat(b.locked) > 0)
@@ -316,6 +360,7 @@ export class TradingAgentController {
           assets: a.assets,
           strategy: a.strategy,
         })),
+        hasApiKeys,
       });
     } catch (error: any) {
       console.error('Portfolio analysis error:', error);
