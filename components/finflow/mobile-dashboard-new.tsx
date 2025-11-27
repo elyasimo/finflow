@@ -1,0 +1,469 @@
+"use client"
+
+import { useMemo, useState } from "react"
+import { 
+  ArrowUpRight, 
+  Plus,
+  ChevronRight,
+  Wallet,
+  CreditCard,
+  PiggyBank,
+  TrendingUp,
+  Banknote,
+  Bell,
+  Receipt,
+  Sparkles
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { useCurrency } from "./CurrencyContext"
+import Link from "next/link"
+import MobileBottomNav from "./mobile-bottom-nav"
+import TransactionCard from "./ui/transaction-card"
+import BudgetWalletCard from "./ui/budget-wallet-card"
+
+interface Account {
+  id: string
+  name: string
+  type: string
+  balance: number
+  currency: string
+  color?: string
+  bankName?: string
+  isPinned?: boolean
+}
+
+interface Transaction {
+  id: string
+  description: string
+  amount: number
+  type: 'income' | 'expense'
+  category?: string
+  transactionDate: string
+  currency: string
+  note?: string
+  tag?: string
+  merchant?: string
+}
+
+interface Budget {
+  id: string
+  name: string
+  amount: number
+  spent: number
+  currency: string
+  category?: string
+  startDate?: string
+  endDate?: string
+  isPinned?: boolean
+}
+
+interface MobileDashboardProps {
+  accounts: Account[]
+  transactions: Transaction[]
+  budgets: Budget[]
+  totalBalance: number
+  totalIncome: number
+  totalExpenses: number
+  userName?: string
+}
+
+// Account type icons
+const accountTypeIcons: Record<string, React.ElementType> = {
+  'checking': Wallet,
+  'giro': Wallet,
+  'savings': PiggyBank,
+  'spar': PiggyBank,
+  'credit': CreditCard,
+  'investment': TrendingUp,
+  'cash': Banknote,
+  'default': Wallet,
+}
+
+// Gradient presets for account cards
+const gradientPresets = [
+  'from-blue-500 via-blue-600 to-indigo-700',
+  'from-emerald-500 via-emerald-600 to-teal-700',
+  'from-purple-500 via-purple-600 to-violet-700',
+  'from-rose-500 via-rose-600 to-pink-700',
+  'from-amber-500 via-amber-600 to-orange-700',
+]
+
+export default function MobileDashboard({
+  accounts,
+  transactions,
+  budgets,
+  totalBalance,
+  totalIncome,
+  totalExpenses,
+  userName = 'User',
+}: MobileDashboardProps) {
+  const { t } = useLanguage()
+  const { currency } = useCurrency()
+  const [activeAccountIndex, setActiveAccountIndex] = useState(0)
+
+  const formatCurrency = (amount: number, curr?: string) => {
+    return new Intl.NumberFormat('de-CH', {
+      style: 'currency',
+      currency: curr || currency,
+      minimumFractionDigits: 2,
+    }).format(amount)
+  }
+
+  // Get recent transactions (last 5)
+  const recentTransactions = useMemo(() => 
+    [...transactions]
+      .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
+      .slice(0, 5),
+    [transactions]
+  )
+
+  // Get pinned budgets first, then regular
+  const sortedBudgets = useMemo(() => 
+    [...budgets].sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1
+      if (!a.isPinned && b.isPinned) return 1
+      return 0
+    }).slice(0, 3),
+    [budgets]
+  )
+
+  const getAccountIcon = (type: string) => {
+    const key = type?.toLowerCase() || 'default'
+    return accountTypeIcons[key] || accountTypeIcons.default
+  }
+
+  // Calculate savings rate
+  const savingsRate = totalIncome > 0 
+    ? Math.round(((totalIncome - totalExpenses) / totalIncome) * 100) 
+    : 0
+
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Guten Morgen'
+    if (hour < 18) return 'Guten Tag'
+    return 'Guten Abend'
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+      {/* Elegant Header with More Whitespace */}
+      <div className="px-6 pt-16 pb-8 bg-white dark:bg-[#1a2332]">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mb-1">{getGreeting()}</p>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {userName.split(' ')[0]}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="w-11 h-11 rounded-full bg-gray-50 dark:bg-[#232e40] flex items-center justify-center relative">
+              <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500"></span>
+            </button>
+            <Link 
+              href="/settings"
+              className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-blue-500/20"
+            >
+              {userName.charAt(0).toUpperCase()}
+            </Link>
+          </div>
+        </div>
+
+        {/* Main Balance Display - Large, Elegant Typography */}
+        <div className="text-center mb-10">
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-widest font-medium">
+            Gesamtsaldo
+          </p>
+          <h2 className="text-5xl font-extralight text-gray-900 dark:text-white tracking-tight mb-6">
+            {formatCurrency(totalBalance)}
+          </h2>
+          
+          {/* Income/Expense Pills */}
+          <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-950/30">
+              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                +{formatCurrency(totalIncome)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 dark:bg-rose-950/30">
+              <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+              <span className="text-sm font-medium text-rose-600 dark:text-rose-400">
+                −{formatCurrency(totalExpenses)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Savings Rate Ring - Subtle */}
+        <div className="flex justify-center">
+          <div className="relative w-24 h-24">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle
+                cx="48"
+                cy="48"
+                r="42"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="6"
+                className="text-gray-100 dark:text-gray-800"
+              />
+              <circle
+                cx="48"
+                cy="48"
+                r="42"
+                fill="none"
+                stroke="url(#dashboardGradient)"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeDasharray={`${Math.max(savingsRate, 0) * 2.64} 264`}
+                className="transition-all duration-1000"
+              />
+              <defs>
+                <linearGradient id="dashboardGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#3B82F6" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-xl font-bold text-gray-900 dark:text-white">{Math.max(savingsRate, 0)}%</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider">Sparrate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content with Generous Spacing */}
+      <div className="px-6 py-8 space-y-8">
+        
+        {/* Primary CTA - Add Transaction */}
+        <div className="flex gap-3">
+          <Link
+            href="/transactions?action=add"
+            className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl bg-blue-500 text-white font-semibold shadow-xl shadow-blue-500/30 hover:bg-blue-600 active:scale-[0.98] transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            Transaktion hinzufügen
+          </Link>
+          <Link
+            href="/transactions"
+            className="w-14 h-14 rounded-2xl bg-white dark:bg-[#1a2332] shadow-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-[#1e2940] transition-colors"
+          >
+            <Receipt className="w-5 h-5 text-gray-500" />
+          </Link>
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-3 gap-3">
+          <Link
+            href="/analytics"
+            className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-[#1a2332] shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-purple-500" />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Statistik</span>
+          </Link>
+          <Link
+            href="/budgets"
+            className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-[#1a2332] shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center">
+              <Wallet className="w-5 h-5 text-amber-500" />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Budgets</span>
+          </Link>
+          <Link
+            href="/accounts"
+            className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white dark:bg-[#1a2332] shadow-sm hover:shadow-md transition-shadow"
+          >
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+              <ArrowUpRight className="w-5 h-5 text-emerald-500" />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Konten</span>
+          </Link>
+        </div>
+
+        {/* Accounts Carousel */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('accounts')}</h3>
+            <Link href="/accounts" className="text-sm font-medium text-blue-500 flex items-center gap-1">
+              {t('seeAll')} <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          
+          {accounts.length > 0 ? (
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory scrollbar-hide">
+                {accounts.map((account, idx) => {
+                  const AccountIcon = getAccountIcon(account.type)
+                  
+                  return (
+                    <Link
+                      key={account.id}
+                      href={`/accounts/${account.id}`}
+                      className={cn(
+                        "flex-shrink-0 w-72 h-44 rounded-3xl p-5 text-white relative overflow-hidden snap-center",
+                        "bg-gradient-to-br shadow-xl transition-transform active:scale-[0.98]",
+                        gradientPresets[idx % gradientPresets.length]
+                      )}
+                    >
+                      {/* Decorative Elements */}
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none" />
+                      
+                      <div className="relative z-10 h-full flex flex-col justify-between">
+                        <div className="flex items-start justify-between">
+                          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <AccountIcon className="w-6 h-6" />
+                          </div>
+                          <span className="text-xs font-medium bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                            {account.type}
+                          </span>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm opacity-80 mb-1">{account.name}</p>
+                          <p className="text-2xl font-bold">
+                            {formatCurrency(account.balance / 100, account.currency)}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+                
+                {/* Add Account Card */}
+                <Link
+                  href="/accounts?action=add"
+                  className="flex-shrink-0 w-72 h-44 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center gap-3 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors snap-center"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <Plus className="w-7 h-7" />
+                  </div>
+                  <span className="font-medium">Konto hinzufügen</span>
+                </Link>
+              </div>
+              
+              {/* Scroll Indicator */}
+              {accounts.length > 1 && (
+                <div className="flex justify-center gap-1.5 mt-2">
+                  {accounts.slice(0, Math.min(5, accounts.length + 1)).map((_, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full transition-colors",
+                        idx === activeAccountIndex ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-700"
+                      )} 
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/accounts?action=add"
+              className="flex items-center justify-center h-44 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors"
+            >
+              <div className="text-center">
+                <Plus className="w-8 h-8 mx-auto mb-2" />
+                <span className="text-sm font-medium">{t('addAccount')}</span>
+              </div>
+            </Link>
+          )}
+        </div>
+
+        {/* Recent Transactions - Individual Cards */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t('recentTransactions')}
+            </h3>
+            <Link href="/transactions" className="text-sm font-medium text-blue-500 flex items-center gap-1">
+              {t('seeAll')} <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          
+          {recentTransactions.length === 0 ? (
+            <div className="bg-white dark:bg-[#1a2332] rounded-3xl p-10 text-center">
+              <div className="w-20 h-20 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-10 h-10 text-gray-300 dark:text-gray-600" />
+              </div>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                Noch keine Transaktionen
+              </h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Erfassen Sie Ihre erste Transaktion, um zu beginnen
+              </p>
+              <Link
+                href="/transactions?action=add"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-medium shadow-lg shadow-blue-500/30"
+              >
+                <Plus className="w-5 h-5" />
+                Erste Transaktion
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-0">
+              {recentTransactions.map((transaction) => (
+                <TransactionCard
+                  key={transaction.id}
+                  {...transaction}
+                  formatCurrency={formatCurrency}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Budgets Section - Wallet Style Cards */}
+        {(sortedBudgets.length > 0 || budgets.length === 0) && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('budgets')}</h3>
+              <Link href="/budgets" className="text-sm font-medium text-blue-500 flex items-center gap-1">
+                {t('seeAll')} <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            {sortedBudgets.length === 0 ? (
+              <Link
+                href="/budgets?action=add"
+                className="flex items-center justify-center h-32 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800 text-gray-400 hover:border-purple-400 hover:text-purple-500 transition-colors"
+              >
+                <div className="text-center">
+                  <Plus className="w-8 h-8 mx-auto mb-2" />
+                  <span className="text-sm font-medium">Erstes Budget erstellen</span>
+                </div>
+              </Link>
+            ) : (
+              <div className="space-y-0">
+                {sortedBudgets.map((budget, idx) => (
+                  <BudgetWalletCard
+                    key={budget.id}
+                    {...budget}
+                    spent={budget.spent || 0}
+                    formatCurrency={formatCurrency}
+                    variant="list"
+                    index={idx}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bottom Spacing for Nav */}
+        <div className="h-28" />
+      </div>
+
+      {/* Bottom Navigation */}
+      <MobileBottomNav />
+    </div>
+  )
+}
