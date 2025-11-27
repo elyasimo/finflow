@@ -9,6 +9,7 @@ import MobileMenu from "./mobile-menu"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { CurrencyProvider } from './CurrencyContext'
+import { useMediaQuery } from "@/hooks/use-mobile"
 
 // User interface
 interface User {
@@ -26,48 +27,61 @@ export default function Layout({ children, user }: LayoutProps) {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const isMobile = useMediaQuery("(max-width: 1023px)")
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) {
-    return null
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-[#0a0e17]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
     <CurrencyProvider>
-      <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
+      <div className={`flex h-screen overflow-hidden ${theme === "dark" ? "dark" : ""}`}>
         {/* Desktop Sidebar - Hidden on Mobile */}
-        <div className="hidden lg:block">
-          <Sidebar user={user} />
-        </div>
+        {!isMobile && (
+          <div className="hidden lg:block flex-shrink-0">
+            <Sidebar user={user} />
+          </div>
+        )}
         
-        <div className="w-full flex flex-1 flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Desktop Header - Hidden on Mobile */}
-          <header className="hidden lg:block h-16 border-b border-gray-200 dark:border-[#232e40]">
-            <TopNav user={user} />
-          </header>
+          {!isMobile && (
+            <header className="hidden lg:block h-16 flex-shrink-0 border-b border-gray-200 dark:border-[#232e40]">
+              <TopNav user={user} />
+            </header>
+          )}
 
           {/* Mobile Header - Hidden on Desktop */}
-          <MobileHeader user={user} />
+          {isMobile && <MobileHeader user={user} />}
           
           {/* Main Content */}
-          <main className="flex-1 overflow-auto bg-gray-50 dark:bg-[#0a0e17] pb-20 lg:pb-0">
-            <div className="p-4 lg:p-6">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-[#0a0e17]">
+            <div className={isMobile ? "px-4 py-4 pb-24" : "p-6"}>
               {children}
             </div>
           </main>
 
           {/* Mobile Bottom Navigation - Hidden on Desktop */}
-          <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
+          {isMobile && (
+            <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
+          )}
 
           {/* Mobile Menu Drawer */}
-          <MobileMenu 
-            isOpen={isMobileMenuOpen} 
-            onClose={() => setIsMobileMenuOpen(false)}
-            user={user}
-          />
+          {isMobile && (
+            <MobileMenu 
+              isOpen={isMobileMenuOpen} 
+              onClose={() => setIsMobileMenuOpen(false)}
+              user={user}
+            />
+          )}
         </div>
       </div>
     </CurrencyProvider>

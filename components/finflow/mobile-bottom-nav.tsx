@@ -7,7 +7,8 @@ import {
   CreditCard, 
   TrendingUp, 
   PieChart,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  Plus
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -44,12 +45,6 @@ const navItems: NavItem[] = [
     labelKey: "reports",
     matchPaths: ["/reports", "/analytics", "/budgets"]
   },
-  { 
-    href: "#menu", 
-    icon: MenuIcon, 
-    labelKey: "more",
-    matchPaths: ["/settings", "/support"]
-  },
 ]
 
 interface MobileBottomNavProps {
@@ -68,67 +63,80 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   }
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#0f1623] border-t border-gray-200 dark:border-[#232e40] safe-area-bottom">
-      <div className="flex items-center justify-around h-16 px-2">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const active = isActive(item)
-          
-          if (item.href === "#menu") {
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+      {/* Gradient shadow overlay */}
+      <div className="absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-white dark:from-[#0f1623] to-transparent pointer-events-none" />
+      
+      {/* Navigation bar */}
+      <div className="bg-white/90 dark:bg-[#0f1623]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-[#232e40]/50 pb-safe">
+        <div className="flex items-center justify-around h-16 px-2 max-w-lg mx-auto">
+          {navItems.map((item, index) => {
+            const Icon = item.icon
+            const active = isActive(item)
+            
+            // Center FAB button
+            if (index === 2) {
+              return (
+                <div key="fab" className="flex items-center gap-4">
+                  {/* Markets Button */}
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center w-14 h-12 transition-all",
+                      active 
+                        ? "text-blue-600 dark:text-blue-400" 
+                        : "text-gray-400 dark:text-gray-500"
+                    )}
+                  >
+                    <Icon className={cn(
+                      "h-5 w-5 mb-0.5 transition-transform",
+                      active && "scale-110"
+                    )} />
+                    <span className={cn(
+                      "text-[10px] font-medium",
+                      active && "font-semibold"
+                    )}>
+                      {t(item.labelKey as any)}
+                    </span>
+                  </Link>
+                </div>
+              )
+            }
+
             return (
-              <button
+              <Link
                 key={item.href}
-                onClick={onMenuClick}
+                href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors",
+                  "flex flex-col items-center justify-center w-14 h-12 transition-all",
                   active 
                     ? "text-blue-600 dark:text-blue-400" 
-                    : "text-gray-500 dark:text-gray-400"
+                    : "text-gray-400 dark:text-gray-500"
                 )}
               >
                 <Icon className={cn(
-                  "h-5 w-5 mb-1",
-                  active && "text-blue-600 dark:text-blue-400"
+                  "h-5 w-5 mb-0.5 transition-transform",
+                  active && "scale-110"
                 )} />
                 <span className={cn(
                   "text-[10px] font-medium",
-                  active && "text-blue-600 dark:text-blue-400"
+                  active && "font-semibold"
                 )}>
                   {t(item.labelKey as any)}
                 </span>
-              </button>
+              </Link>
             )
-          }
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors",
-                active 
-                  ? "text-blue-600 dark:text-blue-400" 
-                  : "text-gray-500 dark:text-gray-400"
-              )}
-            >
-              <div className={cn(
-                "relative",
-                active && "after:absolute after:-top-2 after:left-1/2 after:-translate-x-1/2 after:w-8 after:h-1 after:bg-blue-600 after:dark:bg-blue-400 after:rounded-full"
-              )}>
-                <Icon className={cn(
-                  "h-5 w-5 mb-1",
-                  active && "text-blue-600 dark:text-blue-400"
-                )} />
-              </div>
-              <span className={cn(
-                "text-[10px] font-medium",
-                active && "text-blue-600 dark:text-blue-400"
-              )}>
-                {t(item.labelKey as any)}
-              </span>
-            </Link>
-          )
-        })}
+          })}
+          
+          {/* Menu button */}
+          <button
+            onClick={onMenuClick}
+            className="flex flex-col items-center justify-center w-14 h-12 text-gray-400 dark:text-gray-500 transition-all"
+          >
+            <MenuIcon className="h-5 w-5 mb-0.5" />
+            <span className="text-[10px] font-medium">{t('more')}</span>
+          </button>
+        </div>
       </div>
     </nav>
   )

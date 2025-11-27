@@ -13,6 +13,7 @@ import {
 import List01 from "./list-01"
 import List02 from "./list-02"
 import List03 from "./list-03"
+import MobileDashboard from "./mobile-dashboard"
 import { Account, Transaction, Budget, User } from "@/lib/types"
 import useBinancePortfolio from '@/hooks/use-binance-portfolio';
 import { PortfolioPieChart } from './PortfolioPieChart';
@@ -24,6 +25,7 @@ import { getTransactionIcon } from '@/lib/transaction-icons';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { getTranslatedText } from '@/lib/translation-utils';
 import { useCurrency } from './CurrencyContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 interface ContentProps {
   user?: User;
@@ -36,6 +38,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
   const { currency: userCurrency } = useCurrency();
   const router = useRouter();
   const { t, language } = useLanguage();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   // Button handlers
   const handleAddAccount = () => router.push('/accounts');
@@ -193,6 +196,67 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
   const portfolioAssets = portfolio
     ? portfolio.filter(a => parseFloat(a.free) > 0).map(a => ({ symbol: a.asset, amount: a.free }))
     : [];
+
+  // Calculate total income and expenses for the current month
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const currentMonthTransactions = transactions.filter(t => new Date(t.transactionDate) >= currentMonthStart);
+  
+  const totalIncome = currentMonthTransactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+  
+  const totalExpenses = currentMonthTransactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + Number(t.amount), 0);
+
+  // Mobile budgets with spent calculation
+  const mobileBudgets = budgets.map(budget => {
+    const budgetStart = new Date(budget.startDate);
+    const budgetEnd = new Date(budget.endDate);
+    const spent = transactions
+      .filter(t => {
+        const txDate = new Date(t.transactionDate);
+        return t.type === 'expense' && txDate >= budgetStart && txDate <= budgetEnd;
+      })
+      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+    
+    return {
+      id: budget.id,
+      name: getTranslatedText(budget.name, budget.nameTranslations, language),
+      amount: Number(budget.amount),
+      spent,
+      currency: budget.currency || userCurrency,
+    };
+  });
+
+  // Render Mobile Dashboard for mobile devices
+  if (isMobile) {
+    return (
+      <MobileDashboard
+        accounts={accounts.map(a => ({
+          id: a.id,
+          name: getTranslatedText(a.name, a.nameTranslations, language),
+          type: a.type,
+          balance: Number(a.balance),
+          currency: a.currency || userCurrency,
+        }))}
+        transactions={transactions.map(t => ({
+          id: t.id,
+          description: getTranslatedText(t.description, t.descriptionTranslations, language),
+          amount: Number(t.amount),
+          type: t.type as 'income' | 'expense',
+          category: t.category,
+          transactionDate: t.transactionDate,
+          currency: t.currency || userCurrency,
+        }))}
+        budgets={mobileBudgets}
+        totalBalance={totalBalance}
+        totalIncome={totalIncome}
+        totalExpenses={totalExpenses}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4 lg:space-y-6">
