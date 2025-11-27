@@ -7,12 +7,14 @@ import { useAccounts } from '@/hooks/use-accounts';
 import { useTransactions } from '@/hooks/use-transactions';
 import { useBudgets } from '@/hooks/use-budgets';
 import { useRouter } from 'next/navigation';
+import { useMediaQuery } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, PieChart, LineChart, Calendar, ArrowUpRight, ArrowDownLeft, DollarSign } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
+import MobileReports from '@/components/finflow/mobile-reports';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip as ReTooltip, ResponsiveContainer as ReResponsiveContainer, PieChart as RePieChart, Pie, Cell, Legend } from 'recharts';
@@ -150,6 +152,26 @@ export default function ReportsPage() {
       remaining: Math.max(0, budgetAmount - spent)
     };
   }) || [];
+
+  const isMobile = useMediaQuery("(max-width: 1023px)");
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileReports
+        income={income}
+        expenses={expenses}
+        balance={balance}
+        transactions={filteredTransactions}
+        budgetPerformance={budgetPerformance.map(b => ({ ...b, id: b.name }))}
+        expensesByCategory={expensesByCategory}
+        incomeTrends={incomeTrends}
+        isLoading={false}
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+      />
+    );
+  }
 
   return (
     <Layout user={user}>

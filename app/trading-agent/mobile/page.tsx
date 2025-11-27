@@ -16,7 +16,9 @@ import {
   Activity,
   ChevronRight,
   Settings2,
-  RefreshCw
+  RefreshCw,
+  X,
+  Check
 } from 'lucide-react';
 import { useAuth } from "@/hooks/use-auth";
 import { useCurrency } from '@/hooks/use-currency';
@@ -25,6 +27,22 @@ import { tradingAgentApi } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import MobileHeader from '@/components/finflow/mobile-header';
 import MobileBottomNav from '@/components/finflow/mobile-bottom-nav';
+
+// Popular cryptos for quick selection
+const POPULAR_CRYPTOS = [
+  { symbol: 'BTC', name: 'Bitcoin' },
+  { symbol: 'ETH', name: 'Ethereum' },
+  { symbol: 'SOL', name: 'Solana' },
+  { symbol: 'XRP', name: 'Ripple' },
+  { symbol: 'ADA', name: 'Cardano' },
+  { symbol: 'DOGE', name: 'Dogecoin' },
+  { symbol: 'DOT', name: 'Polkadot' },
+  { symbol: 'AVAX', name: 'Avalanche' },
+  { symbol: 'LINK', name: 'Chainlink' },
+  { symbol: 'MATIC', name: 'Polygon' },
+  { symbol: 'UNI', name: 'Uniswap' },
+  { symbol: 'ATOM', name: 'Cosmos' },
+];
 
 interface TradingAgent {
   id: string;
@@ -64,6 +82,17 @@ export default function MobileTradingAgentPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'portfolio' | 'agents'>('portfolio');
+  
+  // Create Agent State
+  const [showCreateSheet, setShowCreateSheet] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newAgentName, setNewAgentName] = useState('Mein Trading Agent');
+  const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+  const [strategy, setStrategy] = useState<'conservative' | 'moderate' | 'aggressive'>('conservative');
+  const [stopLoss, setStopLoss] = useState(8);
+  const [takeProfit, setTakeProfit] = useState(15);
+  const [maxDailyTrades, setMaxDailyTrades] = useState(100);
+  const [maxSingleTrade, setMaxSingleTrade] = useState(50);
 
   useEffect(() => {
     loadData();
@@ -90,6 +119,52 @@ export default function MobileTradingAgentPage() {
     setIsRefreshing(true);
     await loadData();
     setIsRefreshing(false);
+  };
+
+  const toggleAsset = (symbol: string) => {
+    setSelectedAssets(prev => 
+      prev.includes(symbol) 
+        ? prev.filter(a => a !== symbol)
+        : [...prev, symbol]
+    );
+  };
+
+  const createAgent = async () => {
+    if (!newAgentName.trim()) {
+      alert(t('pleaseEnterAgentName') || 'Bitte gib einen Namen ein');
+      return;
+    }
+    if (selectedAssets.length === 0) {
+      alert(t('pleaseSelectAtLeastOneCrypto') || 'Bitte wähle mindestens eine Kryptowährung');
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      await tradingAgentApi.createAgent({
+        name: newAgentName,
+        assets: selectedAssets,
+        strategy,
+        stopLossPercent: stopLoss,
+        takeProfitPercent: takeProfit,
+        maxDailyTradesEur: maxDailyTrades,
+        maxSingleTradeEur: maxSingleTrade,
+      });
+
+      // Reset form
+      setNewAgentName('Mein Trading Agent');
+      setSelectedAssets([]);
+      setStrategy('conservative');
+      setStopLoss(8);
+      setTakeProfit(15);
+      setShowCreateSheet(false);
+      loadData();
+    } catch (error) {
+      console.error('Error creating agent:', error);
+      alert(t('errorCreatingAgent') || 'Fehler beim Erstellen des Agents');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const toggleAgent = async (agentId: string, enabled: boolean) => {
@@ -267,7 +342,7 @@ export default function MobileTradingAgentPage() {
                   {t('noAgentsYet')}
                 </p>
                 <button
-                  onClick={() => router.push('/trading-agent')}
+                  onClick={() => setShowCreateSheet(true)}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium"
                 >
                   <Plus className="w-4 h-4 inline mr-1" />
@@ -363,7 +438,7 @@ export default function MobileTradingAgentPage() {
             {/* Add Agent Button */}
             {agents.length > 0 && (
               <button
-                onClick={() => router.push('/trading-agent')}
+                onClick={() => setShowCreateSheet(true)}
                 className="w-full py-3 bg-blue-500 text-white rounded-xl font-medium flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
@@ -373,6 +448,207 @@ export default function MobileTradingAgentPage() {
           </div>
         )}
       </div>
+
+      {/* Create Agent Bottom Sheet */}
+      {showCreateSheet && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowCreateSheet(false)}
+          />
+          
+          {/* Sheet */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            </div>
+            
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                {t('createNewTradingAgent') || 'Neuen Agent erstellen'}
+              </h2>
+              <button
+                onClick={() => setShowCreateSheet(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            
+            {/* Content */}
+            <div className="p-4 space-y-5 pb-8">
+              {/* Agent Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('name') || 'Name'}
+                </label>
+                <input
+                  type="text"
+                  value={newAgentName}
+                  onChange={(e) => setNewAgentName(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-[#232e40] rounded-xl text-gray-900 dark:text-white border-0 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Mein Trading Agent"
+                />
+              </div>
+
+              {/* Strategy Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('strategy') || 'Strategie'}
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { value: 'conservative', icon: Shield, label: t('conservative') || 'Konservativ', color: 'blue' },
+                    { value: 'moderate', icon: TrendingUp, label: t('moderate') || 'Moderat', color: 'yellow' },
+                    { value: 'aggressive', icon: Zap, label: t('aggressive') || 'Aggressiv', color: 'red' },
+                  ].map((s) => (
+                    <button
+                      key={s.value}
+                      onClick={() => setStrategy(s.value as any)}
+                      className={`p-3 rounded-xl border-2 transition-all ${
+                        strategy === s.value
+                          ? `border-${s.color}-500 bg-${s.color}-50 dark:bg-${s.color}-900/20`
+                          : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <s.icon className={`w-5 h-5 mx-auto mb-1 ${
+                        strategy === s.value ? `text-${s.color}-500` : 'text-gray-400'
+                      }`} />
+                      <span className={`text-xs font-medium ${
+                        strategy === s.value ? `text-${s.color}-600 dark:text-${s.color}-400` : 'text-gray-500'
+                      }`}>
+                        {s.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Crypto Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('selectCryptocurrencies') || 'Kryptowährungen auswählen'} ({selectedAssets.length})
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {POPULAR_CRYPTOS.map((crypto) => (
+                    <button
+                      key={crypto.symbol}
+                      onClick={() => toggleAsset(crypto.symbol)}
+                      className={`p-3 rounded-xl border-2 transition-all ${
+                        selectedAssets.includes(crypto.symbol)
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-medium ${
+                          selectedAssets.includes(crypto.symbol)
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : 'text-gray-700 dark:text-gray-300'
+                        }`}>
+                          {crypto.symbol}
+                        </span>
+                        {selectedAssets.includes(crypto.symbol) && (
+                          <Check className="w-4 h-4 text-blue-500" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stop Loss & Take Profit */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('stopLoss') || 'Stop Loss'}: {stopLoss}%
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="20"
+                    value={stopLoss}
+                    onChange={(e) => setStopLoss(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Auto-Verkauf bei -{stopLoss}%</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('takeProfit') || 'Take Profit'}: {takeProfit}%
+                  </label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="50"
+                    step="5"
+                    value={takeProfit}
+                    onChange={(e) => setTakeProfit(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Gewinnmitnahme bei +{takeProfit}%</p>
+                </div>
+              </div>
+
+              {/* Max Trade Limits */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('maxDailyVolume') || 'Max. täglich'}: {maxDailyTrades}€
+                  </label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="500"
+                    step="50"
+                    value={maxDailyTrades}
+                    onChange={(e) => setMaxDailyTrades(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('maxSingleTradeSize') || 'Max. pro Trade'}: {maxSingleTrade}€
+                  </label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="200"
+                    step="10"
+                    value={maxSingleTrade}
+                    onChange={(e) => setMaxSingleTrade(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Create Button */}
+              <button
+                onClick={createAgent}
+                disabled={isCreating || selectedAssets.length === 0}
+                className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCreating ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5" />
+                    {t('createAgent') || 'Agent erstellen'}
+                    {selectedAssets.length > 0 && (
+                      <span className="ml-1 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                        {selectedAssets.length}
+                      </span>
+                    )}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <MobileBottomNav />
     </div>

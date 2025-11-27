@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Layout from "@/components/finflow/layout";
+import MobileAnalytics from "@/components/finflow/mobile-analytics";
 import { useAuth } from "@/hooks/use-auth";
 import { formatCurrency } from '@/lib/utils';
 import { accountsApi, transactionsApi, tradingAgentApi, budgetsApi, categoriesApi } from '@/lib/api';
@@ -50,6 +51,7 @@ import {
 } from 'lucide-react';
 import { useCurrency } from '@/components/finflow/CurrencyContext';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 interface BalanceData {
   date: string;
@@ -295,6 +297,8 @@ export default function AnalyticsPage() {
     }
   };
 
+  const isMobile = useMediaQuery("(max-width: 1023px)");
+
   if (isLoading) {
     return (
       <Layout user={user}>
@@ -302,6 +306,24 @@ export default function AnalyticsPage() {
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </Layout>
+    );
+  }
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileAnalytics
+        totalIncome={totalIncome}
+        totalExpenses={totalExpenses}
+        netBalance={netBalance}
+        categorySpending={categorySpending}
+        cryptoPortfolio={cryptoPortfolio}
+        totalCryptoValue={totalCryptoValue}
+        balanceData={balanceData}
+        isLoading={isLoading}
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+      />
     );
   }
 

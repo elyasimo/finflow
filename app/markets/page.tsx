@@ -19,9 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, Loader2 } from "lucide-react";
 import Layout from "@/components/finflow/layout";
+import MobileMarkets from "@/components/finflow/mobile-markets";
 import { useAuth } from "@/hooks/use-auth";
 import { useCurrency } from '@/components/finflow/CurrencyContext';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function MarketsPage() {
   const { markets, isLoading, error } = useMarkets();
@@ -96,6 +98,24 @@ export default function MarketsPage() {
   // Timestamp für letzte Aktualisierung
   const lastUpdated = markets?.stocks?.[0]?.lastUpdated ? 
     new Date(markets.stocks[0].lastUpdated).toLocaleString('de-DE') : '';
+
+  const isMobile = useMediaQuery("(max-width: 1023px)");
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileMarkets
+        cryptoMarkets={cryptoMarkets || []}
+        stocks={filteredStocks}
+        indices={filteredIndices}
+        commodities={filteredCommodities}
+        forex={filteredForex}
+        isLoading={isLoading}
+        cryptoLoading={cryptoLoading}
+        onRefresh={() => window.location.reload()}
+      />
+    );
+  }
 
   return (
     <Layout user={user}>

@@ -15,6 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Bell, BellOff, Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import MobilePriceAlerts from '@/components/finflow/mobile-price-alerts';
 
 interface PriceAlert {
   id: string;
@@ -145,6 +147,8 @@ export default function PriceAlertsPage() {
   const activeAlerts = alerts.filter(a => a.isActive && !a.triggeredAt);
   const triggeredAlerts = alerts.filter(a => a.triggeredAt);
 
+  const isMobile = useMediaQuery("(max-width: 1023px)");
+
   // Show loading while checking auth
   if (authLoading) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
@@ -153,6 +157,26 @@ export default function PriceAlertsPage() {
   // Don't render if not authenticated
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobilePriceAlerts
+        alerts={alerts}
+        isLoading={isLoading}
+        onCreateAlert={async (data) => {
+          await createAlertMutation.mutateAsync(data);
+        }}
+        onDeleteAlert={async (id) => {
+          await deleteAlertMutation.mutateAsync(id);
+        }}
+        onToggleAlert={async (id) => {
+          await toggleAlertMutation.mutateAsync(id);
+        }}
+        isCreating={createAlertMutation.isPending}
+      />
+    );
   }
 
   return (
