@@ -24,7 +24,7 @@ import { useAccounts } from "@/hooks/use-accounts";
 import { useBudgets } from "@/hooks/use-budgets";
 import { useCategories } from "@/hooks/use-categories";
 import Layout from "@/components/finflow/layout";
-import MobileTransactions from "@/components/finflow/mobile-transactions";
+import MobileTransactionsNew from "@/components/finflow/mobile-transactions-new";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { format } from 'date-fns';
@@ -301,7 +301,7 @@ export default function TransactionsPage() {
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileTransactions
+      <MobileTransactionsNew
         transactions={transactions?.map(t => ({
           id: t.id,
           description: getTranslatedText(t.description, t.descriptionTranslations, language),

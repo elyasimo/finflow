@@ -13,7 +13,7 @@ import {
 import List01 from "./list-01"
 import List02 from "./list-02"
 import List03 from "./list-03"
-import MobileDashboard from "./mobile-dashboard"
+import MobileDashboardNew from "./mobile-dashboard-new"
 import { Account, Transaction, Budget, User } from "@/lib/types"
 import useBinancePortfolio from '@/hooks/use-binance-portfolio';
 import { PortfolioPieChart } from './PortfolioPieChart';
@@ -234,7 +234,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
   // Render Mobile Dashboard for mobile devices
   if (isMobile) {
     return (
-      <MobileDashboard
+      <MobileDashboardNew
         accounts={accounts.map(a => ({
           id: a.id,
           name: getTranslatedText(a.name, a.nameTranslations, language),

@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Plus, Trash2, Pencil } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Layout from "@/components/finflow/layout";
-import MobileCategories from "@/components/finflow/mobile-categories";
+import MobileCategoriesNew from "@/components/finflow/mobile-categories-new";
 import { useAuth } from "@/hooks/use-auth";
 import {
   AlertDialog,
@@ -94,7 +94,7 @@ export default function CategoriesPage() {
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileCategories
+      <MobileCategoriesNew
         categories={categories.map(c => ({
           id: c.id,
           name: getTranslatedText(c.name, c.nameTranslations, language),

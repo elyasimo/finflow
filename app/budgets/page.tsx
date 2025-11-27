@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Plus, Trash2, Edit, PiggyBank, Calendar } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
-import MobileBudgets from '@/components/finflow/mobile-budgets';
+import MobileBudgetsNew from '@/components/finflow/mobile-budgets-new';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -260,7 +260,7 @@ export default function BudgetsPage() {
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileBudgets
+      <MobileBudgetsNew
         budgets={budgetsWithSpent}
         onAddBudget={() => setIsCreateDialogOpen(true)}
         onEditBudget={(id) => {
