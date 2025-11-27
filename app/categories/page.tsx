@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2, Plus, Trash2, Pencil } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import Layout from "@/components/finflow/layout";
+import MobileCategories from "@/components/finflow/mobile-categories";
 import { useAuth } from "@/hooks/use-auth";
 import {
   AlertDialog,
@@ -31,12 +32,14 @@ import {
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { getTranslatedText } from '@/lib/translation-utils';
 import { CategoryIcon } from '@/components/icons/CategoryIcon';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function CategoriesPage() {
   const { categories, isLoading, createCategory, updateCategory, deleteCategory } =
     useCategories();
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<{
@@ -87,6 +90,27 @@ export default function CategoriesPage() {
     setEditCategoryName(category.name);
     setIsEditDialogOpen(true);
   };
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileCategories
+        categories={categories.map(c => ({
+          id: c.id,
+          name: getTranslatedText(c.name, c.nameTranslations, language),
+          icon: c.icon,
+        }))}
+        onAddCategory={() => setIsCreateDialogOpen(true)}
+        onEditCategory={(id) => {
+          const category = categories.find(c => c.id === id);
+          if (category) {
+            handleEditClick(category);
+          }
+        }}
+        onDeleteCategory={(id) => handleDeleteCategory(id)}
+      />
+    );
+  }
 
   return (
     <Layout user={user}>

@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useBudgets } from '@/hooks/use-budgets';
+import { useTransactions } from '@/hooks/use-transactions';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Plus, Trash2, Edit, PiggyBank, Calendar } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
+import MobileBudgets from '@/components/finflow/mobile-budgets';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -20,6 +22,7 @@ import { budgetsApi } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { getTranslatedText } from '@/lib/translation-utils';
 import { useCurrency } from '@/components/finflow/CurrencyContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 interface BudgetUsage {
   budgetId: string;
@@ -31,9 +34,11 @@ interface BudgetUsage {
 export default function BudgetsPage() {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const { budgets, isLoading: budgetsLoading, createBudget, updateBudget, deleteBudget, isCreating, isUpdating, isDeleting } = useBudgets();
+  const { transactions } = useTransactions();
   const router = useRouter();
   const { t, language } = useLanguage();
   const { currency: userCurrency } = useCurrency();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -228,6 +233,46 @@ export default function BudgetsPage() {
   // If not authenticated, don't render anything (will be redirected)
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Calculate spent amounts for budgets
+  const budgetsWithSpent = budgets?.map(budget => {
+    const budgetStart = new Date(budget.startDate);
+    const budgetEnd = new Date(budget.endDate);
+    const spent = transactions
+      ?.filter(t => {
+        const txDate = new Date(t.transactionDate);
+        return t.type === 'expense' && txDate >= budgetStart && txDate <= budgetEnd;
+      })
+      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0) || 0;
+    
+    return {
+      id: budget.id,
+      name: getTranslatedText(budget.name, budget.nameTranslations, language),
+      amount: Number(budget.amount),
+      spent,
+      currency: budget.currency || userCurrency,
+      startDate: budget.startDate,
+      endDate: budget.endDate,
+    };
+  }) || [];
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileBudgets
+        budgets={budgetsWithSpent}
+        onAddBudget={() => setIsCreateDialogOpen(true)}
+        onEditBudget={(id) => {
+          const budget = budgets?.find(b => b.id === id);
+          if (budget) {
+            setSelectedBudget(budget);
+            setIsEditDialogOpen(true);
+          }
+        }}
+        onDeleteBudget={(id) => deleteBudget(id)}
+      />
+    );
   }
 
   return (

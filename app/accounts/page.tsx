@@ -14,11 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Plus, Trash2, Edit, CreditCard, Wallet, PiggyBank, BarChart } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Layout from '@/components/finflow/layout';
+import MobileAccounts from '@/components/finflow/mobile-accounts';
 import { Account } from '@/lib/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { getTranslatedText } from '@/lib/translation-utils';
 import { useCurrency } from '@/components/finflow/CurrencyContext';
 import { PostFinanceIcon, UBSIcon, getSwissBrandIcon } from '@/components/icons/swiss-brand-icons';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function AccountsPage() {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
@@ -26,6 +28,7 @@ export default function AccountsPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { currency: userCurrency } = useCurrency();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -171,6 +174,41 @@ export default function AccountsPage() {
   // If not authenticated, don't render anything (will be redirected)
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Calculate total balance
+  const totalBalance = accounts?.reduce((sum, account) => sum + (Number(account.balance) || 0), 0) || 0;
+
+  // If mobile, render mobile version
+  if (isMobile) {
+    return (
+      <MobileAccounts
+        accounts={accounts?.map(account => ({
+          id: account.id,
+          name: getTranslatedText(account.name, account.nameTranslations, language),
+          type: account.type,
+          balance: Number(account.balance),
+          currency: account.currency || userCurrency,
+          bankName: account.name?.split(' - ')?.[0] || undefined,
+        })) || []}
+        totalBalance={totalBalance / 100}
+        onAddAccount={() => setIsCreateDialogOpen(true)}
+        onEditAccount={(id) => {
+          const account = accounts?.find(a => a.id === id);
+          if (account) {
+            setSelectedAccount(account);
+            setIsEditDialogOpen(true);
+          }
+        }}
+        onDeleteAccount={(id) => {
+          const account = accounts?.find(a => a.id === id);
+          if (account) {
+            setSelectedAccount(account);
+            setIsDeleteDialogOpen(true);
+          }
+        }}
+      />
+    );
   }
 
   // Extract bank info from account name

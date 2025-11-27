@@ -12,16 +12,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, User, Lock, Bell, Moon, Sun, LogOut } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
+import MobileSettings from '@/components/finflow/mobile-settings';
 import { useTheme } from 'next-themes';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function SettingsPage() {
   const { isAuthenticated, user, isLoading: authLoading, updateProfile, isUpdateProfileLoading, logout } = useAuth();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   // Form state
   const [fullName, setFullName] = useState('');
@@ -308,6 +311,29 @@ export default function SettingsPage() {
   // If not authenticated, don't render anything (will be redirected)
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileSettings
+        user={{
+          name: user?.fullName || '',
+          email: user?.email || '',
+        }}
+        theme={theme || 'system'}
+        language={language}
+        currency={defaultCurrency}
+        onThemeChange={setTheme}
+        onLanguageChange={setLanguage}
+        onCurrencyChange={(currency) => {
+          setDefaultCurrency(currency);
+          handleCurrencyUpdate();
+        }}
+        onLogout={handleLogout}
+        onUpdateProfile={handleProfileUpdate}
+      />
+    );
   }
 
   return (

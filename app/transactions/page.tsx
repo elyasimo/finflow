@@ -24,6 +24,7 @@ import { useAccounts } from "@/hooks/use-accounts";
 import { useBudgets } from "@/hooks/use-budgets";
 import { useCategories } from "@/hooks/use-categories";
 import Layout from "@/components/finflow/layout";
+import MobileTransactions from "@/components/finflow/mobile-transactions";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { format } from 'date-fns';
@@ -33,6 +34,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { getTranslatedText } from '@/lib/translation-utils';
 import { useCurrency } from '@/components/finflow/CurrencyContext';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function TransactionsPage() {
   const { transactions, isLoading, createTransaction, isCreating, updateTransaction, deleteTransaction, isDeleting } = useTransactions();
@@ -43,6 +45,7 @@ export default function TransactionsPage() {
   const { t, language } = useLanguage();
   const { currency: userCurrency } = useCurrency();
   const { convert, convertAndFormat } = useExchangeRates();
+  const isMobile = useMediaQuery("(max-width: 1023px)");
 
   // Get date-fns locale based on current language
   const getDateLocale = () => {
@@ -294,6 +297,50 @@ export default function TransactionsPage() {
       alert(`Aktualisieren fehlgeschlagen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   };
+
+  // Render mobile version
+  if (isMobile) {
+    return (
+      <MobileTransactions
+        transactions={transactions?.map(t => ({
+          id: t.id,
+          description: getTranslatedText(t.description, t.descriptionTranslations, language),
+          amount: Number(t.amount),
+          type: t.type as 'income' | 'expense',
+          category: typeof t.category === 'object' ? t.category?.name : t.category,
+          transactionDate: t.transactionDate,
+          currency: t.currency || userCurrency,
+          accountId: t.accountId,
+        })) || []}
+        accounts={accounts?.map(a => ({
+          id: a.id,
+          name: getTranslatedText(a.name, a.nameTranslations, language),
+        })) || []}
+        categories={categories?.map(c => ({
+          id: c.id,
+          name: getTranslatedText(c.name, c.nameTranslations, language),
+        })) || []}
+        onAddTransaction={() => setIsCreateOpen(true)}
+        onEditTransaction={(id) => {
+          const transaction = transactions?.find(t => t.id === id);
+          if (transaction) {
+            setSelectedTransaction(transaction);
+            setNewTransaction({
+              accountId: transaction.accountId || "",
+              amount: parseFloat(transaction.amount.toString()),
+              type: transaction.type,
+              description: transaction.description || "",
+              categoryId: transaction.categoryId || "",
+              currency: transaction.currency || userCurrency,
+              transactionDate: new Date(transaction.transactionDate),
+            });
+            setIsEditOpen(true);
+          }
+        }}
+        onDeleteTransaction={(id) => deleteTransaction(id)}
+      />
+    );
+  }
 
   return (
     <Layout user={user}>
