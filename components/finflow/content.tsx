@@ -195,98 +195,114 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
     : [];
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-[#232e40] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#2d3b4e]">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-left flex items-center gap-2 ">
-            <Wallet className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
-            {t('accounts')}
-          </h2>
-          <div className="flex-1">
-            <List01 
-              className="h-full" 
-              accounts={mappedAccounts} 
-              totalBalance={formattedTotalBalance}
-              hasMultipleCurrencies={hasMultipleCurrencies}
-              userCurrency={userCurrency}
-              onAddClick={handleAddAccount}
-              onSendClick={handleSendMoney}
-              onTopUpClick={handleTopUp}
-              onMoreClick={handleMore}
-            />
+    <div className="space-y-4 lg:space-y-6">
+      {/* Main Cards Grid - Stack on Mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+        {/* Accounts Card */}
+        <div className="bg-white dark:bg-[#1a2332] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#232e40]">
+          <div className="p-4 lg:p-6 border-b border-gray-100 dark:border-[#232e40]">
+            <h2 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Wallet className="w-4 h-4 lg:w-5 lg:h-5 text-blue-500" />
+              {t('accounts')}
+            </h2>
           </div>
+          <List01 
+            className="border-0 shadow-none rounded-none" 
+            accounts={mappedAccounts} 
+            totalBalance={formattedTotalBalance}
+            hasMultipleCurrencies={hasMultipleCurrencies}
+            userCurrency={userCurrency}
+            onAddClick={handleAddAccount}
+            onSendClick={handleSendMoney}
+            onTopUpClick={handleTopUp}
+            onMoreClick={handleMore}
+          />
         </div>
-        <div className="bg-white dark:bg-[#232e40] rounded-xl p-6 flex flex-col border border-gray-200 dark:border-[#2d3b4e]">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white text-left flex items-center gap-2">
-              <CreditCard className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
+
+        {/* Recent Transactions Card */}
+        <div className="bg-white dark:bg-[#1a2332] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#232e40]">
+          <div className="p-4 lg:p-6 border-b border-gray-100 dark:border-[#232e40]">
+            <h2 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <CreditCard className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-500" />
               {t('recentTransactions')}
             </h2>
           </div>
-          <div className="flex-1">
+          <div className="p-4 lg:p-6">
             <List02 className="h-full" transactions={mappedTransactions} onViewAllClick={handleViewAllTransactions} />
           </div>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#232e40] rounded-xl p-6 flex flex-col items-start justify-start border border-gray-200 dark:border-[#2d3b4e]">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 text-left flex items-center gap-2">
-          <Calendar className="w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
-          {t('upcomingEvents')}
-        </h2>
-        <List03 items={mappedBudgets} onViewDetailsClick={handleViewBudgetDetails} />
+      {/* Budgets Card */}
+      <div className="bg-white dark:bg-[#1a2332] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#232e40]">
+        <div className="p-4 lg:p-6 border-b border-gray-100 dark:border-[#232e40]">
+          <h2 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <Calendar className="w-4 h-4 lg:w-5 lg:h-5 text-purple-500" />
+            {t('upcomingEvents')}
+          </h2>
+        </div>
+        <div className="p-4 lg:p-6">
+          <List03 items={mappedBudgets} onViewDetailsClick={handleViewBudgetDetails} />
+        </div>
       </div>
 
-      {/* Binance Portfolio Card */}
-      <div className="bg-white dark:bg-[#232e40] rounded-xl border border-gray-200 dark:border-[#2d3b4e] overflow-hidden">
-        <div className="p-6 border-b border-gray-200 dark:border-[#2d3b4e]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <svg className="w-6 h-6" viewBox="0 0 126.61 126.61" fill="currentColor">
+      {/* Binance Portfolio Card - Mobile Optimized */}
+      <div className="bg-white dark:bg-[#1a2332] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#232e40]">
+        {/* Header */}
+        <div className="p-4 lg:p-6 border-b border-gray-100 dark:border-[#232e40]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                <svg className="w-6 h-6 text-yellow-500" viewBox="0 0 126.61 126.61" fill="currentColor">
                   <path d="M38.73 53.2l24.59-24.58 24.6 24.6-14.45 14.44-10.15-10.15-10.14 10.15z"/>
                   <path d="M0 63.31l24.58-24.6 14.45 14.45-24.6 24.6z"/>
                   <path d="M38.73 73.41l24.59 24.6 24.6-24.6-14.45-14.45-10.15 10.15-10.14-10.15z"/>
                   <path d="M87.47 63.31l14.45-14.45L126.61 63.3l-24.6 24.6z"/>
                   <path d="M77.83 63.3L63.32 48.78 52.59 59.51l-5.15 5.16 5.15 5.15 10.73 10.73z"/>
                 </svg>
-                {t('binancePortfolio')}
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                {t('liveCryptocurrencyHoldings')}
-              </p>
+              </div>
+              <div>
+                <h2 className="text-base lg:text-lg font-bold text-gray-900 dark:text-white">
+                  {t('binancePortfolio')}
+                </h2>
+                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">
+                  {t('liveCryptocurrencyHoldings')}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            <div className="text-left sm:text-right bg-gray-50 dark:bg-[#232e40] rounded-xl p-3">
+              <div className="text-xs text-gray-500 dark:text-gray-400">{t('totalValue')}</div>
+              <div className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
                 {new Intl.NumberFormat('de-CH', { style: 'currency', currency: userCurrency, minimumFractionDigits: 2 }).format(estimatedTotal)}
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">{t('totalValue')}</div>
             </div>
           </div>
         </div>
 
         {binanceLoading && (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-4">{t('loadingPortfolio')}</p>
+          <div className="p-8 lg:p-12 text-center">
+            <div className="animate-spin rounded-full h-10 w-10 lg:h-12 lg:w-12 border-b-2 border-yellow-500 mx-auto"></div>
+            <p className="text-gray-500 dark:text-gray-400 mt-4 text-sm">{t('loadingPortfolio')}</p>
           </div>
         )}
         
         {needsConfiguration && !binanceLoading && (
-          <div className="p-8 text-center">
+          <div className="p-6 lg:p-8 text-center">
             <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
             </div>
-            <p className="font-medium text-gray-900 dark:text-white mb-2">{t('binanceApiKeysNotConfigured') || 'Binance API Keys Not Configured'}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="font-semibold text-gray-900 dark:text-white mb-2">{t('binanceApiKeysNotConfigured') || 'Binance API Keys Not Configured'}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto">
               {t('configureBinanceApiKeys') || 'Add your Binance API keys in Settings to view your portfolio.'}
             </p>
             <a
               href="/settings"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-medium transition-colors active:scale-[0.98]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -298,96 +314,92 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
         )}
         
         {binanceError && !needsConfiguration && !binanceLoading && (
-          <div className="p-8 text-center">
-            <div className="text-red-500 dark:text-red-400">{binanceError}</div>
+          <div className="p-6 lg:p-8 text-center">
+            <div className="text-red-500 dark:text-red-400 text-sm">{binanceError}</div>
           </div>
         )}
         
         {!binanceLoading && !binanceError && !needsConfiguration && (
           <>
             {portfolio.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-6 lg:p-8 text-center text-gray-500 dark:text-gray-400">
                 <div className="mb-4">
-                  <svg className="w-16 h-16 mx-auto opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
+                  <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-[#232e40] flex items-center justify-center mx-auto">
+                    <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                  </div>
                 </div>
-                <p className="font-medium">{t('noAssetsFound')}</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{t('noAssetsFound')}</p>
                 <p className="text-sm mt-1">{t('binancePortfolioEmpty')}</p>
               </div>
             ) : (
-              <div className="p-6">
+              <div className="p-4 lg:p-6">
                 {/* Portfolio Chart */}
-                <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900/50 dark:to-zinc-800/30 rounded-lg p-4">
+                <div className="mb-4 lg:mb-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900/50 dark:to-zinc-800/30 rounded-xl p-4">
                   <PortfolioPieChart data={portfolio.map(a => ({
                     asset: a.asset,
                     value: a.currentPrice ? parseFloat(a.free) * a.currentPrice : 0
                   }))} />
                 </div>
 
-                {/* Asset Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Asset Cards Grid - Mobile Optimized */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
                   {portfolio.map((asset) => {
                     const value = asset.currentPrice ? parseFloat(asset.free) * asset.currentPrice : 0;
-                    const baseSymbol = asset.asset.replace('USDT', '').toLowerCase();
-                    const logoUrl = `/logos/cryptocurrency/${baseSymbol}.png`;
                     const isPositive = (asset.priceChange24h || 0) > 0;
                     const isNegative = (asset.priceChange24h || 0) < 0;
                     
                     return (
                       <div 
                         key={asset.asset}
-                        className="bg-white dark:bg-zinc-900/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all hover:shadow-md"
+                        className="bg-white dark:bg-[#232e40] rounded-xl p-4 border border-gray-100 dark:border-[#2d3b4e] hover:border-gray-200 dark:hover:border-[#3d4b5e] transition-all active:scale-[0.98]"
                       >
                         {/* Header with Icon and 24h Change */}
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-700 flex items-center justify-center overflow-hidden">
-                              {/* Fallback to SVG icon */}
-                              <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
-                              </svg>
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
+                              {asset.asset.substring(0, 2)}
                             </div>
                             <div>
-                              <div className="font-bold text-gray-900 dark:text-white">{asset.asset}</div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">
-                                {parseFloat(asset.free).toFixed(6)}
+                              <div className="font-bold text-gray-900 dark:text-white text-sm">{asset.asset}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {parseFloat(asset.free).toFixed(4)}
                               </div>
                             </div>
                           </div>
                           {asset.priceChange24h !== null && (
-                            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-                              isPositive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                              isNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                              'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
+                            <div className={`flex items-center gap-0.5 px-2 py-1 rounded-lg text-xs font-semibold ${
+                              isPositive ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' :
+                              isNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                              'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                             }`}>
                               {isPositive ? (
                                 <ArrowUpRight className="w-3 h-3" />
                               ) : isNegative ? (
                                 <ArrowDownLeft className="w-3 h-3" />
                               ) : null}
-                              {isPositive ? '+' : ''}{asset.priceChange24h.toFixed(2)}%
+                              {isPositive ? '+' : ''}{asset.priceChange24h?.toFixed(2)}%
                             </div>
                           )}
                         </div>
 
                         {/* Price and Value */}
                         <div className="space-y-2">
-                          <div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('currentPrice')}</div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{t('currentPrice')}</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
                               {asset.currentPrice !== null
-                                ? new Intl.NumberFormat('de-CH', { style: 'currency', currency: userCurrency, minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(asset.currentPrice)
+                                ? new Intl.NumberFormat('de-CH', { style: 'currency', currency: userCurrency, minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(asset.currentPrice)
                                 : '-'
                               }
-                            </div>
+                            </span>
                           </div>
-                          <div className="pt-2 border-t border-gray-200 dark:border-zinc-800">
-                            <div className="text-xs text-gray-600 dark:text-gray-400">{t('totalValue')}</div>
-                            <div className="text-lg font-bold text-gray-900 dark:text-white">
+                          <div className="pt-2 border-t border-gray-100 dark:border-[#2d3b4e] flex items-center justify-between">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{t('totalValue')}</span>
+                            <span className="text-base font-bold text-gray-900 dark:text-white">
                               {new Intl.NumberFormat('de-CH', { style: 'currency', currency: userCurrency, minimumFractionDigits: 2 }).format(value)}
-                            </div>
+                            </span>
                           </div>
                         </div>
                       </div>

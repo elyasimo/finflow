@@ -2,22 +2,12 @@
 
 import {
   BarChart2,
-  Receipt,
-  Building2,
   CreditCard,
-  Folder,
   Wallet,
-  Users2,
-  Shield,
-  MessagesSquare,
-  Video,
   Settings,
   HelpCircle,
-  Menu,
   PiggyBank,
-  DollarSign,
   TrendingUp,
-  Bitcoin,
   Tags,
   Home,
   Bot,
@@ -27,8 +17,8 @@ import {
   Award,
   Bell,
   LogOut,
-  User,
-  ChevronUp
+  ChevronUp,
+  Shield
 } from "lucide-react"
 
 import Link from "next/link"
@@ -133,13 +123,8 @@ function UserProfileMenu({ user }: { user?: User }) {
 }
 
 export default function Sidebar({ user }: SidebarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const { t } = useLanguage()
-
-  function handleNavigation() {
-    setIsMobileMenuOpen(false)
-  }
 
   function NavItem({
     href,
@@ -155,7 +140,6 @@ export default function Sidebar({ user }: SidebarProps) {
     return (
       <Link
         href={href}
-        onClick={handleNavigation}
         className={cn(
           "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
           isActive
@@ -170,21 +154,7 @@ export default function Sidebar({ user }: SidebarProps) {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-white dark:bg-[#1a2332] shadow-md"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <Menu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-      </button>
-      <nav
-        className={`
-                fixed inset-y-0 left-0 z-[70] w-64 bg-white dark:bg-[#1a2332] transform transition-transform duration-200 ease-in-out
-                lg:translate-x-0 lg:static lg:w-64 border-r border-gray-200 dark:border-[#232e40]
-                ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
-            `}
-      >
+    <nav className="hidden lg:flex flex-col h-full w-64 bg-white dark:bg-[#1a2332] border-r border-gray-200 dark:border-[#232e40]">
         <div className="h-full flex flex-col">
           <Link
             href="/dashboard"
@@ -283,13 +253,5 @@ export default function Sidebar({ user }: SidebarProps) {
           </div>
         </div>
       </nav>
-
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[65] lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-    </>
   );
 }
