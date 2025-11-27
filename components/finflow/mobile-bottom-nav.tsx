@@ -7,8 +7,7 @@ import {
   CreditCard, 
   TrendingUp, 
   PieChart,
-  Menu as MenuIcon,
-  Plus
+  Menu as MenuIcon
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -64,62 +63,33 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-      {/* Gradient shadow overlay */}
-      <div className="absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-white dark:from-[#0f1623] to-transparent pointer-events-none" />
+      {/* Gradient shadow */}
+      <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-white dark:from-[#0f1623] to-transparent pointer-events-none" />
       
-      {/* Navigation bar */}
-      <div className="bg-white/90 dark:bg-[#0f1623]/90 backdrop-blur-xl border-t border-gray-200/50 dark:border-[#232e40]/50 pb-safe">
-        <div className="flex items-center justify-around h-16 px-2 max-w-lg mx-auto">
-          {navItems.map((item, index) => {
+      {/* Navigation bar - Larger touch targets */}
+      <div className="bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-[#232e40]/50 safe-area-pb">
+        <div className="flex items-stretch justify-around h-20 px-1 max-w-lg mx-auto">
+          {navItems.map((item) => {
             const Icon = item.icon
             const active = isActive(item)
             
-            // Center FAB button
-            if (index === 2) {
-              return (
-                <div key="fab" className="flex items-center gap-4">
-                  {/* Markets Button */}
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "flex flex-col items-center justify-center w-14 h-12 transition-all",
-                      active 
-                        ? "text-blue-600 dark:text-blue-400" 
-                        : "text-gray-400 dark:text-gray-500"
-                    )}
-                  >
-                    <Icon className={cn(
-                      "h-5 w-5 mb-0.5 transition-transform",
-                      active && "scale-110"
-                    )} />
-                    <span className={cn(
-                      "text-[10px] font-medium",
-                      active && "font-semibold"
-                    )}>
-                      {t(item.labelKey as any)}
-                    </span>
-                  </Link>
-                </div>
-              )
-            }
-
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center w-14 h-12 transition-all",
+                  "flex-1 flex flex-col items-center justify-center gap-1 min-h-[72px] px-2 rounded-xl mx-0.5 transition-all active:scale-95",
                   active 
-                    ? "text-blue-600 dark:text-blue-400" 
-                    : "text-gray-400 dark:text-gray-500"
+                    ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20" 
+                    : "text-gray-500 dark:text-gray-400"
                 )}
               >
                 <Icon className={cn(
-                  "h-5 w-5 mb-0.5 transition-transform",
+                  "h-6 w-6 transition-transform",
                   active && "scale-110"
                 )} />
                 <span className={cn(
-                  "text-[10px] font-medium",
+                  "text-[11px] font-medium leading-tight",
                   active && "font-semibold"
                 )}>
                   {t(item.labelKey as any)}
@@ -129,13 +99,13 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
           })}
           
           {/* Menu button */}
-          <button
-            onClick={onMenuClick}
-            className="flex flex-col items-center justify-center w-14 h-12 text-gray-400 dark:text-gray-500 transition-all"
+          <Link
+            href="/settings"
+            className="flex-1 flex flex-col items-center justify-center gap-1 min-h-[72px] px-2 rounded-xl mx-0.5 text-gray-500 dark:text-gray-400 transition-all active:scale-95"
           >
-            <MenuIcon className="h-5 w-5 mb-0.5" />
-            <span className="text-[10px] font-medium">{t('more')}</span>
-          </button>
+            <MenuIcon className="h-6 w-6" />
+            <span className="text-[11px] font-medium leading-tight">{t('more')}</span>
+          </Link>
         </div>
       </div>
     </nav>

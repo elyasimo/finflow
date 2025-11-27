@@ -4,39 +4,40 @@ import { useState, useMemo } from "react"
 import { 
   Plus,
   ChevronLeft,
-  Target,
-  Sparkles
+  Target
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
-import { getTranslatedText } from "@/lib/translation-utils"
-import { Budget } from "@/lib/types"
 import MobileBottomNav from "./mobile-bottom-nav"
 import BudgetWalletCard, { EmptyBudgetCard } from "./ui/budget-wallet-card"
 
+interface BudgetItem {
+  id: string
+  name: string
+  amount: number
+  spent: number
+  currency: string
+  startDate?: string
+  endDate?: string
+}
+
 interface MobileBudgetsNewProps {
-  budgets: Budget[]
-  budgetUsage: Record<string, number>
+  budgets: BudgetItem[]
   onAddBudget: () => void
-  onEditBudget: (budget: Budget) => void
-  onDeleteBudget: (budget: Budget) => void
-  onTopUpBudget?: (budget: Budget) => void
-  onPinBudget?: (budget: Budget) => void
+  onEditBudget: (id: string) => void
+  onDeleteBudget: (id: string) => void
 }
 
 export default function MobileBudgetsNew({
   budgets,
-  budgetUsage,
   onAddBudget,
   onEditBudget,
   onDeleteBudget,
-  onTopUpBudget,
-  onPinBudget,
 }: MobileBudgetsNewProps) {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const { currency } = useCurrency()
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards')
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('list')
 
   const formatCurrency = (amount: number, curr?: string) => {
     return new Intl.NumberFormat('de-CH', {
@@ -46,31 +47,29 @@ export default function MobileBudgetsNew({
     }).format(amount)
   }
 
-  // Sort budgets: pinned first, then by usage percentage
+  // Sort budgets by usage percentage (highest first)
   const sortedBudgets = useMemo(() => {
     return [...budgets].sort((a, b) => {
-      // Pinned items first (if we add pinning support)
-      const aUsage = (budgetUsage[a.id] || 0) / Number(a.amount)
-      const bUsage = (budgetUsage[b.id] || 0) / Number(b.amount)
-      // Sort by usage percentage (highest first)
+      const aUsage = a.amount > 0 ? (a.spent / a.amount) : 0
+      const bUsage = b.amount > 0 ? (b.spent / b.amount) : 0
       return bUsage - aUsage
     })
-  }, [budgets, budgetUsage])
+  }, [budgets])
 
   // Calculate overall statistics
   const stats = useMemo(() => {
-    const total = budgets.reduce((sum, b) => sum + Number(b.amount), 0)
-    const spent = Object.values(budgetUsage).reduce((sum, s) => sum + s, 0)
+    const total = budgets.reduce((sum, b) => sum + b.amount, 0)
+    const spent = budgets.reduce((sum, b) => sum + b.spent, 0)
     const remaining = Math.max(total - spent, 0)
     const overallProgress = total > 0 ? (spent / total) * 100 : 0
-    const budgetsOverLimit = budgets.filter(b => (budgetUsage[b.id] || 0) >= Number(b.amount)).length
+    const budgetsOverLimit = budgets.filter(b => b.spent >= b.amount).length
     const budgetsNearLimit = budgets.filter(b => {
-      const usage = (budgetUsage[b.id] || 0) / Number(b.amount)
+      const usage = b.amount > 0 ? b.spent / b.amount : 0
       return usage >= 0.8 && usage < 1
     }).length
     
     return { total, spent, remaining, overallProgress, budgetsOverLimit, budgetsNearLimit }
-  }, [budgets, budgetUsage])
+  }, [budgets])
 
   const getProgressColor = () => {
     if (stats.overallProgress >= 100) return { stroke: 'stroke-rose-500', text: 'text-rose-500' }
@@ -96,52 +95,52 @@ export default function MobileBudgetsNew({
 
         {/* Overall Progress Ring */}
         <div className="flex justify-center mb-8">
-          <div className="relative w-44 h-44">
+          <div className="relative w-36 h-36">
             <svg className="w-full h-full transform -rotate-90">
               <circle
-                cx="88"
-                cy="88"
-                r="76"
+                cx="72"
+                cy="72"
+                r="64"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="10"
+                strokeWidth="8"
                 className="text-gray-100 dark:text-gray-800"
               />
               <circle
-                cx="88"
-                cy="88"
-                r="76"
+                cx="72"
+                cy="72"
+                r="64"
                 fill="none"
-                strokeWidth="10"
+                strokeWidth="8"
                 strokeLinecap="round"
-                strokeDasharray={`${Math.min(stats.overallProgress, 100) * 4.77} 477`}
+                strokeDasharray={`${Math.min(stats.overallProgress, 100) * 4.02} 402`}
                 className={cn("transition-all duration-1000", progressColors.stroke)}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={cn("text-4xl font-bold", progressColors.text)}>
+              <span className={cn("text-3xl font-bold", progressColors.text)}>
                 {Math.round(stats.overallProgress)}%
               </span>
-              <span className="text-sm text-gray-400 mt-1">verwendet</span>
+              <span className="text-xs text-gray-400">verwendet</span>
             </div>
           </div>
         </div>
 
         {/* Summary Stats */}
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-6">
           <div className="text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Ausgegeben</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.spent)}</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(stats.spent)}</p>
           </div>
           <div className="w-px bg-gray-200 dark:bg-gray-700"></div>
           <div className="text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Verbleibend</p>
-            <p className="text-xl font-bold text-emerald-500">{formatCurrency(stats.remaining)}</p>
+            <p className="text-lg font-bold text-emerald-500">{formatCurrency(stats.remaining)}</p>
           </div>
           <div className="w-px bg-gray-200 dark:bg-gray-700"></div>
           <div className="text-center">
             <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Budgets</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">{budgets.length}</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{budgets.length}</p>
           </div>
         </div>
 
@@ -212,61 +211,47 @@ export default function MobileBudgetsNew({
             </button>
           </div>
         ) : viewMode === 'cards' ? (
-          // Card View - Horizontal Scroll
+          // Card View
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 snap-x snap-mandatory scrollbar-hide">
-            {sortedBudgets.map((budget, idx) => {
-              const name = getTranslatedText(budget.name, budget.nameTranslations, language)
-              const spent = budgetUsage[budget.id] || 0
-              
-              return (
-                <BudgetWalletCard
-                  key={budget.id}
-                  id={budget.id}
-                  name={name}
-                  amount={Number(budget.amount)}
-                  spent={spent}
-                  currency={budget.currency}
-                  category={budget.name}
-                  startDate={budget.startDate}
-                  endDate={budget.endDate}
-                  formatCurrency={formatCurrency}
-                  onEdit={() => onEditBudget(budget)}
-                  onDelete={() => onDeleteBudget(budget)}
-                  onTopUp={onTopUpBudget ? () => onTopUpBudget(budget) : undefined}
-                  variant="card"
-                  index={idx}
-                />
-              )
-            })}
+            {sortedBudgets.map((budget, idx) => (
+              <BudgetWalletCard
+                key={budget.id}
+                id={budget.id}
+                name={budget.name}
+                amount={budget.amount}
+                spent={budget.spent}
+                currency={budget.currency}
+                startDate={budget.startDate}
+                endDate={budget.endDate}
+                formatCurrency={formatCurrency}
+                onEdit={() => onEditBudget(budget.id)}
+                onDelete={() => onDeleteBudget(budget.id)}
+                variant="card"
+                index={idx}
+              />
+            ))}
             <EmptyBudgetCard onAdd={onAddBudget} />
           </div>
         ) : (
           // List View
-          <div className="space-y-0">
-            {sortedBudgets.map((budget, idx) => {
-              const name = getTranslatedText(budget.name, budget.nameTranslations, language)
-              const spent = budgetUsage[budget.id] || 0
-              
-              return (
-                <BudgetWalletCard
-                  key={budget.id}
-                  id={budget.id}
-                  name={name}
-                  amount={Number(budget.amount)}
-                  spent={spent}
-                  currency={budget.currency}
-                  category={budget.name}
-                  startDate={budget.startDate}
-                  endDate={budget.endDate}
-                  formatCurrency={formatCurrency}
-                  onEdit={() => onEditBudget(budget)}
-                  onDelete={() => onDeleteBudget(budget)}
-                  onTopUp={onTopUpBudget ? () => onTopUpBudget(budget) : undefined}
-                  variant="list"
-                  index={idx}
-                />
-              )
-            })}
+          <div className="space-y-3">
+            {sortedBudgets.map((budget, idx) => (
+              <BudgetWalletCard
+                key={budget.id}
+                id={budget.id}
+                name={budget.name}
+                amount={budget.amount}
+                spent={budget.spent}
+                currency={budget.currency}
+                startDate={budget.startDate}
+                endDate={budget.endDate}
+                formatCurrency={formatCurrency}
+                onEdit={() => onEditBudget(budget.id)}
+                onDelete={() => onDeleteBudget(budget.id)}
+                variant="list"
+                index={idx}
+              />
+            ))}
             
             {/* Add Budget Button */}
             <button
@@ -283,7 +268,7 @@ export default function MobileBudgetsNew({
         <div className="h-36" />
       </div>
 
-      {/* Floating Action Button */}
+      {/* FAB */}
       {budgets.length > 0 && (
         <button
           onClick={onAddBudget}

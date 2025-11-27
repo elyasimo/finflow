@@ -14,12 +14,15 @@ import {
   PiggyBank,
   Loader2,
   CheckCircle2,
-  Lock
+  Lock,
+  Eye,
+  EyeOff,
+  User
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { FinflowLogo } from "@/components/icons/finflow-logo"
 
-type OnboardingStep = 'contact' | 'verification' | 'verified' | 'account-setup' | 'complete'
+type OnboardingStep = 'contact' | 'password' | 'verification' | 'verified' | 'account-setup' | 'complete'
 
 interface MobileOnboardingProps {
   onComplete: (data: OnboardingData) => void
@@ -29,6 +32,8 @@ interface MobileOnboardingProps {
 interface OnboardingData {
   contactType: 'email' | 'phone'
   contact: string
+  password?: string
+  fullName?: string
   account: {
     bankName: string
     accountType: string
@@ -63,6 +68,10 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
   const [step, setStep] = useState<OnboardingStep>('contact')
   const [contactType, setContactType] = useState<'email' | 'phone'>('email')
   const [contact, setContact] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -129,7 +138,31 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
     setError('')
     
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    setIsLoading(false)
+    setStep('password')
+  }
+
+  const handlePasswordSubmit = async () => {
+    if (!fullName.trim()) {
+      setError('Bitte geben Sie Ihren Namen ein')
+      return
+    }
+    if (password.length < 8) {
+      setError('Passwort muss mindestens 8 Zeichen lang sein')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwörter stimmen nicht überein')
+      return
+    }
+    
+    setIsLoading(true)
+    setError('')
+    
+    // Simulate sending verification code
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
     setIsLoading(false)
     setStep('verification')
@@ -175,6 +208,8 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
       onComplete({
         contactType,
         contact,
+        password,
+        fullName,
         account: {
           bankName,
           accountType,
@@ -195,46 +230,18 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
           Willkommen bei FinFlow
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Registrieren Sie sich mit Ihrer E-Mail oder Telefonnummer
+          Registrieren Sie sich mit Ihrer E-Mail
         </p>
-      </div>
-
-      {/* Contact Type Toggle */}
-      <div className="flex p-1 bg-gray-100 dark:bg-[#232e40] rounded-xl mb-6">
-        <button
-          onClick={() => setContactType('email')}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all",
-            contactType === 'email'
-              ? "bg-white dark:bg-[#1a2332] text-gray-900 dark:text-white shadow-sm"
-              : "text-gray-500 dark:text-gray-400"
-          )}
-        >
-          <Mail className="w-4 h-4" />
-          E-Mail
-        </button>
-        <button
-          onClick={() => setContactType('phone')}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all",
-            contactType === 'phone'
-              ? "bg-white dark:bg-[#1a2332] text-gray-900 dark:text-white shadow-sm"
-              : "text-gray-500 dark:text-gray-400"
-          )}
-        >
-          <Smartphone className="w-4 h-4" />
-          Telefon
-        </button>
       </div>
 
       {/* Input Field */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {contactType === 'email' ? 'E-Mail-Adresse' : 'Telefonnummer'}
+          E-Mail-Adresse
         </label>
         <input
-          type={contactType === 'email' ? 'email' : 'tel'}
-          placeholder={contactType === 'email' ? 'name@beispiel.ch' : '+41 79 123 45 67'}
+          type="email"
+          placeholder="name@beispiel.ch"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
           className="w-full px-4 py-4 rounded-2xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 border border-transparent focus:border-blue-500"
@@ -269,10 +276,121 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
     </div>
   )
 
-  const renderVerificationStep = () => (
+  const renderPasswordStep = () => (
     <div className="animate-fade-in">
       <button
         onClick={() => setStep('contact')}
+        className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-6 hover:text-gray-700 dark:hover:text-gray-300"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        Zurück
+      </button>
+
+      <div className="text-center mb-8">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-500/30">
+          <User className="w-10 h-10 text-white" />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          Konto erstellen
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Geben Sie Ihre Daten ein
+        </p>
+      </div>
+
+      {/* Full Name */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Vollständiger Name
+        </label>
+        <input
+          type="text"
+          placeholder="Max Mustermann"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          className="w-full px-4 py-4 rounded-2xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 border border-transparent focus:border-indigo-500"
+        />
+      </div>
+
+      {/* Password */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Passwort
+        </label>
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-4 pr-12 rounded-2xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 border border-transparent focus:border-indigo-500"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        </div>
+        {password && (
+          <p className={cn(
+            "text-xs mt-2",
+            password.length >= 8 ? "text-emerald-500" : "text-gray-400"
+          )}>
+            {password.length >= 8 ? "✓" : "○"} Mindestens 8 Zeichen
+          </p>
+        )}
+      </div>
+
+      {/* Confirm Password */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Passwort bestätigen
+        </label>
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="w-full px-4 py-4 rounded-2xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 border border-transparent focus:border-indigo-500"
+        />
+        {confirmPassword && (
+          <p className={cn(
+            "text-xs mt-2",
+            password === confirmPassword ? "text-emerald-500" : "text-rose-500"
+          )}>
+            {password === confirmPassword ? "✓ Passwörter stimmen überein" : "✗ Passwörter stimmen nicht überein"}
+          </p>
+        )}
+      </div>
+
+      {error && (
+        <p className="text-sm text-rose-500 mb-4 text-center">{error}</p>
+      )}
+
+      {/* Continue Button */}
+      <button
+        onClick={handlePasswordSubmit}
+        disabled={isLoading || !fullName || password.length < 8 || password !== confirmPassword}
+        className="w-full py-4 rounded-2xl bg-indigo-500 text-white font-semibold text-lg shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+      >
+        {isLoading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : (
+          <>
+            Weiter
+            <ArrowRight className="w-5 h-5" />
+          </>
+        )}
+      </button>
+    </div>
+  )
+
+  const renderVerificationStep = () => (
+    <div className="animate-fade-in">
+      <button
+        onClick={() => setStep('password')}
         className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-6 hover:text-gray-700 dark:hover:text-gray-300"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -544,15 +662,16 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
       {/* Progress Indicator */}
       <div className="px-5 py-4">
         <div className="flex items-center justify-center gap-2">
-          {['contact', 'verification', 'account-setup'].map((s, idx) => (
+          {['contact', 'password', 'verification', 'account-setup'].map((s, idx) => (
             <div
               key={s}
               className={cn(
                 "h-1.5 rounded-full transition-all duration-500",
-                idx === 0 ? "w-8" : "w-8",
+                "w-6",
                 step === 'contact' && idx === 0 ? "bg-blue-500" :
-                step === 'verification' && idx <= 1 ? "bg-emerald-500" :
-                step === 'verified' && idx <= 1 ? "bg-emerald-500" :
+                step === 'password' && idx <= 1 ? "bg-indigo-500" :
+                step === 'verification' && idx <= 2 ? "bg-emerald-500" :
+                step === 'verified' && idx <= 2 ? "bg-emerald-500" :
                 (step === 'account-setup' || step === 'complete') ? "bg-purple-500" :
                 "bg-gray-200 dark:bg-gray-800"
               )}
@@ -564,6 +683,7 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
       {/* Content */}
       <div className="flex-1 px-5 py-6">
         {step === 'contact' && renderContactStep()}
+        {step === 'password' && renderPasswordStep()}
         {step === 'verification' && renderVerificationStep()}
         {step === 'verified' && renderVerifiedStep()}
         {step === 'account-setup' && renderAccountSetupStep()}
