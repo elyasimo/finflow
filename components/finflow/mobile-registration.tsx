@@ -1202,8 +1202,8 @@ export default function MobileRegistration({
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 px-5 py-6 overflow-y-auto">
+      {/* Content - A1.1/A6 Fix: Added bottom padding for keyboard and safe area */}
+      <div className="flex-1 px-5 py-6 pb-[120px] overflow-y-auto overscroll-contain">
         {step === 'contact' && renderContactStep()}
         {step === 'password' && renderPasswordStep()}
         {step === 'email-verification' && renderEmailVerificationStep()}

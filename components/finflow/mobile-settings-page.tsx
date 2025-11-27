@@ -50,6 +50,13 @@ interface ApiKeys {
   binanceSecretKey?: string
   alpacaApiKey?: string
   alpacaSecretKey?: string
+  // Firebase Configuration
+  firebaseApiKey?: string
+  firebaseAuthDomain?: string
+  firebaseProjectId?: string
+  firebaseStorageBucket?: string
+  firebaseMessagingSenderId?: string
+  firebaseAppId?: string
 }
 
 interface MobileSettingsPageProps {
@@ -109,7 +116,7 @@ const SettingsSection = ({ title, children }: { title: string; children: React.R
   </div>
 )
 
-// Settings Item Component
+// Settings Item Component - A5: Modern design with gradient icons
 const SettingsItem = ({ 
   icon: Icon, 
   label, 
@@ -117,6 +124,7 @@ const SettingsItem = ({
   onClick,
   showArrow = true,
   danger = false,
+  accent = false,
   children 
 }: { 
   icon: React.ElementType
@@ -125,43 +133,50 @@ const SettingsItem = ({
   onClick?: () => void
   showArrow?: boolean
   danger?: boolean
+  accent?: boolean
   children?: React.ReactNode
 }) => (
   <button
     onClick={onClick}
     className={cn(
       "flex items-center gap-4 w-full p-4 text-left",
-      "hover:bg-gray-50 dark:hover:bg-[#232e40] transition-colors",
+      "hover:bg-gray-50 dark:hover:bg-[#232e40] active:bg-gray-100 dark:active:bg-[#2a3749]",
+      "transition-all duration-150",
       onClick ? "cursor-pointer" : "cursor-default"
     )}
+    aria-label={label}
   >
     <div className={cn(
-      "w-10 h-10 rounded-xl flex items-center justify-center",
+      "w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm",
       danger 
-        ? "bg-rose-100 dark:bg-rose-950/40 text-rose-500" 
-        : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
+        ? "bg-gradient-to-br from-rose-500 to-pink-600 text-white" 
+        : accent
+        ? "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+        : "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-[#2a3749] dark:to-[#232e40] text-gray-600 dark:text-gray-400"
     )}>
       <Icon className="w-5 h-5" />
     </div>
     <div className="flex-1 min-w-0">
       <p className={cn(
-        "font-medium",
+        "font-semibold text-[15px]",
         danger ? "text-rose-500" : "text-gray-900 dark:text-white"
       )}>
         {label}
       </p>
       {value && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{value}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">{value}</p>
       )}
     </div>
     {children}
     {showArrow && !children && (
-      <ChevronRight className="w-5 h-5 text-gray-400" />
+      <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center">
+        <ChevronRight className="w-4 h-4 text-gray-400" />
+      </div>
     )}
   </button>
 )
 
-// Toggle Switch Component
+// Toggle Switch Component - iOS-style toggle with green activation
 const ToggleSwitch = ({ 
   enabled, 
   onChange,
@@ -175,15 +190,24 @@ const ToggleSwitch = ({
     onClick={() => !disabled && onChange(!enabled)}
     disabled={disabled}
     className={cn(
-      "relative w-12 h-7 rounded-full transition-colors",
-      enabled ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600",
+      "relative w-[51px] h-[31px] rounded-full transition-all duration-300 ease-in-out",
+      enabled 
+        ? "bg-[#34C759]" // iOS green
+        : "bg-[#E5E5EA] dark:bg-[#39393D]",
       disabled && "opacity-50 cursor-not-allowed"
     )}
+    aria-label={enabled ? "Aktiviert" : "Deaktiviert"}
+    role="switch"
+    aria-checked={enabled}
   >
     <div className={cn(
-      "absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform",
-      enabled ? "translate-x-6" : "translate-x-1"
-    )} />
+      "absolute top-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-md transition-all duration-300 ease-in-out",
+      enabled ? "translate-x-[22px]" : "translate-x-[2px]"
+    )} 
+    style={{ 
+      boxShadow: '0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)' 
+    }}
+    />
   </button>
 )
 
@@ -239,6 +263,15 @@ export default function MobileSettingsPage({
   const [alpacaSecretKey, setAlpacaSecretKey] = useState(apiKeys.alpacaSecretKey || '')
   const [showBinanceSecret, setShowBinanceSecret] = useState(false)
   const [showAlpacaSecret, setShowAlpacaSecret] = useState(false)
+  
+  // Firebase Config State
+  const [firebaseApiKey, setFirebaseApiKey] = useState(apiKeys.firebaseApiKey || '')
+  const [firebaseAuthDomain, setFirebaseAuthDomain] = useState(apiKeys.firebaseAuthDomain || '')
+  const [firebaseProjectId, setFirebaseProjectId] = useState(apiKeys.firebaseProjectId || '')
+  const [firebaseStorageBucket, setFirebaseStorageBucket] = useState(apiKeys.firebaseStorageBucket || '')
+  const [firebaseMessagingSenderId, setFirebaseMessagingSenderId] = useState(apiKeys.firebaseMessagingSenderId || '')
+  const [firebaseAppId, setFirebaseAppId] = useState(apiKeys.firebaseAppId || '')
+  const [showFirebaseSheet, setShowFirebaseSheet] = useState(false)
   
   // Notification State (local until saved)
   const [localEmailNotifications, setLocalEmailNotifications] = useState(emailNotifications)
@@ -342,7 +375,13 @@ export default function MobileSettingsPage({
           binanceApiKey,
           binanceSecretKey,
           alpacaApiKey,
-          alpacaSecretKey
+          alpacaSecretKey,
+          firebaseApiKey,
+          firebaseAuthDomain,
+          firebaseProjectId,
+          firebaseStorageBucket,
+          firebaseMessagingSenderId,
+          firebaseAppId
         })
       }
       
@@ -350,6 +389,7 @@ export default function MobileSettingsPage({
       setTimeout(() => {
         setApiKeysSaved(false)
         setShowApiKeysSheet(false)
+        setShowFirebaseSheet(false)
       }, 1500)
     } catch (err: any) {
       setError(err.message || 'Fehler beim Speichern der API-Schlüssel')
@@ -476,13 +516,21 @@ export default function MobileSettingsPage({
           </SettingsItem>
         </SettingsSection>
 
-        {/* API Keys */}
-        <SettingsSection title="API-Schlüssel">
+        {/* API Keys & Integrations */}
+        <SettingsSection title="Integrationen">
           <SettingsItem 
             icon={Key} 
             label="Trading API-Schlüssel"
             value={binanceApiKey || alpacaApiKey ? 'Konfiguriert' : 'Nicht konfiguriert'}
             onClick={() => setShowApiKeysSheet(true)}
+            accent
+          />
+          <SettingsItem 
+            icon={Shield} 
+            label="Firebase Konfiguration"
+            value={firebaseApiKey ? 'Konfiguriert' : 'Nicht konfiguriert'}
+            onClick={() => setShowFirebaseSheet(true)}
+            accent
           />
         </SettingsSection>
 
@@ -1106,6 +1154,226 @@ export default function MobileSettingsPage({
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Firebase Configuration Sheet */}
+      {showFirebaseSheet && (
+        <div className="fixed inset-0 z-50">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowFirebaseSheet(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+              <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            </div>
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Firebase Konfiguration</h2>
+              <button
+                onClick={() => setShowFirebaseSheet(false)}
+                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px] space-y-6">
+                {/* Firebase Info */}
+                <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                        Firebase für Verifikation
+                      </h4>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        Diese Konfiguration wird für E-Mail- und SMS-Verifikation sowie Push-Benachrichtigungen verwendet.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Firebase API Key */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    API Key
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseApiKey}
+                    onChange={(e) => setFirebaseApiKey(e.target.value)}
+                    placeholder="AIzaSy..."
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* Auth Domain */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Auth Domain
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseAuthDomain}
+                    onChange={(e) => setFirebaseAuthDomain(e.target.value)}
+                    placeholder="your-app.firebaseapp.com"
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* Project ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Project ID
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseProjectId}
+                    onChange={(e) => setFirebaseProjectId(e.target.value)}
+                    placeholder="your-project-id"
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* Storage Bucket */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Storage Bucket
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseStorageBucket}
+                    onChange={(e) => setFirebaseStorageBucket(e.target.value)}
+                    placeholder="your-app.appspot.com"
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* Messaging Sender ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Messaging Sender ID
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseMessagingSenderId}
+                    onChange={(e) => setFirebaseMessagingSenderId(e.target.value)}
+                    placeholder="123456789012"
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* App ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    App ID
+                  </label>
+                  <input
+                    type="text"
+                    value={firebaseAppId}
+                    onChange={(e) => setFirebaseAppId(e.target.value)}
+                    placeholder="1:123456789012:web:abc123..."
+                    className={cn(
+                      "w-full px-4 py-4 rounded-2xl text-base",
+                      "bg-gray-50 dark:bg-[#232e40]",
+                      "text-gray-900 dark:text-white placeholder-gray-400",
+                      "border-2 border-transparent",
+                      "focus:outline-none focus:border-blue-500"
+                    )}
+                  />
+                </div>
+
+                {/* Firebase Console Link */}
+                <a
+                  href="https://console.firebase.google.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-[#232e40] hover:bg-gray-100 dark:hover:bg-[#2a3749] transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                      <ExternalLink className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      Firebase Console öffnen
+                    </span>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </a>
+
+                {/* Security Note */}
+                <div className="flex items-start gap-2 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
+                  <Shield className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                    Ihre Firebase-Konfiguration wird sicher verschlüsselt gespeichert und nur für die Verifikation verwendet.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="flex items-center gap-2 p-3 bg-rose-50 dark:bg-rose-950/30 rounded-xl text-rose-600 dark:text-rose-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleSaveApiKeys}
+                  disabled={isSubmitting}
+                  className={cn(
+                    "w-full py-4 rounded-2xl font-semibold text-lg",
+                    "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg",
+                    "hover:from-orange-600 hover:to-amber-600 active:scale-[0.98]",
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    "transition-all flex items-center justify-center gap-2"
+                  )}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Firebase speichern
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

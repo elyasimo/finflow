@@ -166,7 +166,7 @@ export default function MobileLoginPage({
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f1419] via-[#1a2332] to-[#0f1419] flex flex-col safe-area-inset">
       {/* Header with Logo */}
-      <div className="px-6 pt-16 pb-8">
+      <div className="px-6 pt-16 pb-8 flex-shrink-0">
         <div className="flex justify-center mb-8">
           <FinflowLogo size="lg" variant="full" />
         </div>
@@ -180,8 +180,8 @@ export default function MobileLoginPage({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 px-6 py-8">
+      {/* Main Content - A4 Fix: Scrollable with safe area padding */}
+      <div className="flex-1 px-6 py-8 pb-[100px] overflow-y-auto overscroll-contain">
         {/* Biometric Login Button - Prominent Position */}
         {biometricAvailable && isNative && hasSavedCredentials && (
           <div className="mb-8">

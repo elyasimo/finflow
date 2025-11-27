@@ -174,12 +174,12 @@ export default function MobileDashboard({
           </Link>
         </div>
 
-        {/* Main Balance Display - Money App Style */}
+        {/* Main Balance Display - Money App Style - A2 Fix: Responsive */}
         <div className="text-center mb-8">
-          <h2 className="text-5xl font-light text-gray-900 dark:text-white tracking-tight mb-3">
+          <h2 className="text-4xl sm:text-5xl font-light text-gray-900 dark:text-white tracking-tight mb-3 truncate px-4">
             {formatCurrency(totalBalance)}
           </h2>
-          <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center justify-center gap-4 sm:gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
               <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -290,11 +290,11 @@ export default function MobileDashboard({
                     'from-amber-500 via-amber-600 to-orange-700',
                   ]
                   
-                  return (
+                    return (
                     <div
                       key={account.id}
                       className={cn(
-                        "flex-shrink-0 w-72 h-44 rounded-3xl p-5 text-white relative overflow-hidden snap-center",
+                        "flex-shrink-0 w-72 h-44 rounded-3xl p-5 text-white relative snap-center",
                         "bg-gradient-to-br shadow-xl",
                         gradients[idx % gradients.length]
                       )}
@@ -314,8 +314,8 @@ export default function MobileDashboard({
                         </div>
                         
                         <div>
-                          <p className="text-sm opacity-80 mb-1">{account.name}</p>
-                          <p className="text-2xl font-bold">
+                          <p className="text-sm opacity-80 mb-1 truncate">{account.name}</p>
+                          <p className="text-xl sm:text-2xl font-bold truncate">
                             {formatCurrency(account.balance / 100, account.currency)}
                           </p>
                         </div>

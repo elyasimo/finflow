@@ -579,7 +579,7 @@ export default function MobileBudgetsPage({
                 <div 
                   key={budget.id}
                   className={cn(
-                    "relative rounded-3xl p-5 text-white overflow-hidden shadow-lg",
+                    "relative rounded-3xl p-5 text-white shadow-lg",
                     "bg-gradient-to-br",
                     walletStyle.gradient
                   )}
@@ -614,17 +614,17 @@ export default function MobileBudgetsPage({
                         </button>
                         
                         {activeMenu === budget.id && (
-                          <div className="absolute top-full right-0 mt-1 bg-white dark:bg-[#232e40] rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-10 min-w-[130px]">
+                          <div className="absolute top-full right-0 mt-1 bg-white dark:bg-[#232e40] rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 min-w-[140px]">
                             <button
                               onClick={() => handleOpenEdit(budget)}
-                              className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332]"
+                              className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332] transition-colors"
                             >
                               <Edit className="w-4 h-4" />
                               Bearbeiten
                             </button>
                             <button
                               onClick={() => handleOpenDelete(budget)}
-                              className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                              className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />
                               Löschen
@@ -634,13 +634,13 @@ export default function MobileBudgetsPage({
                       </div>
                     </div>
                     
-                    {/* Amount Display */}
+                    {/* Amount Display - A2 Fix: Responsive text for large numbers */}
                     <div className="mb-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-2xl sm:text-3xl font-bold truncate max-w-[160px]">
                           {formatCurrency(budget.spent)}
                         </span>
-                        <span className="text-lg text-white/70">
+                        <span className="text-base sm:text-lg text-white/70 truncate">
                           / {formatCurrency(budget.amount)}
                         </span>
                       </div>
@@ -711,23 +711,27 @@ export default function MobileBudgetsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Neues Budget
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderBudgetForm(false)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderBudgetForm(false)}
+              </div>
             </div>
           </div>
         </div>
@@ -740,23 +744,27 @@ export default function MobileBudgetsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Budget bearbeiten
               </h2>
               <button
                 onClick={() => setShowEditSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderBudgetForm(true)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderBudgetForm(true)}
+              </div>
             </div>
           </div>
         </div>

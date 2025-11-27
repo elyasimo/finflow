@@ -967,23 +967,27 @@ export default function MobileTransactionsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Neue Transaktion
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderTransactionForm(false)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderTransactionForm(false)}
+              </div>
             </div>
           </div>
         </div>
@@ -996,23 +1000,27 @@ export default function MobileTransactionsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Transaktion bearbeiten
               </h2>
               <button
                 onClick={() => setShowEditSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderTransactionForm(true)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderTransactionForm(true)}
+              </div>
             </div>
           </div>
         </div>

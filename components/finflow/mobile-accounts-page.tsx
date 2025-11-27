@@ -553,7 +553,7 @@ export default function MobileAccountsPage({
                 <div 
                   key={account.id}
                   className={cn(
-                    "relative rounded-2xl overflow-hidden",
+                    "relative rounded-2xl",
                     bankInfo 
                       ? `bg-gradient-to-br ${bankInfo.gradient}` 
                       : "bg-white dark:bg-[#1a2332]"
@@ -602,15 +602,15 @@ export default function MobileAccountsPage({
                       </p>
                     </div>
 
-                    {/* Balance */}
+                    {/* Balance - A2 Fix: Responsive text size, centered */}
                     <p className={cn(
-                      "font-bold text-lg whitespace-nowrap",
+                      "font-bold text-base sm:text-lg whitespace-nowrap flex-shrink-0 max-w-[140px] truncate text-right",
                       !bankInfo && "text-gray-900 dark:text-white"
                     )}>
                       {formatCurrency(account.balance, account.currency)}
                     </p>
 
-                    {/* Menu */}
+                    {/* Menu - A3 Fix: Higher z-index, not clipped */}
                     <div className="relative">
                       <button
                         onClick={() => setActiveMenu(activeMenu === account.id ? null : account.id)}
@@ -620,6 +620,7 @@ export default function MobileAccountsPage({
                             ? "hover:bg-white/20" 
                             : "hover:bg-gray-100 dark:hover:bg-[#232e40]"
                         )}
+                        aria-label="Menü öffnen"
                       >
                         <MoreVertical className={cn(
                           "w-5 h-5",
@@ -628,17 +629,17 @@ export default function MobileAccountsPage({
                       </button>
                       
                       {activeMenu === account.id && (
-                        <div className="absolute top-full right-0 mt-1 bg-white dark:bg-[#232e40] rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-10 min-w-[130px]">
+                        <div className="absolute top-full right-0 mt-1 bg-white dark:bg-[#232e40] rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 min-w-[140px]">
                           <button
                             onClick={() => handleOpenEdit(account)}
-                            className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332]"
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332] transition-colors"
                           >
                             <Edit className="w-4 h-4" />
                             Bearbeiten
                           </button>
                           <button
                             onClick={() => handleOpenDelete(account)}
-                            className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                             Löschen
@@ -673,23 +674,27 @@ export default function MobileAccountsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Neues Konto
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderAccountForm(false)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderAccountForm(false)}
+              </div>
             </div>
           </div>
         </div>
@@ -702,23 +707,27 @@ export default function MobileAccountsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 Konto bearbeiten
               </h2>
               <button
                 onClick={() => setShowEditSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                aria-label="Schließen"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
-              {renderAccountForm(true)}
+            {/* A1 Fix: Scrollable content with safe area padding */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[120px]">
+                {renderAccountForm(true)}
+              </div>
             </div>
           </div>
         </div>
