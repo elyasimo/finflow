@@ -18,6 +18,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import MobileHeader from "./mobile-header"
 import MobileBottomNav from "./mobile-bottom-nav"
+import MobileSVGChart from "./mobile-svg-chart"
 
 interface Transaction {
   id: string
@@ -240,7 +241,7 @@ export default function MobileReports({
           </div>
         )}
 
-        {/* Income Tab */}
+        {/* Income Tab - Interactive SVG Line Chart */}
         {activeTab === 'income' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
@@ -252,27 +253,21 @@ export default function MobileReports({
                 <p className="text-gray-500">Keine Einnahmen-Daten verfügbar</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {incomeTrends.map((trend, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{trend.month}</span>
-                      <span className="text-sm font-semibold text-emerald-500">{formatCurrency(trend.income)}</span>
-                    </div>
-                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-emerald-500 rounded-full transition-all"
-                        style={{ width: `${(trend.income / maxIncome) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <MobileSVGChart
+                type="line"
+                height={200}
+                data={incomeTrends.map(t => ({
+                  label: t.month,
+                  value: t.income
+                }))}
+                primaryColor="#10b981"
+                formatValue={(v) => formatCurrency(v)}
+              />
             )}
           </div>
         )}
 
-        {/* Expenses Tab */}
+        {/* Expenses Tab - Interactive Donut Chart */}
         {activeTab === 'expenses' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
@@ -284,33 +279,16 @@ export default function MobileReports({
                 <p className="text-gray-500">Keine Ausgaben in diesem Zeitraum</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {categoryData.map((cat, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: cat.color }}
-                        />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{cat.name}</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {formatCurrency(cat.amount)} ({cat.percentage.toFixed(1)}%)
-                      </span>
-                    </div>
-                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all"
-                        style={{ 
-                          width: `${cat.percentage}%`,
-                          backgroundColor: cat.color 
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <MobileSVGChart
+                type="donut"
+                height={240}
+                data={categoryData.map(c => ({
+                  label: c.name,
+                  value: c.amount,
+                  color: c.color
+                }))}
+                formatValue={(v) => formatCurrency(v)}
+              />
             )}
           </div>
         )}

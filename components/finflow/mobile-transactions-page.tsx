@@ -153,13 +153,19 @@ const CATEGORY_COLORS: Record<string, string> = {
   'default': 'bg-gray-500',
 }
 
-// Quick filters
-const QUICK_FILTERS = [
+// Transaction type tabs
+const TYPE_TABS = [
+  { id: 'all', label: 'Alle' },
+  { id: 'expense', label: 'Ausgaben' },
+  { id: 'income', label: 'Einnahmen' },
+]
+
+// Quick date filters
+const DATE_FILTERS = [
   { id: 'all', label: 'Alle' },
   { id: '7days', label: '7 Tage' },
   { id: '30days', label: '30 Tage' },
-  { id: 'income', label: 'Einnahmen' },
-  { id: 'expense', label: 'Ausgaben' },
+  { id: '90days', label: '3 Monate' },
 ]
 
 export default function MobileTransactionsPage({
@@ -177,7 +183,8 @@ export default function MobileTransactionsPage({
   const { currency } = useCurrency()
   
   // UI State
-  const [activeFilter, setActiveFilter] = useState('all')
+  const [activeTypeTab, setActiveTypeTab] = useState('all')
+  const [activeDateFilter, setActiveDateFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -235,17 +242,24 @@ export default function MobileTransactionsPage({
   const filteredTransactions = useMemo(() => {
     let filtered = [...transactions]
     
+    // Apply type filter (tabs)
+    if (activeTypeTab === 'income') {
+      filtered = filtered.filter(t => t.type === 'income')
+    } else if (activeTypeTab === 'expense') {
+      filtered = filtered.filter(t => t.type === 'expense')
+    }
+    
+    // Apply date filter
     const now = new Date()
-    if (activeFilter === '7days') {
+    if (activeDateFilter === '7days') {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
       filtered = filtered.filter(t => new Date(t.transactionDate) >= weekAgo)
-    } else if (activeFilter === '30days') {
+    } else if (activeDateFilter === '30days') {
       const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
       filtered = filtered.filter(t => new Date(t.transactionDate) >= monthAgo)
-    } else if (activeFilter === 'income') {
-      filtered = filtered.filter(t => t.type === 'income')
-    } else if (activeFilter === 'expense') {
-      filtered = filtered.filter(t => t.type === 'expense')
+    } else if (activeDateFilter === '90days') {
+      const threeMonthsAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      filtered = filtered.filter(t => new Date(t.transactionDate) >= threeMonthsAgo)
     }
     
     if (selectedCategory) {
@@ -265,7 +279,7 @@ export default function MobileTransactionsPage({
     return filtered.sort((a, b) => 
       new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime()
     )
-  }, [transactions, activeFilter, selectedCategory, searchQuery])
+  }, [transactions, activeTypeTab, activeDateFilter, selectedCategory, searchQuery])
 
   // Group transactions by date
   const groupedTransactions = useMemo(() => {
@@ -661,6 +675,30 @@ export default function MobileTransactionsPage({
         searchPlaceholder="Transaktionen suchen..."
       />
 
+      {/* Type Tabs - Split Income/Expense */}
+      <div className="bg-white dark:bg-[#1a2332] px-5 pt-3">
+        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#232e40] rounded-2xl">
+          {TYPE_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTypeTab(tab.id)}
+              className={cn(
+                "flex-1 py-3 rounded-xl text-sm font-semibold transition-all",
+                activeTypeTab === tab.id
+                  ? tab.id === 'income' 
+                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
+                    : tab.id === 'expense'
+                    ? "bg-rose-500 text-white shadow-lg shadow-rose-500/30"
+                    : "bg-white dark:bg-[#1a2332] text-gray-900 dark:text-white shadow-md"
+                  : "text-gray-500 dark:text-gray-400"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Summary Header */}
       <div className="bg-white dark:bg-[#1a2332] px-5 py-4">
         <div className="flex justify-center gap-8">
@@ -686,17 +724,16 @@ export default function MobileTransactionsPage({
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Date Filters (Quick-range Pills) */}
       <div className="bg-white dark:bg-[#1a2332] px-5 pb-4 border-b border-gray-100 dark:border-gray-800">
-        {/* Quick Filters */}
         <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
-          {QUICK_FILTERS.map((filter) => (
+          {DATE_FILTERS.map((filter) => (
             <button
               key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
+              onClick={() => setActiveDateFilter(filter.id)}
               className={cn(
                 "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
-                activeFilter === filter.id
+                activeDateFilter === filter.id
                   ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
                   : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
               )}

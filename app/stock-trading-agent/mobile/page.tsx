@@ -475,6 +475,19 @@ export default function MobileStockTradingPage() {
         )}
       </div>
 
+      {/* FAB - Always Visible for Quick Trade */}
+      <button
+        onClick={() => {
+          if (filteredStocks.length > 0) {
+            openTradeModal(filteredStocks[0]);
+          }
+        }}
+        className="fixed bottom-28 right-6 w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-2xl shadow-indigo-500/40 flex items-center justify-center active:scale-95 transition-transform z-20"
+        aria-label={t('placeOrder') || 'Order platzieren'}
+      >
+        <ShoppingCart className="w-7 h-7 text-white" />
+      </button>
+
       {/* Order Modal */}
       {showOrderModal && selectedStock && (
         <>

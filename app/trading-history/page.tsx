@@ -38,6 +38,8 @@ import { useCurrency } from '@/hooks/use-currency';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { tradingAgentApi } from '@/lib/api';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileTradingHistory from '@/components/finflow/mobile-trading-history';
 
 interface TradeLog {
   id: string;
@@ -60,6 +62,7 @@ export default function TradingHistoryPage() {
   const { currency } = useCurrency();
   const { convertAndFormat } = useExchangeRates();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   const [logs, setLogs] = useState<TradeLog[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -150,6 +153,11 @@ export default function TradingHistoryPage() {
     a.download = `trading-history-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
   };
+
+  // Render mobile version
+  if (isMobile) {
+    return <MobileTradingHistory user={user} />;
+  }
 
   return (
     <Layout>

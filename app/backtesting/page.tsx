@@ -14,6 +14,8 @@ import { useCurrency } from '@/components/finflow/CurrencyContext';
 import Layout from '@/components/finflow/layout';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileBacktesting from '@/components/finflow/mobile-backtesting';
 
 interface BacktestResult {
   config: {
@@ -57,6 +59,7 @@ export default function BacktestingPage() {
   const { currency } = useCurrency();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [symbol, setSymbol] = useState('BTC');
   const [strategy, setStrategy] = useState('moderate');
   const [initialCapital, setInitialCapital] = useState(1000);
@@ -64,6 +67,11 @@ export default function BacktestingPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Render mobile version
+  if (isMobile) {
+    return <MobileBacktesting user={user} />;
+  }
 
   const runBacktest = async () => {
     setLoading(true);

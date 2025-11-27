@@ -19,6 +19,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useCurrency } from '@/hooks/use-currency';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { tradingAgentApi } from '@/lib/api';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileTradingPerformance from '@/components/finflow/mobile-trading-performance';
 
 interface PerformanceData {
   equityCurve: Array<{ date: string; equity: number }>;
@@ -48,6 +50,7 @@ export default function TradingPerformancePage() {
   const { user } = useAuth();
   const { currency } = useCurrency();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = useState('30'); // days
   const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -98,6 +101,11 @@ export default function TradingPerformancePage() {
 
   if (!user) {
     return null;
+  }
+
+  // Render mobile version
+  if (isMobile) {
+    return <MobileTradingPerformance user={user} />;
   }
 
   return (

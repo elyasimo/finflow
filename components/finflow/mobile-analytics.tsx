@@ -18,6 +18,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import MobileHeader from "./mobile-header"
 import MobileBottomNav from "./mobile-bottom-nav"
+import MobileSVGChart from "./mobile-svg-chart"
 
 interface BalanceData {
   date: string
@@ -214,49 +215,48 @@ export default function MobileAnalytics({
           </button>
         </div>
 
-        {/* Overview View - Simple Bar Chart */}
+        {/* Overview View - Interactive SVG Bar Chart */}
         {activeView === 'overview' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
               Einnahmen vs. Ausgaben
             </h3>
-            <div className="space-y-4">
-              {balanceData.slice(-6).map((data, idx) => (
-                <div key={idx}>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{data.date}</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 text-xs text-emerald-500">Einn.</div>
-                      <div className="flex-1 h-6 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-emerald-500 rounded-full transition-all"
-                          style={{ width: `${(data.income / maxBarValue) * 100}%` }}
-                        />
-                      </div>
-                      <div className="w-20 text-xs text-right text-gray-600 dark:text-gray-300">
-                        {formatCurrency(data.income)}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 text-xs text-rose-500">Ausg.</div>
-                      <div className="flex-1 h-6 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-rose-500 rounded-full transition-all"
-                          style={{ width: `${(data.expenses / maxBarValue) * 100}%` }}
-                        />
-                      </div>
-                      <div className="w-20 text-xs text-right text-gray-600 dark:text-gray-300">
-                        {formatCurrency(data.expenses)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            {balanceData.length > 0 ? (
+              <MobileSVGChart
+                type="bar"
+                height={220}
+                data={balanceData.slice(-6).map(d => ({
+                  label: d.date,
+                  value: d.income,
+                  secondaryValue: d.expenses,
+                  color: '#ef4444' // Expenses color
+                }))}
+                primaryColor="#10b981"
+                secondaryColor="#ef4444"
+                formatValue={(v) => formatCurrency(v)}
+              />
+            ) : (
+              <div className="py-8 text-center">
+                <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">Keine Daten verfügbar</p>
+              </div>
+            )}
+            
+            {/* Legend */}
+            <div className="flex justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-emerald-500" />
+                <span className="text-xs text-gray-500 dark:text-gray-400">Einnahmen</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded bg-rose-500" />
+                <span className="text-xs text-gray-500 dark:text-gray-400">Ausgaben</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Categories View */}
+        {/* Categories View - Interactive Donut Chart */}
         {activeView === 'categories' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
@@ -268,35 +268,43 @@ export default function MobileAnalytics({
                 <p className="text-gray-500 dark:text-gray-400">Keine Ausgaben in diesem Zeitraum</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {categorySpending.map((category, idx) => (
-                  <div key={idx}>
-                    <div className="flex items-center justify-between mb-2">
+              <>
+                <MobileSVGChart
+                  type="donut"
+                  height={240}
+                  data={categorySpending.map(c => ({
+                    label: c.name,
+                    value: c.amount,
+                    color: c.color
+                  }))}
+                  formatValue={(v) => formatCurrency(v)}
+                />
+                
+                {/* Category List */}
+                <div className="mt-4 space-y-3">
+                  {categorySpending.slice(0, 5).map((category, idx) => (
+                    <div key={idx} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div 
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: category.color }}
                         />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[140px]">
                           {category.name}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatCurrency(category.amount)} ({category.percentage.toFixed(1)}%)
-                      </span>
+                      <div className="text-right">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {formatCurrency(category.amount)}
+                        </span>
+                        <span className="text-xs text-gray-400 ml-2">
+                          ({category.percentage.toFixed(0)}%)
+                        </span>
+                      </div>
                     </div>
-                    <div className="h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all"
-                        style={{ 
-                          width: `${category.percentage}%`,
-                          backgroundColor: category.color 
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}

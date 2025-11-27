@@ -10,10 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, MessageSquare, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import MobileSupportPage from '@/components/finflow/mobile-support-page';
 
 export default function SupportPage() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   // `user` type may not include `fullName` in all environments/builds.
   // Cast to `any` when reading optional profile fields to keep the page type-safe during build.
   const [name, setName] = useState<string>((user as any)?.fullName || (user as any)?.email?.split?.('@')?.[0] || '');
@@ -22,6 +25,19 @@ export default function SupportPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Render mobile version on mobile devices
+  if (isMobile) {
+    return (
+      <MobileSupportPage 
+        user={user as any}
+        onSendEmail={async (subject, message) => {
+          // Implement actual email sending here
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }}
+      />
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,20 +61,13 @@ export default function SupportPage() {
     window.location.href = 'mailto:info@finflowapp.ch';
   };
 
-  const handleChatClick = () => {
-    // Open Crisp chat
-    if (typeof window !== 'undefined' && (window as any).$crisp) {
-      (window as any).$crisp.push(['do', 'chat:open']);
-    }
-  };
-
   return (
     <Layout user={user}>
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Support</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Wir sind hier um zu helfen. Kontaktiere uns über E-Mail oder Chat.
+            Wir sind hier um zu helfen. Kontaktiere uns per E-Mail.
           </p>
         </div>
 
@@ -91,7 +100,7 @@ export default function SupportPage() {
               </CardContent>
             </Card>
 
-            {/* Chat Card */}
+            {/* In-App Chat Info */}
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-3">
@@ -99,18 +108,14 @@ export default function SupportPage() {
                     <MessageSquare className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">Live Chat</CardTitle>
+                    <CardTitle className="text-lg">In-App Assistent</CardTitle>
                     <CardDescription className="text-sm">Sofortige Hilfe</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" variant="outline" onClick={handleChatClick}>
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Chat öffnen
-                </Button>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  Mo-Fr: 9:00 - 18:00 Uhr
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Nutzen Sie die mobile App für unseren interaktiven Support-Assistenten.
                 </p>
               </CardContent>
             </Card>

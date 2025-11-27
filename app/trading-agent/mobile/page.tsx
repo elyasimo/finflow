@@ -435,19 +435,18 @@ export default function MobileTradingAgentPage() {
               ))
             )}
 
-            {/* Add Agent Button */}
-            {agents.length > 0 && (
-              <button
-                onClick={() => setShowCreateSheet(true)}
-                className="w-full py-3 bg-blue-500 text-white rounded-xl font-medium flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                {t('newAgent')}
-              </button>
-            )}
           </div>
         )}
       </div>
+
+      {/* FAB - Always Visible */}
+      <button
+        onClick={() => setShowCreateSheet(true)}
+        className="fixed bottom-28 right-6 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center active:scale-95 transition-transform z-20"
+        aria-label={t('newAgent') || 'Neuen Agent erstellen'}
+      >
+        <Plus className="w-7 h-7 text-white" />
+      </button>
 
       {/* Create Agent Bottom Sheet */}
       {showCreateSheet && (

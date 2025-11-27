@@ -4,17 +4,23 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useBiometric } from '@/hooks/use-biometric';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Fingerprint, ScanFace } from 'lucide-react';
+import { Loader2, Fingerprint, ScanFace, Eye, EyeOff } from 'lucide-react';
 import { FinflowLogo } from '@/components/icons/finflow-logo';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import MobileLoginPage from '@/components/finflow/mobile-login-page';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [showBiometricSetup, setShowBiometricSetup] = useState(false);
   const { login, isLoginLoading, loginError } = useAuth();
   const { 
@@ -29,12 +35,12 @@ export default function LoginPage() {
     hapticFeedback,
   } = useBiometric();
 
-  // Try biometric login on mount if available
+  // Try biometric login on mount if available (must be before any conditional returns)
   useEffect(() => {
-    if (biometricAvailable && isNative) {
+    if (biometricAvailable && isNative && !isMobile) {
       tryBiometricLogin();
     }
-  }, [biometricAvailable, isNative]);
+  }, [biometricAvailable, isNative, isMobile]);
 
   const tryBiometricLogin = async () => {
     const credentials = await getCredentials();
@@ -72,6 +78,11 @@ export default function LoginPage() {
 
   const BiometricIcon = biometryType === 'face' ? ScanFace : Fingerprint;
 
+  // Render mobile version on mobile devices (after all hooks)
+  if (isMobile) {
+    return <MobileLoginPage />;
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
@@ -79,15 +90,15 @@ export default function LoginPage() {
           <div className="flex justify-center mb-6">
             <FinflowLogo size="lg" variant="full" />
           </div>
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
-          <CardDescription>Enter your email and password to login to your account</CardDescription>
+          <CardTitle className="text-2xl font-bold">Anmelden</CardTitle>
+          <CardDescription>Geben Sie Ihre Daten ein, um sich anzumelden</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {loginError && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  {loginError instanceof Error ? loginError.message : 'Failed to login. Please try again.'}
+                  {loginError instanceof Error ? loginError.message : 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.'}
                 </AlertDescription>
               </Alert>
             )}
@@ -126,42 +137,55 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">E-Mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="name@beispiel.ch"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Passwort</Label>
                 <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                  Forgot password?
+                  Passwort vergessen?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoginLoading}>
               {isLoginLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Login
+              Anmelden
             </Button>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{' '}
+              Noch kein Konto?{' '}
               <Link href="/register" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
-                Register
+                Jetzt registrieren
               </Link>
             </div>
           </CardFooter>

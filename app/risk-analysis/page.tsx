@@ -11,6 +11,8 @@ import useBinancePortfolio from '@/hooks/use-binance-portfolio';
 import Layout from '@/components/finflow/layout';
 import { useAuth } from '@/hooks/use-auth';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import MobileRiskAnalysisPage from '@/components/finflow/mobile-risk-analysis-page';
 
 interface RiskMetrics {
   var95: number;
@@ -37,12 +39,65 @@ export default function RiskAnalysisPage() {
   const { currency } = useCurrency();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const { portfolio, loading: portfolioLoading } = useBinancePortfolio();
   const [metrics, setMetrics] = useState<RiskMetrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const calculateRisk = async () => {
+  const calculateRisk = async (positions?: any[]) => {
+    const portfolioPositions = positions || portfolio
+      ?.filter(asset => parseFloat(asset.free) > 0)
+      .map(asset => ({
+        symbol: asset.asset,
+        quantity: parseFloat(asset.free),
+        currentPrice: asset.currentPrice || 0,
+      }));
+
+    if (!portfolioPositions || portfolioPositions.length === 0) {
+      throw new Error('No portfolio data available');
+    }
+
+    const token = localStorage.getItem('accessToken');
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/risk-metrics/portfolio`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ positions: portfolioPositions }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to calculate risk metrics');
+    }
+
+    return await response.json();
+  };
+
+  // Render mobile version on mobile devices
+  if (isMobile) {
+    const mobilePortfolio = portfolio
+      ?.filter(asset => parseFloat(asset.free) > 0)
+      .map(asset => ({
+        asset: asset.asset,
+        quantity: parseFloat(asset.free),
+        currentPrice: asset.currentPrice || 0,
+      })) || [];
+
+    return (
+      <MobileRiskAnalysisPage 
+        user={user as any}
+        portfolio={mobilePortfolio}
+        currency={currency}
+        onCalculateRisk={calculateRisk}
+      />
+    );
+  }
+
+  const handleCalculateRisk = async () => {
     if (!portfolio || portfolio.length === 0) {
       setError('No portfolio data available');
       return;
@@ -52,32 +107,7 @@ export default function RiskAnalysisPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('accessToken');
-
-      // Prepare positions
-      const positions = portfolio
-        .filter(asset => parseFloat(asset.free) > 0)
-        .map(asset => ({
-          symbol: asset.asset,
-          quantity: parseFloat(asset.free),
-          currentPrice: asset.currentPrice || 0,
-        }));
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/risk-metrics/portfolio`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ positions }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to calculate risk metrics');
-      }
-
-      const data = await response.json();
+      const data = await calculateRisk();
       setMetrics(data);
     } catch (err: any) {
       setError(err.message || 'Failed to calculate risk metrics');
