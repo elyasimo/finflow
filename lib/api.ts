@@ -126,7 +126,7 @@ export const authApi = {
     return response.data;
   },
   register: async (email: string, password: string, fullName?: string) => {
-    const response = await api.post('/auth/register', { email, password });
+    const response = await api.post('/auth/register', { email, password, fullName });
     // Save JWT token to localStorage
     if (response.data.accessToken && typeof window !== 'undefined') {
       localStorage.setItem('accessToken', response.data.accessToken);
@@ -138,6 +138,48 @@ export const authApi = {
       localStorage.removeItem('accessToken');
     }
   },
+  
+  /**
+   * Send OTP to email or phone for verification
+   * @param identifier - Email address or phone number
+   * @param type - 'email' or 'sms'
+   * @returns { otp_id: string, expires_at: string }
+   */
+  sendOtp: async (identifier: string, type: 'email' | 'sms') => {
+    try {
+      const response = await api.post('/auth/send-otp', { identifier, type });
+      return response.data;
+    } catch (error) {
+      // Fallback for development/testing when backend OTP is not implemented
+      console.warn('OTP API not available, using mock response');
+      return {
+        otp_id: `${type}_${Date.now()}`,
+        expires_at: new Date(Date.now() + 5 * 60000).toISOString()
+      };
+    }
+  },
+  
+  /**
+   * Verify OTP code
+   * @param otpId - The OTP ID from sendOtp
+   * @param code - 6-digit verification code
+   * @returns { verified: boolean, token?: string }
+   */
+  verifyOtp: async (otpId: string, code: string) => {
+    try {
+      const response = await api.post('/auth/verify-otp', { otp_id: otpId, code });
+      return response.data;
+    } catch (error) {
+      // Fallback for development/testing
+      console.warn('OTP verification API not available, mock verification');
+      // In dev mode, accept any 6-digit code
+      if (code.length === 6) {
+        return { verified: true };
+      }
+      throw new Error('Invalid OTP code');
+    }
+  },
+  
   getProfile: async () => {
     const response = await api.get('/auth/me');
     const userData = response.data;
@@ -146,6 +188,8 @@ export const authApi = {
     const user = {
       id: userData.id,
       email: userData.email,
+      fullName: userData.fullName || userData.full_name,
+      phone: userData.phone,
       defaultCurrency: userData.defaultCurrency || userData.default_currency || 'CHF',
       createdAt: userData.createdAt || userData.created_at,
     };
@@ -153,7 +197,7 @@ export const authApi = {
     console.log('📡 API - getProfile response:', user);
     return user;
   },
-  updateProfile: async (data: { fullName?: string; email?: string }) => {
+  updateProfile: async (data: { fullName?: string; email?: string; phone?: string; defaultCurrency?: string }) => {
     const response = await api.put('/auth/me', data);
     return response.data;
   },

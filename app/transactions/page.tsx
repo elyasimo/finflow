@@ -24,7 +24,7 @@ import { useAccounts } from "@/hooks/use-accounts";
 import { useBudgets } from "@/hooks/use-budgets";
 import { useCategories } from "@/hooks/use-categories";
 import Layout from "@/components/finflow/layout";
-import MobileTransactionsNew from "@/components/finflow/mobile-transactions-new";
+import MobileTransactionsPage from "@/components/finflow/mobile-transactions-page";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { format } from 'date-fns';
@@ -298,10 +298,25 @@ export default function TransactionsPage() {
     }
   };
 
+  // Import CSV handler for mobile
+  const handleMobileImport = async (file: File) => {
+    if (!accounts || accounts.length === 0) {
+      throw new Error('Kein Konto verfügbar');
+    }
+    
+    const text = await file.text();
+    await transactionsApi.importCsv({
+      data: text,
+      accountId: accounts[0].id // Use first account for import
+    });
+    
+    window.location.reload();
+  };
+
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileTransactionsNew
+      <MobileTransactionsPage
         transactions={transactions?.map(t => ({
           id: t.id,
           description: getTranslatedText(t.description, t.descriptionTranslations, language),
@@ -311,33 +326,49 @@ export default function TransactionsPage() {
           transactionDate: t.transactionDate,
           currency: t.currency || userCurrency,
           accountId: t.accountId,
+          note: (t as any).note,
+          merchant: (t as any).merchant,
         })) || []}
         accounts={accounts?.map(a => ({
           id: a.id,
           name: getTranslatedText(a.name, a.nameTranslations, language),
+          currency: a.currency || userCurrency,
         })) || []}
         categories={categories?.map(c => ({
           id: c.id,
           name: getTranslatedText(c.name, c.nameTranslations, language),
         })) || []}
-        onAddTransaction={() => setIsCreateOpen(true)}
-        onEditTransaction={(id) => {
-          const transaction = transactions?.find(t => t.id === id);
-          if (transaction) {
-            setSelectedTransaction(transaction);
-            setNewTransaction({
-              accountId: transaction.accountId || "",
-              amount: parseFloat(transaction.amount.toString()),
-              type: transaction.type,
-              description: transaction.description || "",
-              categoryId: transaction.categoryId || "",
-              currency: transaction.currency || userCurrency,
-              transactionDate: new Date(transaction.transactionDate),
-            });
-            setIsEditOpen(true);
-          }
+        isLoading={isLoading}
+        onAddTransaction={async (data) => {
+          await createTransaction({
+            accountId: data.accountId,
+            amount: data.amount,
+            type: data.type,
+            currency: userCurrency,
+            description: data.description,
+            categoryId: data.category || undefined,
+            transactionDate: new Date(data.transactionDate),
+          });
         }}
-        onDeleteTransaction={(id) => deleteTransaction(id)}
+        onEditTransaction={async (id, data) => {
+          await updateTransaction({
+            id,
+            data: {
+              accountId: data.accountId,
+              amount: data.amount,
+              type: data.type,
+              currency: userCurrency,
+              description: data.description,
+              categoryId: data.category || undefined,
+              transactionDate: new Date(data.transactionDate),
+            }
+          });
+        }}
+        onDeleteTransaction={async (id) => {
+          await deleteTransaction(id);
+        }}
+        onImport={handleMobileImport}
+        user={user || undefined}
       />
     );
   }

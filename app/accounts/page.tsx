@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Plus, Trash2, Edit, CreditCard, Wallet, PiggyBank, BarChart } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Layout from '@/components/finflow/layout';
-import MobileAccounts from '@/components/finflow/mobile-accounts';
+import MobileAccountsPage from '@/components/finflow/mobile-accounts-page';
 import { Account } from '@/lib/types';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { getTranslatedText } from '@/lib/translation-utils';
@@ -182,7 +182,7 @@ export default function AccountsPage() {
   // If mobile, render mobile version
   if (isMobile) {
     return (
-      <MobileAccounts
+      <MobileAccountsPage
         accounts={accounts?.map(account => ({
           id: account.id,
           name: getTranslatedText(account.name, account.nameTranslations, language),
@@ -191,25 +191,64 @@ export default function AccountsPage() {
           currency: account.currency || userCurrency,
           bankName: account.name?.split(' - ')?.[0] || undefined,
         })) || []}
-        totalBalance={totalBalance / 100}
-        onAddAccount={() => setIsCreateDialogOpen(true)}
-        onEditAccount={(id) => {
-          const account = accounts?.find(a => a.id === id);
-          if (account) {
-            setSelectedAccount(account);
-            setIsEditDialogOpen(true);
-          }
+        isLoading={accountsLoading}
+        onAddAccount={async (data) => {
+          // Build account name with bank prefix
+          const fullName = data.bankName && data.bankName !== 'other' 
+            ? `${SWISS_BANKS.find(b => b.id === data.bankName)?.label || data.bankName} - ${data.name}`
+            : data.name;
+          
+          await new Promise<void>((resolve, reject) => {
+            createAccount({
+              name: fullName,
+              type: data.type,
+              balance: data.balance,
+              currency: data.currency,
+            }, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          });
         }}
-        onDeleteAccount={(id) => {
-          const account = accounts?.find(a => a.id === id);
-          if (account) {
-            setSelectedAccount(account);
-            setIsDeleteDialogOpen(true);
-          }
+        onEditAccount={async (id, data) => {
+          const fullName = data.bankName && data.bankName !== 'other' 
+            ? `${SWISS_BANKS.find(b => b.id === data.bankName)?.label || data.bankName} - ${data.name}`
+            : data.name;
+          
+          await new Promise<void>((resolve, reject) => {
+            updateAccount({
+              id,
+              data: {
+                name: fullName,
+                type: data.type,
+                openingBalanceCents: Math.round(data.balance * 100),
+                currency: data.currency,
+              },
+            }, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          });
         }}
+        onDeleteAccount={async (id) => {
+          await new Promise<void>((resolve) => {
+            deleteAccount(id, { onSuccess: () => resolve() });
+          });
+        }}
+        user={user || undefined}
       />
     );
   }
+
+  // Swiss Banks constant for name building
+  const SWISS_BANKS = [
+    { id: 'postfinance', label: 'PostFinance' },
+    { id: 'ubs', label: 'UBS' },
+    { id: 'credit-suisse', label: 'Credit Suisse' },
+    { id: 'raiffeisen', label: 'Raiffeisen' },
+    { id: 'zkb', label: 'ZKB' },
+    { id: 'other', label: 'Other' },
+  ];
 
   // Extract bank info from account name
   const extractBankInfo = (accountName: string) => {

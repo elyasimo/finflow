@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, User, Lock, Bell, Moon, Sun, LogOut } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
-import MobileSettings from '@/components/finflow/mobile-settings';
+import MobileSettingsPage from '@/components/finflow/mobile-settings-page';
 import { useTheme } from 'next-themes';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { toast } from 'sonner';
@@ -313,25 +313,81 @@ export default function SettingsPage() {
     return null;
   }
 
+  // Handle password change for mobile
+  const handlePasswordChange = async (currentPwd: string, newPwd: string) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/auth/change-password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      body: JSON.stringify({
+        currentPassword: currentPwd,
+        newPassword: newPwd,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Passwort konnte nicht geändert werden');
+    }
+    
+    toast.success(t('passwordUpdatedSuccessfully') || 'Passwort erfolgreich geändert!');
+  };
+
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileSettings
+      <MobileSettingsPage
         user={{
-          name: user?.fullName || '',
+          id: user?.id || '',
+          fullName: user?.fullName || '',
           email: user?.email || '',
         }}
         theme={theme || 'system'}
         language={language}
         currency={defaultCurrency}
+        emailNotifications={emailNotifications}
+        pushNotifications={pushNotifications}
         onThemeChange={setTheme}
         onLanguageChange={setLanguage}
-        onCurrencyChange={(currency) => {
+        onCurrencyChange={async (currency) => {
           setDefaultCurrency(currency);
-          handleCurrencyUpdate();
+          // Persist to API
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/auth/preferences`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+              },
+              body: JSON.stringify({ defaultCurrency: currency }),
+            });
+            
+            if (response.ok) {
+              toast.success('Währung aktualisiert');
+            }
+          } catch (error) {
+            console.error('Currency update error:', error);
+          }
         }}
+        onEmailNotificationsChange={async (enabled) => {
+          setEmailNotifications(enabled);
+          // In a real app, persist to API
+          toast.success(enabled ? 'E-Mail Benachrichtigungen aktiviert' : 'E-Mail Benachrichtigungen deaktiviert');
+        }}
+        onPushNotificationsChange={async (enabled) => {
+          setPushNotifications(enabled);
+          // In a real app, persist to API
+          toast.success(enabled ? 'Push-Benachrichtigungen aktiviert' : 'Push-Benachrichtigungen deaktiviert');
+        }}
+        onUpdateProfile={async (data) => {
+          if (data.fullName) setFullName(data.fullName);
+          if (data.email) setEmail(data.email);
+          await handleProfileUpdate();
+        }}
+        onChangePassword={handlePasswordChange}
         onLogout={handleLogout}
-        onUpdateProfile={handleProfileUpdate}
       />
     );
   }

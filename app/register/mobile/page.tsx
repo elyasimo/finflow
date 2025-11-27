@@ -1,17 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import MobileOnboarding from '@/components/finflow/mobile-onboarding';
-import { accountsApi } from '@/lib/api';
+import MobileRegistration from '@/components/finflow/mobile-registration';
 
-interface OnboardingData {
-  contactType: 'email' | 'phone'
-  contact: string
-  password?: string
-  fullName?: string
-  account: {
+interface RegistrationData {
+  email: string
+  phone: string
+  password: string
+  fullName: string
+  account?: {
     bankName: string
     accountType: string
     displayName: string
@@ -21,37 +19,13 @@ interface OnboardingData {
 
 export default function RegisterMobilePage() {
   const router = useRouter();
-  const { register, isAuthenticated } = useAuth();
   const [error, setError] = useState('');
 
-  const handleOnboardingComplete = async (data: OnboardingData) => {
+  const handleRegistrationComplete = async (data: RegistrationData) => {
     try {
       setError('');
-      
-      // Register the user if not already authenticated
-      if (!isAuthenticated && data.password) {
-        await register({
-          email: data.contact,
-          password: data.password,
-          fullName: data.fullName || data.contact.split('@')[0],
-        });
-      }
-      
-      // Create the first bank account
-      try {
-        await accountsApi.create({
-          name: data.account.displayName,
-          type: data.account.accountType,
-          balance: 0,
-          currency: 'CHF',
-          // @ts-ignore - add bank info to notes or custom field
-          bankName: data.account.bankName,
-        });
-      } catch (accountError) {
-        console.error('Account creation error (non-fatal):', accountError);
-      }
-      
-      // Redirect to dashboard
+      // Registration is handled inside the MobileRegistration component
+      // Just redirect to dashboard on success
       router.push('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
@@ -63,10 +37,15 @@ export default function RegisterMobilePage() {
     router.push('/login');
   };
 
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
   return (
-    <MobileOnboarding 
-      onComplete={handleOnboardingComplete}
+    <MobileRegistration 
+      onComplete={handleRegistrationComplete}
       onSkip={handleSkip}
+      onLogin={handleLogin}
     />
   );
 }

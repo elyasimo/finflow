@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Plus, Trash2, Edit, PiggyBank, Calendar } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
-import MobileBudgetsNew from '@/components/finflow/mobile-budgets-new';
+import MobileBudgetsPage from '@/components/finflow/mobile-budgets-page';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -257,20 +257,60 @@ export default function BudgetsPage() {
     };
   }) || [];
 
+  // Get categories from transactions
+  const uniqueCategories = [...new Set(
+    transactions
+      ?.filter(t => t.category)
+      .map(t => typeof t.category === 'object' ? t.category.name : t.category)
+  )].filter(Boolean).map((name, index) => ({
+    id: `cat-${index}`,
+    name: name as string,
+  }));
+
   // Render mobile version
   if (isMobile) {
     return (
-      <MobileBudgetsNew
+      <MobileBudgetsPage
         budgets={budgetsWithSpent}
-        onAddBudget={() => setIsCreateDialogOpen(true)}
-        onEditBudget={(id) => {
-          const budget = budgets?.find(b => b.id === id);
-          if (budget) {
-            setSelectedBudget(budget);
-            setIsEditDialogOpen(true);
-          }
+        categories={uniqueCategories}
+        isLoading={budgetsLoading}
+        onAddBudget={async (data) => {
+          await new Promise<void>((resolve, reject) => {
+            createBudget({
+              name: data.name,
+              amount: data.amount,
+              currency: userCurrency,
+              period: 'monthly',
+              startDate: data.startDate ? new Date(data.startDate) : new Date(),
+              endDate: data.endDate ? new Date(data.endDate) : new Date(),
+            }, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          });
         }}
-        onDeleteBudget={(id) => deleteBudget(id)}
+        onEditBudget={async (id, data) => {
+          await new Promise<void>((resolve, reject) => {
+            updateBudget({
+              id,
+              data: {
+                name: data.name,
+                amount: data.amount,
+                startDate: data.startDate ? new Date(data.startDate) : undefined,
+                endDate: data.endDate ? new Date(data.endDate) : undefined,
+              },
+            }, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          });
+        }}
+        onDeleteBudget={async (id) => {
+          await new Promise<void>((resolve) => {
+            deleteBudget(id, { onSuccess: () => resolve() });
+          });
+        }}
+        user={user || undefined}
       />
     );
   }
