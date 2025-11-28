@@ -173,7 +173,7 @@ export default function MobileReports({
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setShowMonthPicker(false)}
             />
-            <div className="relative w-full max-w-md bg-white dark:bg-[#1a2332] rounded-t-3xl p-6 pb-10 animate-slide-up safe-area-inset">
+            <div className="relative w-full max-w-md bg-white dark:bg-[#1a2332] rounded-t-3xl p-6 pb-10 animate-slide-up safe-area-inset max-h-[85vh] overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -207,7 +207,7 @@ export default function MobileReports({
               </div>
 
               {/* Month Grid */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3 pb-8">
                 {months.map((month) => {
                   const isSelected = 
                     selectedMonth.getMonth() === month.value && 

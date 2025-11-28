@@ -54,6 +54,15 @@ export default function MobileLoginPage({
   const [showBiometricSetup, setShowBiometricSetup] = useState(false)
   const [hasSavedCredentials, setHasSavedCredentials] = useState(false)
   const [biometricChecked, setBiometricChecked] = useState(false)
+  const [biometricsEnabledSetting, setBiometricsEnabledSetting] = useState(false)
+  
+  // Check biometrics enabled setting from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedSetting = localStorage.getItem('biometricsEnabled')
+      setBiometricsEnabledSetting(savedSetting === 'true')
+    }
+  }, [])
   
   // Check for saved biometric credentials on mount - retry until native is ready
   useEffect(() => {
@@ -154,18 +163,31 @@ export default function MobileLoginPage({
     login(
       { email, password },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           // Debug: Log biometric state
           console.log('🔐 Login success - Biometric state:', {
             biometricAvailable,
             isNative,
             biometricInitialized,
             hasSavedCredentials,
+            biometricsEnabledSetting,
             shouldShowSetup: biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials
           })
           
-          // Offer to save credentials for biometric
-          if (biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials) {
+          // Auto-save credentials if biometrics is enabled in settings but credentials not saved yet
+          if (biometricInitialized && biometricAvailable && isNative && biometricsEnabledSetting && !hasSavedCredentials) {
+            console.log('🔐 Auto-saving credentials because biometrics is enabled in settings')
+            const saved = await saveCredentials(email, password)
+            if (saved) {
+              await hapticFeedback('success')
+              console.log('🔐 Credentials saved successfully')
+            }
+            router.push('/dashboard')
+            return
+          }
+          
+          // Offer to save credentials for biometric if not enabled yet
+          if (biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials && !biometricsEnabledSetting) {
             setShowBiometricSetup(true)
           } else {
             router.push('/dashboard')
@@ -217,44 +239,50 @@ export default function MobileLoginPage({
 
       {/* Main Content - A4 Fix: Scrollable with safe area padding */}
       <div className="flex-1 px-6 py-8 pb-[100px] overflow-y-auto overscroll-contain">
-        {/* Debug Panel - for development */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mb-4 p-3 bg-gray-800/50 rounded-xl text-xs font-mono text-gray-400 space-y-1">
-            <p>🔐 Biometric Debug:</p>
-            <p>- initialized: {String(biometricInitialized)}</p>
-            <p>- available: {String(biometricAvailable)}</p>
-            <p>- isNative: {String(isNative)}</p>
-            <p>- hasCreds: {String(hasSavedCredentials)}</p>
-            <p>- type: {biometryType}</p>
-            <p>- checked: {String(biometricChecked)}</p>
-          </div>
-        )}
-        
-        {/* Biometric Login Button - Show when credentials are saved */}
-        {biometricAvailable && isNative && hasSavedCredentials && (
+        {/* Face ID Quick Login - Show when credentials are saved OR biometrics enabled but need setup */}
+        {biometricAvailable && isNative && (hasSavedCredentials || biometricsEnabledSetting) && (
           <div className="mb-8">
-            <button
-              onClick={handleBiometricLogin}
-              disabled={isAuthenticating}
-              className={cn(
-                "w-full py-5 rounded-2xl font-semibold text-lg",
-                "bg-gradient-to-r from-emerald-500 to-teal-600",
-                "text-white shadow-xl shadow-emerald-500/30",
-                "hover:shadow-emerald-500/40 active:scale-[0.98]",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "transition-all flex items-center justify-center gap-3"
-              )}
-              aria-label={`Mit ${getBiometryLabel()} anmelden`}
-            >
-              {isAuthenticating ? (
-                <Loader2 className="w-7 h-7 animate-spin" />
-              ) : (
-                <BiometricIcon className="w-7 h-7" />
-              )}
-              <span>Mit {getBiometryLabel()} anmelden</span>
-            </button>
+            {hasSavedCredentials ? (
+              <button
+                onClick={handleBiometricLogin}
+                disabled={isAuthenticating}
+                className={cn(
+                  "w-full py-5 rounded-2xl font-semibold text-lg",
+                  "bg-gradient-to-r from-emerald-500 to-teal-600",
+                  "text-white shadow-xl shadow-emerald-500/30",
+                  "hover:shadow-emerald-500/40 active:scale-[0.98]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  "transition-all flex items-center justify-center gap-3"
+                )}
+                aria-label={`Mit ${getBiometryLabel()} anmelden`}
+              >
+                {isAuthenticating ? (
+                  <Loader2 className="w-7 h-7 animate-spin" />
+                ) : (
+                  <BiometricIcon className="w-7 h-7" />
+                )}
+                <span>Mit {getBiometryLabel()} anmelden</span>
+              </button>
+            ) : (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                    <BiometricIcon className="w-6 h-6 text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-white">
+                      {getBiometryLabel()} einrichten
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Melden Sie sich einmal mit E-Mail an, um {getBiometryLabel()} zu aktivieren
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             
-            {/* Divider */}
+            {/* Divider - only show if Face ID button is available */}
+            {hasSavedCredentials && (
             <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-700" />
@@ -265,6 +293,7 @@ export default function MobileLoginPage({
                 </span>
               </div>
             </div>
+            )}
           </div>
         )}
 

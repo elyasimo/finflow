@@ -652,7 +652,7 @@ export default function AccountsPage() {
                                 {new Intl.NumberFormat('de-DE', {
                                   style: 'currency',
                                   currency: account.currency || 'CHF'
-                                }).format((Number(account.balance) || 0) / 100)}
+                                }).format(Number(account.balance) || 0)}
                               </div>
                             </div>
                             <div className="text-right">
@@ -854,7 +854,7 @@ export default function AccountsPage() {
                                 {new Intl.NumberFormat('de-DE', {
                                   style: 'currency',
                                   currency: account.currency || 'CHF'
-                                }).format((Number(account.balance) || 0) / 100)}
+                                }).format(Number(account.balance) || 0)}
                               </div>
                             </div>
                             <div className="text-[10px] uppercase tracking-[0.1em] font-bold opacity-50">
@@ -1028,7 +1028,7 @@ export default function AccountsPage() {
                       {new Intl.NumberFormat('de-DE', {
                         style: 'currency',
                         currency: account.currency || 'EUR'
-                      }).format((Number(account.balance) || 0) / 100)}
+                      }).format(Number(account.balance) || 0)}
                     </div>
                             </div>
                             <div className="text-[10px] uppercase opacity-50">{account.type}</div>

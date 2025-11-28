@@ -13,9 +13,11 @@ export default function ReactQueryProvider({ children }: ReactQueryProviderProps
     defaultOptions: {
       queries: {
         // Default options for all queries
-        staleTime: 60 * 1000, // 1 minute
-        refetchOnWindowFocus: false,
-        retry: 1,
+        staleTime: 5 * 60 * 1000, // 5 minutes - increased for better mobile experience
+        gcTime: 30 * 60 * 1000, // 30 minutes cache time (formerly cacheTime)
+        refetchOnWindowFocus: true, // Refetch when app comes to foreground
+        refetchOnReconnect: true, // Refetch when network reconnects
+        retry: 2, // Retry twice on failure
       },
     },
   }));

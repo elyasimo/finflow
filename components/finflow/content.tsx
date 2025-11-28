@@ -255,6 +255,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
         totalBalance={totalBalance}
         totalIncome={totalIncome}
         totalExpenses={totalExpenses}
+        userName={user?.fullName || user?.email?.split('@')[0] || 'User'}
       />
     );
   }

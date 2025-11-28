@@ -29,7 +29,8 @@ import {
   Link2,
   ExternalLink,
   Copy,
-  CheckCircle2
+  CheckCircle2,
+  Camera
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -549,7 +550,7 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowProfileSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] animate-slide-up safe-area-inset-bottom flex flex-col">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up safe-area-inset-bottom flex flex-col">
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -562,7 +563,37 @@ export default function MobileSettingsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 space-y-4 overflow-y-auto flex-1 pb-10">
+            <div className="p-5 space-y-4 overflow-y-auto flex-1 pb-32">
+              {/* Profile Picture Section */}
+              <div className="flex flex-col items-center mb-4">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                    {fullName?.charAt(0) || email?.charAt(0) || '?'}
+                  </div>
+                  <button
+                    onClick={() => {
+                      // Create a file input and trigger it
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.accept = 'image/*'
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0]
+                        if (file) {
+                          // For now, show a coming soon message
+                          // In future: upload to server and update profile
+                          alert('Profilbild-Upload kommt bald! Diese Funktion wird in einem zukünftigen Update verfügbar sein.')
+                        }
+                      }
+                      input.click()
+                    }}
+                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center shadow-lg border-2 border-white dark:border-[#1a2332]"
+                  >
+                    <Camera className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">Tippen Sie auf das Kamera-Symbol zum Ändern</p>
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name
@@ -604,11 +635,13 @@ export default function MobileSettingsPage({
               <button
                 onClick={handleUpdateProfile}
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-2xl font-semibold bg-blue-500 text-white flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl font-semibold bg-blue-500 text-white flex items-center justify-center gap-2 mb-4"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                 Speichern
               </button>
+              {/* Extra space to ensure button is visible above keyboard/safe area */}
+              <div className="h-32" />
             </div>
           </div>
         </div>
@@ -1146,7 +1179,8 @@ export default function MobileSettingsPage({
                     "bg-blue-500 text-white shadow-lg",
                     "hover:bg-blue-600 active:scale-[0.98]",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
-                    "transition-all flex items-center justify-center gap-2"
+                    "transition-all flex items-center justify-center gap-2",
+                    "mb-8"
                   )}
                 >
                   {isSubmitting ? (
@@ -1158,6 +1192,8 @@ export default function MobileSettingsPage({
                     </>
                   )}
                 </button>
+                {/* Extra bottom padding for safe scroll */}
+                <div className="h-20" />
               </div>
             )}
             </div>
