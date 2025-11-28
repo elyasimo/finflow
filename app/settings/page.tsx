@@ -351,6 +351,14 @@ export default function SettingsPage() {
 
   // Render mobile version
   if (isMobile) {
+    // Compute apiKeys object for mobile
+    const mobileApiKeys = {
+      binanceApiKey: binanceKeysConfigured ? '••••••••••••••••' : '',
+      binanceSecretKey: binanceKeysConfigured ? '••••••••••••••••' : '',
+      alpacaApiKey: alpacaApiKey || '',
+      alpacaSecretKey: alpacaApiSecret || '',
+    };
+
     return (
       <MobileSettingsPage
         user={{
@@ -364,6 +372,7 @@ export default function SettingsPage() {
         emailNotifications={emailNotifications}
         pushNotifications={pushNotifications}
         biometricsEnabled={biometricsEnabled}
+        apiKeys={mobileApiKeys}
         onThemeChange={setTheme}
         onLanguageChange={setLanguage}
         onCurrencyChange={async (currency) => {
@@ -407,6 +416,78 @@ export default function SettingsPage() {
           await handleProfileUpdate();
         }}
         onChangePassword={handlePasswordChange}
+        onSaveApiKeys={async (keys) => {
+          // Save Binance keys if provided
+          if (keys.binanceApiKey && keys.binanceSecretKey && 
+              !keys.binanceApiKey.includes('•') && !keys.binanceSecretKey.includes('•')) {
+            setBinanceApiKeysLoading(true);
+            try {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/binance`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                  apiKey: keys.binanceApiKey,
+                  apiSecret: keys.binanceSecretKey,
+                }),
+              });
+              
+              if (!response.ok) {
+                throw new Error('Failed to save Binance API keys');
+              }
+              
+              setBinanceKeysConfigured(true);
+              toast.success('Binance API-Schlüssel gespeichert!');
+            } catch (error) {
+              console.error('Failed to save Binance API keys:', error);
+              throw new Error('Binance API-Schlüssel konnten nicht gespeichert werden');
+            } finally {
+              setBinanceApiKeysLoading(false);
+            }
+          }
+          
+          // Save Alpaca keys if provided
+          if (keys.alpacaApiKey && keys.alpacaSecretKey) {
+            setApiKeysLoading(true);
+            try {
+              const keysToSave = [
+                { keyName: 'api_key', keyValue: keys.alpacaApiKey },
+                { keyName: 'api_secret', keyValue: keys.alpacaSecretKey },
+                { keyName: 'is_paper', keyValue: 'true' },
+              ];
+
+              for (const key of keysToSave) {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                  },
+                  body: JSON.stringify({
+                    provider: 'alpaca',
+                    keyName: key.keyName,
+                    keyValue: key.keyValue,
+                  }),
+                });
+
+                if (!response.ok) {
+                  throw new Error('Failed to save Alpaca API key');
+                }
+              }
+              
+              setAlpacaApiKey(keys.alpacaApiKey);
+              setAlpacaApiSecret(keys.alpacaSecretKey);
+              toast.success('Alpaca API-Schlüssel gespeichert!');
+            } catch (error) {
+              console.error('Failed to save Alpaca API keys:', error);
+              throw new Error('Alpaca API-Schlüssel konnten nicht gespeichert werden');
+            } finally {
+              setApiKeysLoading(false);
+            }
+          }
+        }}
         onLogout={handleLogout}
       />
     );

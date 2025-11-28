@@ -323,17 +323,17 @@ export default function MobileDashboard({
             </div>
             
             {/* Portfolio Summary Card */}
-            <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 rounded-3xl p-5 text-white shadow-xl mb-4">
+            <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 rounded-3xl p-5 text-white shadow-xl mb-4 overflow-hidden">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm opacity-80">Gesamtwert</p>
                 {portfolioLoading && <Loader2 className="w-4 h-4 animate-spin opacity-60" />}
               </div>
-              <p className="text-3xl font-bold mb-4">
+              <p className="text-3xl font-bold mb-4 truncate">
                 {formatCurrency(totalPortfolioValue, 'EUR')}
               </p>
               
-              {/* Top 3 Assets */}
-              <div className="flex gap-2">
+              {/* Top 3 Assets - wrap instead of overflow */}
+              <div className="flex flex-wrap gap-2">
                 {binancePortfolio
                   .filter(a => parseFloat(a.free) > 0 && a.currentPrice)
                   .sort((a, b) => {
@@ -343,20 +343,20 @@ export default function MobileDashboard({
                   })
                   .slice(0, 3)
                   .map((asset) => (
-                    <div key={asset.asset} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 rounded-full">
+                    <div key={asset.asset} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/20 rounded-full max-w-[110px] overflow-hidden">
                       <img 
                         src={`/logos/cryptocurrency/${asset.asset.toLowerCase()}.png`}
                         alt={asset.asset}
-                        className="w-4 h-4 rounded-full"
+                        className="w-4 h-4 rounded-full flex-shrink-0"
                         onError={(e) => {
                           e.currentTarget.onerror = null
                           e.currentTarget.src = '/logos/cryptocurrency/default.png'
                         }}
                       />
-                      <span className="text-xs font-medium">{asset.asset}</span>
+                      <span className="text-xs font-medium truncate">{asset.asset}</span>
                       {asset.priceChange24h !== null && (
                         <span className={cn(
-                          "text-xs",
+                          "text-xs flex-shrink-0",
                           asset.priceChange24h >= 0 ? "text-green-200" : "text-red-200"
                         )}>
                           {asset.priceChange24h >= 0 ? '+' : ''}{asset.priceChange24h.toFixed(1)}%

@@ -272,6 +272,14 @@ export default function MobileSettingsPage({
     }
   }, [user])
 
+  // Sync API keys from props when they change (e.g., after loading from server)
+  useEffect(() => {
+    if (apiKeys.binanceApiKey) setBinanceApiKey(apiKeys.binanceApiKey)
+    if (apiKeys.binanceSecretKey) setBinanceSecretKey(apiKeys.binanceSecretKey)
+    if (apiKeys.alpacaApiKey) setAlpacaApiKey(apiKeys.alpacaApiKey)
+    if (apiKeys.alpacaSecretKey) setAlpacaSecretKey(apiKeys.alpacaSecretKey)
+  }, [apiKeys])
+
   // Handlers
   const handleUpdateProfile = async () => {
     try {
@@ -948,12 +956,33 @@ export default function MobileSettingsPage({
                     <div className="w-8 h-8 rounded-lg bg-[#F3BA2F] flex items-center justify-center">
                       <span className="text-black font-bold text-sm">B</span>
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">Binance</h3>
                       <p className="text-xs text-gray-500">Für Krypto-Portfolio & Trading</p>
                     </div>
+                    {binanceApiKey?.includes('•') && (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Verbunden</span>
+                      </div>
+                    )}
                   </div>
                   
+                  {binanceApiKey?.includes('•') ? (
+                    <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+                            Binance ist verbunden
+                          </p>
+                          <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                            Ihr Krypto-Portfolio wird automatisch synchronisiert. Um die Verbindung zu ändern, geben Sie neue API-Schlüssel ein.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -999,7 +1028,9 @@ export default function MobileSettingsPage({
                       </div>
                     </div>
                   </div>
+                  )}
                   
+                  {!binanceApiKey?.includes('•') && (
                   <a 
                     href="https://www.binance.com/en/my/settings/api-management" 
                     target="_blank" 
@@ -1009,6 +1040,7 @@ export default function MobileSettingsPage({
                     <ExternalLink className="w-4 h-4" />
                     API-Schlüssel bei Binance erstellen
                   </a>
+                  )}
                 </div>
 
                 {/* Divider */}
