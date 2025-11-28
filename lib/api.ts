@@ -478,7 +478,31 @@ export type Market = {
   lastUpdated: string;
 };
 
+// Binance Portfolio Response interface
+export interface BinancePortfolioResponse {
+  portfolio: Array<{
+    asset: string;
+    free: string;
+    locked: string;
+    currentPrice: number | null;
+    priceChange24h: number | null;
+    logo: string;
+  }>;
+  totalValue: number;
+  lastUpdated?: string;
+  error?: string;
+  needsConfiguration?: boolean;
+}
+
+// Export getPortfolio function for direct use
+export const getPortfolio = async (): Promise<BinancePortfolioResponse> => {
+  const response = await api.get('/markets/portfolio');
+  return response.data;
+};
+
 export const marketsApi = {
+  getPortfolio,
+  
   getFinancialMarkets: async () => {
     try {
       const response = await api.get('/markets/financial');

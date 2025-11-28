@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { getPortfolio, BinancePortfolioResponse } from '@/lib/api';
 
 export interface BinancePortfolioAsset {
   asset: string;
@@ -10,12 +10,6 @@ export interface BinancePortfolioAsset {
   logo: string;
 }
 
-// Create API client for portfolio - use Backend API
-const portfolioApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081',
-  withCredentials: true,
-});
-
 export default function useBinancePortfolio(pollInterval = 10000) {
   const [portfolio, setPortfolio] = useState<BinancePortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,28 +18,30 @@ export default function useBinancePortfolio(pollInterval = 10000) {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let mounted = true;
+
     async function fetchPortfolio() {
+      if (!mounted) return;
+      
       setLoading(true);
       try {
-        // Get auth token from localStorage
-        const token = localStorage.getItem('accessToken');
-        const response = await portfolioApi.get('/markets/portfolio', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await getPortfolio();
+        
+        if (!mounted) return;
         
         // Check if API keys need configuration
-        if (response.data.needsConfiguration) {
+        if (response.needsConfiguration) {
           setNeedsConfiguration(true);
-          setError(response.data.error || 'Binance API keys not configured');
+          setError(response.error || 'Binance API keys not configured');
           setPortfolio([]);
         } else {
           setNeedsConfiguration(false);
-          setPortfolio(response.data.portfolio || []);
+          setPortfolio(response.portfolio || []);
           setError(null);
         }
       } catch (err: unknown) {
+        if (!mounted) return;
+        
         console.error('Portfolio fetch error:', err);
         const error = err as { response?: { data?: { message?: string; needsConfiguration?: boolean } }; message?: string };
         
@@ -57,12 +53,19 @@ export default function useBinancePortfolio(pollInterval = 10000) {
         }
         setPortfolio([]);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
+
     fetchPortfolio();
     interval = setInterval(fetchPortfolio, pollInterval);
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [pollInterval]);
 
   return { portfolio, loading, error, needsConfiguration };

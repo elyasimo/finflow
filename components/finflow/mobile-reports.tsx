@@ -11,7 +11,10 @@ import {
   BarChart3,
   Calendar,
   ChevronDown,
-  Loader2
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -67,6 +70,7 @@ export default function MobileReports({
   const { t } = useLanguage()
   const { currency } = useCurrency()
   const [activeTab, setActiveTab] = useState<'overview' | 'income' | 'expenses' | 'budgets'>('overview')
+  const [showMonthPicker, setShowMonthPicker] = useState(false)
 
   const formatCurrency = (amount: number, curr?: string) => {
     return new Intl.NumberFormat('de-CH', {
@@ -77,6 +81,35 @@ export default function MobileReports({
   }
 
   const monthLabel = selectedMonth.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+
+  // Generate months for picker (current year +/- 2 years)
+  const currentYear = new Date().getFullYear()
+  const years = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1]
+  const months = [
+    { value: 0, label: 'Januar' },
+    { value: 1, label: 'Februar' },
+    { value: 2, label: 'März' },
+    { value: 3, label: 'April' },
+    { value: 4, label: 'Mai' },
+    { value: 5, label: 'Juni' },
+    { value: 6, label: 'Juli' },
+    { value: 7, label: 'August' },
+    { value: 8, label: 'September' },
+    { value: 9, label: 'Oktober' },
+    { value: 10, label: 'November' },
+    { value: 11, label: 'Dezember' },
+  ]
+
+  const [pickerYear, setPickerYear] = useState(selectedMonth.getFullYear())
+
+  const handleMonthSelect = (month: number) => {
+    const newDate = new Date(pickerYear, month, 1)
+    onMonthChange(newDate)
+    setShowMonthPicker(false)
+  }
+
+  const handlePrevYear = () => setPickerYear(y => y - 1)
+  const handleNextYear = () => setPickerYear(y => y + 1)
 
   // Calculate category data with colors
   const categoryData = useMemo(() => {
@@ -117,7 +150,13 @@ export default function MobileReports({
       {/* Content */}
       <div className="px-4 pt-4 pb-28">
         {/* Month Selector */}
-        <button className="w-full bg-white dark:bg-[#1a2332] rounded-2xl p-4 mb-4 flex items-center justify-between shadow-sm">
+        <button 
+          onClick={() => {
+            setPickerYear(selectedMonth.getFullYear())
+            setShowMonthPicker(true)
+          }}
+          className="w-full bg-white dark:bg-[#1a2332] rounded-2xl p-4 mb-4 flex items-center justify-between shadow-sm active:scale-[0.98] transition-transform"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-blue-500" />
@@ -126,6 +165,78 @@ export default function MobileReports({
           </div>
           <ChevronDown className="w-5 h-5 text-gray-400" />
         </button>
+
+        {/* Month Picker Modal */}
+        {showMonthPicker && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowMonthPicker(false)}
+            />
+            <div className="relative w-full max-w-md bg-white dark:bg-[#1a2332] rounded-t-3xl p-6 pb-10 animate-slide-up safe-area-inset">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  Monat wählen
+                </h3>
+                <button
+                  onClick={() => setShowMonthPicker(false)}
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {/* Year Selector */}
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={handlePrevYear}
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </button>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {pickerYear}
+                </span>
+                <button
+                  onClick={handleNextYear}
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </button>
+              </div>
+
+              {/* Month Grid */}
+              <div className="grid grid-cols-3 gap-3">
+                {months.map((month) => {
+                  const isSelected = 
+                    selectedMonth.getMonth() === month.value && 
+                    selectedMonth.getFullYear() === pickerYear
+                  const isCurrent = 
+                    new Date().getMonth() === month.value && 
+                    new Date().getFullYear() === pickerYear
+                  
+                  return (
+                    <button
+                      key={month.value}
+                      onClick={() => handleMonthSelect(month.value)}
+                      className={cn(
+                        "py-3 px-2 rounded-xl text-sm font-medium transition-all",
+                        isSelected
+                          ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                          : isCurrent
+                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                          : "bg-gray-100 dark:bg-[#232e40] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2a3a50]"
+                      )}
+                    >
+                      {month.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-3 mb-6">
@@ -357,6 +468,23 @@ export default function MobileReports({
 
       {/* Bottom Navigation */}
       <MobileBottomNav />
+
+      {/* CSS Animation for Month Picker */}
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }

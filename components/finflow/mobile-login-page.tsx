@@ -52,13 +52,27 @@ export default function MobileLoginPage({
   // Biometric state
   const [showBiometricSetup, setShowBiometricSetup] = useState(false)
   const [hasSavedCredentials, setHasSavedCredentials] = useState(false)
+  const [biometricChecked, setBiometricChecked] = useState(false)
   
-  // Check for saved biometric credentials on mount
+  // Check for saved biometric credentials on mount - retry until native is ready
   useEffect(() => {
     const checkBiometricCredentials = async () => {
+      // Debug log
+      console.log('🔐 Biometric check:', { biometricAvailable, isNative, hasSavedCredentials })
+      
       if (biometricAvailable && isNative) {
-        const credentials = await getCredentials()
-        setHasSavedCredentials(!!credentials)
+        try {
+          const credentials = await getCredentials()
+          console.log('🔐 Credentials found:', !!credentials)
+          setHasSavedCredentials(!!credentials)
+        } catch (err) {
+          console.error('🔐 Credentials check error:', err)
+          setHasSavedCredentials(false)
+        }
+        setBiometricChecked(true)
+      } else if (!isNative) {
+        // Not a native app, mark as checked
+        setBiometricChecked(true)
       }
     }
     checkBiometricCredentials()
