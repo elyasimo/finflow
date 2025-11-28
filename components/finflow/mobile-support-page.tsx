@@ -302,7 +302,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-24">
+        <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-32 mb-16">
           <div className="flex items-end gap-3">
             <div className="flex-1 relative">
               <input
@@ -349,7 +349,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => !isSendingEmail && setShowContactForm(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto animate-slide-up pb-8">
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>

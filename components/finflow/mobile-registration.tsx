@@ -239,16 +239,17 @@ export default function MobileRegistration({
       // Call backend API to send 6-digit PIN via Gmail
       const response = await authApi.sendEmailOtp(email)
       
-      if (response.success) {
-        setEmailOtpId(`email_${Date.now()}`)
+      // Backend returns otp_id and expires_at on success
+      if (response.otp_id || response.success) {
+        setEmailOtpId(response.otp_id || `email_${Date.now()}`)
         setEmailResendCooldown(OTP_COOLDOWN)
         return true
       } else {
-        setError(response.message || 'Fehler beim Senden des E-Mail-Codes')
+        setError(response.message || response.error || 'Fehler beim Senden des E-Mail-Codes')
         return false
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Fehler beim Senden des E-Mail-Codes')
+      setError(err.response?.data?.message || err.response?.data?.error || err.message || 'Fehler beim Senden des E-Mail-Codes')
       return false
     } finally {
       setIsLoading(false)
@@ -262,13 +263,15 @@ export default function MobileRegistration({
       
       // Resend via backend
       const response = await authApi.sendEmailOtp(email)
-      if (response.success) {
+      if (response.otp_id || response.success) {
+        setEmailOtpId(response.otp_id || `email_${Date.now()}`)
         setEmailResendCooldown(OTP_COOLDOWN)
         return true
       }
+      setError(response.message || response.error || 'Fehler beim erneuten Senden')
       return false
     } catch (err: any) {
-      setError(err.message || 'Fehler beim erneuten Senden')
+      setError(err.response?.data?.message || err.message || 'Fehler beim erneuten Senden')
       return false
     } finally {
       setIsLoading(false)
@@ -1239,7 +1242,7 @@ export default function MobileRegistration({
 
       {/* Content - A1.1/A6 Fix: Added bottom padding for keyboard and safe area */}
       <div 
-        className="flex-1 px-5 py-6 pb-[180px] overflow-y-auto overscroll-contain scroll-smooth"
+        className="flex-1 px-5 py-6 pb-[280px] overflow-y-auto overscroll-contain scroll-smooth"
         onClick={(e) => {
           // Only blur if clicking on the container itself, not on inputs
           if (e.target === e.currentTarget) {
