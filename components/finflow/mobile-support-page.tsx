@@ -284,27 +284,25 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Actions */}
-        {messages.length <= 2 && (
-          <div className="px-4 pb-4">
-            <p className="text-xs text-gray-500 mb-3">Schnelle Hilfe</p>
-            <div className="flex flex-wrap gap-2">
-              {QUICK_ACTIONS.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleQuickAction(action.keyword)}
-                  className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1a2332] rounded-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <action.icon className="w-4 h-4 text-blue-500" />
-                  <span className="truncate">{action.label}</span>
-                </button>
-              ))}
-            </div>
+        {/* Quick Actions - Always visible for continued help */}
+        <div className="px-4 pb-4">
+          <p className="text-xs text-gray-500 mb-3">Schnelle Hilfe</p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_ACTIONS.map((action, index) => (
+              <button
+                key={index}
+                onClick={() => handleQuickAction(action.keyword)}
+                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1a2332] rounded-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <action.icon className="w-4 h-4 text-blue-500" />
+                <span className="truncate">{action.label}</span>
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 safe-area-inset-bottom">
+        <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-24">
           <div className="flex items-end gap-3">
             <div className="flex-1 relative">
               <input

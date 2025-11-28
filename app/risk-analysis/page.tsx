@@ -149,7 +149,7 @@ export default function RiskAnalysisPage() {
           </p>
         </div>
         <Button
-          onClick={calculateRisk}
+          onClick={handleCalculateRisk}
           disabled={loading || portfolioLoading || !portfolio || portfolio.length === 0}
         >
           {loading ? 'Calculating...' : 'Calculate Risk Metrics'}

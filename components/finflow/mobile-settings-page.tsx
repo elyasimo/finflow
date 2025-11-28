@@ -260,11 +260,24 @@ export default function MobileSettingsPage({
   const [showBinanceSecret, setShowBinanceSecret] = useState(false)
   const [showAlpacaSecret, setShowAlpacaSecret] = useState(false)
   
+  // Profile Picture State
+  const [profilePicture, setProfilePicture] = useState<string | null>(null)
+  
   // Firebase Config State
   // Notification State (local until saved)
   const [localEmailNotifications, setLocalEmailNotifications] = useState(emailNotifications)
   const [localPushNotifications, setLocalPushNotifications] = useState(pushNotifications)
   const [localBiometrics, setLocalBiometrics] = useState(biometricsEnabled)
+
+  // Load profile picture from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedPicture = localStorage.getItem('profilePicture')
+      if (savedPicture) {
+        setProfilePicture(savedPicture)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     if (user) {
@@ -426,9 +439,17 @@ export default function MobileSettingsPage({
           onClick={() => setShowProfileSheet(true)}
         >
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-bold">
-              {user?.fullName?.charAt(0) || user?.email?.charAt(0) || '?'}
-            </div>
+            {profilePicture ? (
+              <img 
+                src={profilePicture} 
+                alt="Profile" 
+                className="w-16 h-16 rounded-2xl object-cover"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-2xl font-bold">
+                {user?.fullName?.charAt(0) || user?.email?.charAt(0) || '?'}
+              </div>
+            )}
             <div className="flex-1">
               <p className="text-xl font-bold">{user?.fullName || 'Benutzer'}</p>
               <p className="text-blue-100 text-sm">{user?.email}</p>
@@ -567,21 +588,40 @@ export default function MobileSettingsPage({
               {/* Profile Picture Section */}
               <div className="flex flex-col items-center mb-4">
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-                    {fullName?.charAt(0) || email?.charAt(0) || '?'}
-                  </div>
+                  {profilePicture ? (
+                    <img 
+                      src={profilePicture} 
+                      alt="Profile" 
+                      className="w-24 h-24 rounded-full object-cover shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                      {fullName?.charAt(0) || email?.charAt(0) || '?'}
+                    </div>
+                  )}
                   <button
                     onClick={() => {
                       // Create a file input and trigger it
                       const input = document.createElement('input')
                       input.type = 'file'
                       input.accept = 'image/*'
-                      input.onchange = (e) => {
+                      input.onchange = async (e) => {
                         const file = (e.target as HTMLInputElement).files?.[0]
                         if (file) {
-                          // For now, show a coming soon message
-                          // In future: upload to server and update profile
-                          alert('Profilbild-Upload kommt bald! Diese Funktion wird in einem zukünftigen Update verfügbar sein.')
+                          // Check file size (max 2MB)
+                          if (file.size > 2 * 1024 * 1024) {
+                            alert('Das Bild ist zu groß. Maximal 2MB erlaubt.')
+                            return
+                          }
+                          
+                          // Convert to base64 and save locally
+                          const reader = new FileReader()
+                          reader.onload = (event) => {
+                            const base64 = event.target?.result as string
+                            setProfilePicture(base64)
+                            localStorage.setItem('profilePicture', base64)
+                          }
+                          reader.readAsDataURL(file)
                         }
                       }
                       input.click()

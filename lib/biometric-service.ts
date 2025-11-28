@@ -19,17 +19,12 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
-// Dynamically load a module only in browser - uses Function constructor to avoid static analysis
-async function dynamicImport<T>(moduleName: string): Promise<T | null> {
-  if (!isBrowser()) return null;
-  
-  try {
-    // Use Function constructor to avoid webpack/next.js static analysis
-    const importFn = new Function('specifier', 'return import(specifier)');
-    return await importFn(moduleName);
-  } catch {
-    return null;
-  }
+// Check if running in Capacitor native app via window object
+function isCapacitorNative(): boolean {
+  if (!isBrowser()) return false;
+  // Check for Capacitor bridge injected by native app
+  const win = window as any;
+  return !!(win.Capacitor?.isNativePlatform?.() || win.Capacitor?.isNative);
 }
 
 class BiometricService {
@@ -63,34 +58,48 @@ class BiometricService {
 
   private async loadModules(): Promise<boolean> {
     try {
-      // Load Capacitor core
-      const capacitorCore = await dynamicImport<any>('@capacitor/core');
-      if (!capacitorCore?.Capacitor) {
+      // First check if we're in a native Capacitor environment via window
+      const isNative = isCapacitorNative();
+      console.log('[BiometricService] isCapacitorNative check:', isNative);
+      
+      if (!isNative) {
+        console.log('[BiometricService] Not running in native Capacitor app');
         this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
         return false;
       }
 
-      const Capacitor = capacitorCore.Capacitor;
+      // Use window.Capacitor which is injected by the native app
+      const win = window as any;
+      const Capacitor = win.Capacitor;
       
-      // Only load native modules if actually on native platform
-      if (!Capacitor.isNativePlatform()) {
-        this.modules = { Capacitor, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
+      if (!Capacitor) {
+        console.log('[BiometricService] Capacitor not found on window');
+        this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
         return false;
       }
 
-      // Load biometric and haptics modules
-      const [biometric, haptics] = await Promise.all([
-        dynamicImport<any>('capacitor-native-biometric'),
-        dynamicImport<any>('@capacitor/haptics'),
+      console.log('[BiometricService] Loading native plugins...');
+      
+      // Import modules using standard dynamic import
+      const [capacitorCore, biometric, haptics] = await Promise.all([
+        import('@capacitor/core').catch(() => null),
+        import('capacitor-native-biometric').catch(() => null),
+        import('@capacitor/haptics').catch(() => null),
       ]);
 
       this.modules = {
-        Capacitor,
+        Capacitor: capacitorCore?.Capacitor || Capacitor,
         NativeBiometric: biometric?.NativeBiometric || null,
         BiometryType: biometric?.BiometryType || null,
         Haptics: haptics?.Haptics || null,
         ImpactStyle: haptics?.ImpactStyle || null,
       };
+
+      console.log('[BiometricService] Modules loaded:', {
+        hasCapacitor: !!this.modules.Capacitor,
+        hasNativeBiometric: !!this.modules.NativeBiometric,
+        hasHaptics: !!this.modules.Haptics,
+      });
 
       return true;
     } catch (error) {
@@ -102,9 +111,13 @@ class BiometricService {
 
   private isNative(): boolean {
     try {
-      return this.modules?.Capacitor?.isNativePlatform() || false;
+      // First try the modules, then fallback to window check
+      if (this.modules?.Capacitor?.isNativePlatform?.()) {
+        return true;
+      }
+      return isCapacitorNative();
     } catch {
-      return false;
+      return isCapacitorNative();
     }
   }
 

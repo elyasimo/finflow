@@ -116,8 +116,8 @@ export default function MobilePriceAlerts({
 
         {/* Create Form Modal */}
         {showCreateForm && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
-            <div className="bg-white dark:bg-[#1a2332] rounded-t-3xl w-full p-6 animate-slide-up">
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto p-6 animate-scale-in">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   Neuer Preisalarm

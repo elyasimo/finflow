@@ -168,12 +168,12 @@ export default function MobileReports({
 
         {/* Month Picker Modal */}
         {showMonthPicker && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div 
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setShowMonthPicker(false)}
             />
-            <div className="relative w-full max-w-md bg-white dark:bg-[#1a2332] rounded-t-3xl p-6 pb-10 animate-slide-up safe-area-inset max-h-[85vh] overflow-y-auto">
+            <div className="relative w-full max-w-md bg-white dark:bg-[#1a2332] rounded-3xl p-6 pb-8 animate-scale-in shadow-2xl max-h-[80vh] overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -483,6 +483,19 @@ export default function MobileReports({
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+        @keyframes scale-in {
+          from {
+            transform: scale(0.95);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.2s ease-out;
         }
       `}</style>
     </div>
