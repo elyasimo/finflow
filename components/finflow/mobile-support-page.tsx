@@ -301,8 +301,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </div>
         </div>
 
-        {/* Input Area */}
-        <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-32 mb-16">
+        {/* Input Area - Fixed at bottom above nav */}
+        <div className="sticky bottom-20 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4">
           <div className="flex items-end gap-3">
             <div className="flex-1 relative">
               <input
@@ -344,37 +344,35 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
 
       {/* Contact Form Modal */}
       {showContactForm && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => !isSendingEmail && setShowContactForm(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto animate-slide-up pb-8">
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
-            </div>
-            
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="relative bg-white dark:bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-scale-in shadow-2xl">
+            <div className="sticky top-0 bg-white dark:bg-[#1a2332] z-10 px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700 rounded-t-3xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                      Kontakt
+                    </h2>
+                    <p className="text-xs text-gray-500">
+                      Antwort innerhalb von 24-48 Stunden
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Kontakt
-                  </h2>
-                  <p className="text-xs text-gray-500">
-                    Antwort innerhalb von 24-48 Stunden
-                  </p>
-                </div>
+                <button
+                  onClick={() => setShowContactForm(false)}
+                  disabled={isSendingEmail}
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
               </div>
-              <button
-                onClick={() => setShowContactForm(false)}
-                disabled={isSendingEmail}
-                className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
             </div>
             
             <div className="p-5 space-y-4">

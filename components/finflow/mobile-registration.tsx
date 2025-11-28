@@ -236,19 +236,26 @@ export default function MobileRegistration({
       setIsLoading(true)
       setError('')
       
+      console.log('📧 Sending OTP to:', email)
+      
       // Call backend API to send 6-digit PIN via Gmail
       const response = await authApi.sendEmailOtp(email)
       
+      console.log('📧 OTP Response:', response)
+      
       // Backend returns otp_id and expires_at on success
       if (response.otp_id || response.success) {
+        console.log('✅ OTP sent successfully, moving to verification step')
         setEmailOtpId(response.otp_id || `email_${Date.now()}`)
         setEmailResendCooldown(OTP_COOLDOWN)
         return true
       } else {
+        console.error('❌ OTP send failed:', response)
         setError(response.message || response.error || 'Fehler beim Senden des E-Mail-Codes')
         return false
       }
     } catch (err: any) {
+      console.error('❌ OTP send error:', err)
       setError(err.response?.data?.message || err.response?.data?.error || err.message || 'Fehler beim Senden des E-Mail-Codes')
       return false
     } finally {

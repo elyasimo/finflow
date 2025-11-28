@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { useAuth } from "@/hooks/use-auth"
 import MobileMenu from "./mobile-menu"
 
 interface NavItem {
@@ -55,6 +56,7 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   const pathname = usePathname()
   const { t } = useLanguage()
+  const { user } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
 
   const handleMenuClick = () => {
@@ -124,7 +126,8 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
       {!onMenuClick && (
         <MobileMenu 
           isOpen={showMenu} 
-          onClose={() => setShowMenu(false)} 
+          onClose={() => setShowMenu(false)}
+          user={user as any}
         />
       )}
     </nav>
