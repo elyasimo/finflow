@@ -8,6 +8,7 @@ export function useBiometric() {
     available: false,
     biometryType: 'none',
   });
+  const [isNative, setIsNative] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +19,8 @@ export function useBiometric() {
   const checkAvailability = async () => {
     const result = await biometricService.isAvailable();
     setAvailability(result);
+    // isNative wird jetzt korrekt gesetzt, NACHDEM die Module geladen wurden
+    setIsNative(biometricService.isNativeApp());
   };
 
   const authenticate = useCallback(async (reason?: string): Promise<boolean> => {
@@ -61,7 +64,7 @@ export function useBiometric() {
     // Availability info
     isAvailable: availability.available,
     biometryType: availability.biometryType, // 'face' | 'fingerprint' | 'none'
-    isNative: biometricService.isNativeApp(),
+    isNative, // Jetzt ein state statt synchroner Aufruf
     
     // State
     isAuthenticating,
