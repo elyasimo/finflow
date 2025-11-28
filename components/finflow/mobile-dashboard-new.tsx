@@ -9,10 +9,14 @@ import {
   CreditCard,
   PiggyBank,
   TrendingUp,
+  TrendingDown,
   Banknote,
   Bell,
   Receipt,
-  Sparkles
+  Sparkles,
+  Bitcoin,
+  AlertCircle,
+  Loader2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -21,6 +25,7 @@ import Link from "next/link"
 import MobileBottomNav from "./mobile-bottom-nav"
 import TransactionCard from "./ui/transaction-card"
 import BudgetWalletCard from "./ui/budget-wallet-card"
+import useBinancePortfolio from "@/hooks/use-binance-portfolio"
 
 interface Account {
   id: string
@@ -101,6 +106,22 @@ export default function MobileDashboard({
   const { t } = useLanguage()
   const { currency } = useCurrency()
   const [activeAccountIndex, setActiveAccountIndex] = useState(0)
+
+  // Binance Portfolio Hook
+  const { 
+    portfolio: binancePortfolio, 
+    loading: portfolioLoading, 
+    error: portfolioError,
+    needsConfiguration 
+  } = useBinancePortfolio(60000) // Poll every 60 seconds
+
+  // Calculate total portfolio value
+  const totalPortfolioValue = useMemo(() => {
+    return binancePortfolio.reduce((sum, asset) => {
+      const value = asset.currentPrice ? parseFloat(asset.free) * asset.currentPrice : 0
+      return sum + value
+    }, 0)
+  }, [binancePortfolio])
 
   const formatCurrency = (amount: number, curr?: string) => {
     return new Intl.NumberFormat('de-CH', {
@@ -287,6 +308,83 @@ export default function MobileDashboard({
             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Konten</span>
           </Link>
         </div>
+
+        {/* Binance Portfolio Section */}
+        {!needsConfiguration && binancePortfolio.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <Bitcoin className="w-5 h-5 text-orange-500" />
+                Crypto Portfolio
+              </h3>
+              <Link href="/markets" className="text-sm font-medium text-blue-500 flex items-center gap-1">
+                Details <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            {/* Portfolio Summary Card */}
+            <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 rounded-3xl p-5 text-white shadow-xl mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm opacity-80">Gesamtwert</p>
+                {portfolioLoading && <Loader2 className="w-4 h-4 animate-spin opacity-60" />}
+              </div>
+              <p className="text-3xl font-bold mb-4">
+                {formatCurrency(totalPortfolioValue, 'EUR')}
+              </p>
+              
+              {/* Top 3 Assets */}
+              <div className="flex gap-2">
+                {binancePortfolio
+                  .filter(a => parseFloat(a.free) > 0 && a.currentPrice)
+                  .sort((a, b) => {
+                    const valueA = a.currentPrice ? parseFloat(a.free) * a.currentPrice : 0
+                    const valueB = b.currentPrice ? parseFloat(b.free) * b.currentPrice : 0
+                    return valueB - valueA
+                  })
+                  .slice(0, 3)
+                  .map((asset) => (
+                    <div key={asset.asset} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 rounded-full">
+                      <img 
+                        src={`/logos/cryptocurrency/${asset.asset.toLowerCase()}.png`}
+                        alt={asset.asset}
+                        className="w-4 h-4 rounded-full"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null
+                          e.currentTarget.src = '/logos/cryptocurrency/default.png'
+                        }}
+                      />
+                      <span className="text-xs font-medium">{asset.asset}</span>
+                      {asset.priceChange24h !== null && (
+                        <span className={cn(
+                          "text-xs",
+                          asset.priceChange24h >= 0 ? "text-green-200" : "text-red-200"
+                        )}>
+                          {asset.priceChange24h >= 0 ? '+' : ''}{asset.priceChange24h.toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Show Setup Link if Binance not configured */}
+        {needsConfiguration && (
+          <Link
+            href="/settings"
+            className="flex items-center gap-4 p-4 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-2xl"
+          >
+            <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+              <Bitcoin className="w-6 h-6 text-orange-500" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-gray-900 dark:text-white">Binance verbinden</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Crypto Portfolio anzeigen</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-gray-400" />
+          </Link>
+        )}
 
         {/* Accounts Carousel */}
         <div>

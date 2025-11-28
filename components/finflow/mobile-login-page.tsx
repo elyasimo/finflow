@@ -394,7 +394,7 @@ export default function MobileLoginPage({
         </div>
 
         {/* Biometric Setup Hint (if available but not set up) */}
-        {biometricAvailable && isNative && !hasSavedCredentials && (
+        {biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials && (
           <div className="mt-8 p-4 bg-[#232e40] rounded-2xl border border-gray-700">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
@@ -409,6 +409,17 @@ export default function MobileLoginPage({
                 </p>
               </div>
             </div>
+          </div>
+        )}
+        
+        {/* Debug Info - nur in Development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-3 bg-gray-800 rounded-xl text-xs text-gray-400 font-mono">
+            <p>🔐 Debug: initialized={String(biometricInitialized)}</p>
+            <p>available={String(biometricAvailable)}</p>
+            <p>isNative={String(isNative)}</p>
+            <p>hasCreds={String(hasSavedCredentials)}</p>
+            <p>type={biometryType}</p>
           </div>
         )}
       </div>

@@ -84,7 +84,7 @@ export default function MobileAccounts({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount / 100)
+    }).format(amount)
   }
 
   const formatBalance = (amount: number, curr?: string) => {
