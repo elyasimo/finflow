@@ -34,6 +34,7 @@ export default function MobileLoginPage({
     isAvailable: biometricAvailable, 
     biometryType, 
     isNative,
+    isInitialized: biometricInitialized,
     isAuthenticating,
     authenticate, 
     getCredentials,
@@ -58,7 +59,18 @@ export default function MobileLoginPage({
   useEffect(() => {
     const checkBiometricCredentials = async () => {
       // Debug log
-      console.log('🔐 Biometric check:', { biometricAvailable, isNative, hasSavedCredentials })
+      console.log('🔐 Biometric check:', { 
+        biometricAvailable, 
+        isNative, 
+        biometricInitialized,
+        hasSavedCredentials 
+      })
+      
+      // Wait until biometric is initialized
+      if (!biometricInitialized) {
+        console.log('🔐 Waiting for biometric initialization...')
+        return
+      }
       
       if (biometricAvailable && isNative) {
         try {
@@ -70,13 +82,13 @@ export default function MobileLoginPage({
           setHasSavedCredentials(false)
         }
         setBiometricChecked(true)
-      } else if (!isNative) {
-        // Not a native app, mark as checked
+      } else {
+        // Not a native app or biometric not available, mark as checked
         setBiometricChecked(true)
       }
     }
     checkBiometricCredentials()
-  }, [biometricAvailable, isNative, getCredentials])
+  }, [biometricAvailable, isNative, biometricInitialized, getCredentials])
 
   // Email validation
   const isValidEmail = (email: string) => {
@@ -147,12 +159,13 @@ export default function MobileLoginPage({
           console.log('🔐 Login success - Biometric state:', {
             biometricAvailable,
             isNative,
+            biometricInitialized,
             hasSavedCredentials,
-            shouldShowSetup: biometricAvailable && isNative && !hasSavedCredentials
+            shouldShowSetup: biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials
           })
           
           // Offer to save credentials for biometric
-          if (biometricAvailable && isNative && !hasSavedCredentials) {
+          if (biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials) {
             setShowBiometricSetup(true)
           } else {
             router.push('/dashboard')

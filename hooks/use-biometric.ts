@@ -10,18 +10,36 @@ export function useBiometric() {
   });
   const [isNative, setIsNative] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
+    
+    const checkAvailability = async () => {
+      console.log('🔐 [useBiometric] Starting availability check...');
+      
+      // isAvailable() triggers module loading and returns availability
+      const result = await biometricService.isAvailable();
+      
+      if (!mounted) return;
+      
+      console.log('🔐 [useBiometric] Availability result:', result);
+      setAvailability(result);
+      
+      // After isAvailable, modules are loaded, so isNativeApp should work
+      const nativeStatus = biometricService.isNativeApp();
+      console.log('🔐 [useBiometric] isNative:', nativeStatus);
+      setIsNative(nativeStatus);
+      setIsInitialized(true);
+    };
+    
     checkAvailability();
+    
+    return () => {
+      mounted = false;
+    };
   }, []);
-
-  const checkAvailability = async () => {
-    const result = await biometricService.isAvailable();
-    setAvailability(result);
-    // isNative wird jetzt korrekt gesetzt, NACHDEM die Module geladen wurden
-    setIsNative(biometricService.isNativeApp());
-  };
 
   const authenticate = useCallback(async (reason?: string): Promise<boolean> => {
     setIsAuthenticating(true);
@@ -65,6 +83,7 @@ export function useBiometric() {
     isAvailable: availability.available,
     biometryType: availability.biometryType, // 'face' | 'fingerprint' | 'none'
     isNative, // Jetzt ein state statt synchroner Aufruf
+    isInitialized, // True wenn die Initialisierung abgeschlossen ist
     
     // State
     isAuthenticating,
