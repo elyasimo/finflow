@@ -46,6 +46,7 @@ export default function SettingsPage() {
   const [binanceApiSecret, setBinanceApiSecret] = useState('');
   const [binanceKeysConfigured, setBinanceKeysConfigured] = useState(false);
   const [binanceApiKeysLoading, setBinanceApiKeysLoading] = useState(false);
+  const [binanceStatusLoaded, setBinanceStatusLoaded] = useState(false);
 
   // Notification settings - stored locally until backend supports it
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -126,6 +127,8 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Failed to check Binance API keys status:', error);
+    } finally {
+      setBinanceStatusLoaded(true);
     }
   };
 
@@ -351,6 +354,15 @@ export default function SettingsPage() {
 
   // Render mobile version
   if (isMobile) {
+    // Show loading while Binance status is being fetched
+    if (!binanceStatusLoaded) {
+      return (
+        <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        </div>
+      );
+    }
+    
     // Compute apiKeys object for mobile
     const mobileApiKeys = {
       binanceApiKey: binanceKeysConfigured ? '••••••••••••••••' : '',

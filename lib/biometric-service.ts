@@ -112,9 +112,11 @@ class BiometricService {
    * Check if biometric authentication is available
    */
   async isAvailable(): Promise<BiometricAvailability> {
-    await this.init();
+    const initSuccess = await this.init();
+    console.log('[BiometricService] isAvailable - init result:', initSuccess);
 
     if (!this.modules?.NativeBiometric) {
+      console.log('[BiometricService] NativeBiometric module not available');
       return {
         available: false,
         biometryType: 'none',
@@ -123,7 +125,10 @@ class BiometricService {
     }
 
     try {
+      console.log('[BiometricService] Calling NativeBiometric.isAvailable()...');
       const result = await this.modules.NativeBiometric.isAvailable();
+      console.log('[BiometricService] NativeBiometric.isAvailable() result:', result);
+      
       const BiometryType = this.modules.BiometryType;
 
       let biometryType: 'face' | 'fingerprint' | 'none' = 'none';
@@ -136,12 +141,15 @@ class BiometricService {
         biometryType = 'fingerprint';
       }
 
+      console.log('[BiometricService] Detected biometry type:', biometryType, 'available:', result.isAvailable);
+      
       return {
         available: result.isAvailable,
         biometryType,
         errorMessage: result.errorCode ? `Error: ${result.errorCode}` : undefined,
       };
     } catch (error: any) {
+      console.error('[BiometricService] Error checking availability:', error);
       return {
         available: false,
         biometryType: 'none',

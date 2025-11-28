@@ -217,7 +217,20 @@ export default function MobileLoginPage({
 
       {/* Main Content - A4 Fix: Scrollable with safe area padding */}
       <div className="flex-1 px-6 py-8 pb-[100px] overflow-y-auto overscroll-contain">
-        {/* Biometric Login Button - Prominent Position */}
+        {/* Debug Panel - for development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 p-3 bg-gray-800/50 rounded-xl text-xs font-mono text-gray-400 space-y-1">
+            <p>🔐 Biometric Debug:</p>
+            <p>- initialized: {String(biometricInitialized)}</p>
+            <p>- available: {String(biometricAvailable)}</p>
+            <p>- isNative: {String(isNative)}</p>
+            <p>- hasCreds: {String(hasSavedCredentials)}</p>
+            <p>- type: {biometryType}</p>
+            <p>- checked: {String(biometricChecked)}</p>
+          </div>
+        )}
+        
+        {/* Biometric Login Button - Show when credentials are saved */}
         {biometricAvailable && isNative && hasSavedCredentials && (
           <div className="mb-8">
             <button

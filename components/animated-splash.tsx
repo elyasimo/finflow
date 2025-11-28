@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Capacitor } from "@capacitor/core";
 
 interface AnimatedSplashProps {
   onComplete?: () => void;
@@ -38,12 +37,8 @@ export function AnimatedSplash({ onComplete, minDuration = 2500 }: AnimatedSplas
     };
   }, [minDuration, handleComplete]);
 
-  const isNative = Capacitor.isNativePlatform();
-
-  if (!isNative) {
-    // Don't show animated splash on web
-    return null;
-  }
+  // Note: The native check is now done in providers.tsx, so this component
+  // is only rendered when we're in a native app
 
   return (
     <AnimatePresence>
