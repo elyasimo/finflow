@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from '../db';
-import { otpVerifications } from '../../drizzle/schema';
+import { otpVerifications } from '../db/schema';
 import { eq, and, gt } from 'drizzle-orm';
 import { emailService } from '../services/email.service';
 import crypto from 'crypto';
@@ -135,7 +135,7 @@ export class OtpController {
 
       // Increment attempts
       await db.update(otpVerifications)
-        .set({ attempts: otpRecord.attempts + 1 })
+        .set({ attempts: otpRecord.attempts + 1 } as any)
         .where(eq(otpVerifications.id, otpRecord.id));
 
       // Verify code
@@ -151,7 +151,7 @@ export class OtpController {
 
       // Mark as verified
       await db.update(otpVerifications)
-        .set({ verified: true })
+        .set({ verified: true } as any)
         .where(eq(otpVerifications.id, otpRecord.id));
 
       res.json({
