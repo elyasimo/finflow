@@ -340,7 +340,12 @@ export default function MobileBudgetsPage({
         </label>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setFormData(prev => ({ ...prev, categoryId: '' }))}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setFormData(prev => ({ ...prev, categoryId: '' }))
+            }}
             className={cn(
               "flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all",
               !formData.categoryId
@@ -364,10 +369,15 @@ export default function MobileBudgetsPage({
             return (
               <button
                 key={cat.id}
-                onClick={() => setFormData(prev => ({ 
-                  ...prev, 
-                  categoryId: prev.categoryId === cat.id ? '' : cat.id 
-                }))}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    categoryId: prev.categoryId === cat.id ? '' : cat.id 
+                  }))
+                }}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all",
                   formData.categoryId === cat.id
@@ -438,7 +448,12 @@ export default function MobileBudgetsPage({
           {WALLET_GRADIENTS.map((wallet) => (
             <button
               key={wallet.id}
-              onClick={() => setFormData(prev => ({ ...prev, color: wallet.id }))}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setFormData(prev => ({ ...prev, color: wallet.id }))
+              }}
               className={cn(
                 "w-12 h-12 rounded-xl bg-gradient-to-br transition-all",
                 wallet.gradient,

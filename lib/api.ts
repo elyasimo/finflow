@@ -140,44 +140,53 @@ export const authApi = {
   },
   
   /**
-   * Send OTP to email or phone for verification
-   * @param identifier - Email address or phone number
-   * @param type - 'email' or 'sms'
-   * @returns { otp_id: string, expires_at: string }
+   * Send OTP to email for verification (real SendGrid implementation)
+   * @param email - Email address
+   * @returns { success: boolean, message: string }
    */
-  sendOtp: async (identifier: string, type: 'email' | 'sms') => {
-    try {
-      const response = await api.post('/auth/send-otp', { identifier, type });
-      return response.data;
-    } catch (error) {
-      // Fallback for development/testing when backend OTP is not implemented
-      console.warn('OTP API not available, using mock response');
-      return {
-        otp_id: `${type}_${Date.now()}`,
-        expires_at: new Date(Date.now() + 5 * 60000).toISOString()
-      };
-    }
+  sendEmailOtp: async (email: string) => {
+    const response = await api.post('/auth/otp/send', { email });
+    return response.data;
   },
   
   /**
-   * Verify OTP code
-   * @param otpId - The OTP ID from sendOtp
+   * Verify email OTP code (real verification)
+   * @param email - Email address
    * @param code - 6-digit verification code
-   * @returns { verified: boolean, token?: string }
+   * @returns { success: boolean, message: string }
    */
-  verifyOtp: async (otpId: string, code: string) => {
-    try {
-      const response = await api.post('/auth/verify-otp', { otp_id: otpId, code });
-      return response.data;
-    } catch (error) {
-      // Fallback for development/testing
-      console.warn('OTP verification API not available, mock verification');
-      // In dev mode, accept any 6-digit code
-      if (code.length === 6) {
-        return { verified: true };
-      }
-      throw new Error('Invalid OTP code');
+  verifyEmailOtp: async (email: string, code: string) => {
+    const response = await api.post('/auth/otp/verify', { email, code });
+    return response.data;
+  },
+  
+  /**
+   * Send OTP to phone for verification (mock for now)
+   * @param phone - Phone number
+   * @returns { otp_id: string, expires_at: string }
+   */
+  sendPhoneOtp: async (phone: string) => {
+    // Mock for phone OTP until we integrate SMS provider
+    console.log('📱 Mock: Sending phone OTP to', phone);
+    return {
+      otp_id: `phone_${Date.now()}`,
+      expires_at: new Date(Date.now() + 5 * 60000).toISOString()
+    };
+  },
+  
+  /**
+   * Verify phone OTP code (mock for now)
+   * @param phone - Phone number
+   * @param code - 6-digit verification code
+   * @returns { verified: boolean }
+   */
+  verifyPhoneOtp: async (phone: string, code: string) => {
+    // Mock for phone OTP - accept any 6-digit code
+    console.log('📱 Mock: Verifying phone OTP for', phone);
+    if (code.length === 6) {
+      return { verified: true };
     }
+    throw new Error('Invalid OTP code');
   },
   
   getProfile: async () => {

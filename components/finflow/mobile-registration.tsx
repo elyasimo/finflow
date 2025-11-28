@@ -30,8 +30,8 @@ import { authApi, accountsApi } from "@/lib/api"
  * Registration Flow Steps:
  * 1. contact - Email + Phone input
  * 2. password - Name + Password setup
- * 3. email-verification - Email OTP verification
- * 4. phone-verification - SMS OTP verification  
+ * 3. email-verification - Email 6-digit PIN verification
+ * 4. phone-verification - SMS OTP verification (Mock for now)
  * 5. verified - Success screen
  * 6. account-setup - First bank account setup
  * 7. complete - Final success + redirect
@@ -230,21 +230,45 @@ export default function MobileRegistration({
     }
   }
 
-  // API Calls
+  // API Calls - Send 6-digit PIN via Email (Gmail SMTP)
   const sendEmailOtp = async () => {
     try {
       setIsLoading(true)
       setError('')
       
-      const response = await authApi.sendOtp?.(email, 'email') || 
-        // Fallback if API doesn't exist yet
-        { otp_id: `email_${Date.now()}`, expires_at: new Date(Date.now() + 5 * 60000).toISOString() }
+      // Call backend API to send 6-digit PIN via Gmail
+      const response = await authApi.sendEmailOtp(email)
       
-      setEmailOtpId(response.otp_id)
-      setEmailResendCooldown(OTP_COOLDOWN)
-      return true
+      if (response.success) {
+        setEmailOtpId(`email_${Date.now()}`)
+        setEmailResendCooldown(OTP_COOLDOWN)
+        return true
+      } else {
+        setError(response.message || 'Fehler beim Senden des E-Mail-Codes')
+        return false
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Fehler beim Senden des E-Mail-Codes')
+      setError(err.response?.data?.message || err.message || 'Fehler beim Senden des E-Mail-Codes')
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const resendEmailVerification = async () => {
+    try {
+      setIsLoading(true)
+      setError('')
+      
+      // Resend via backend
+      const response = await authApi.sendEmailOtp(email)
+      if (response.success) {
+        setEmailResendCooldown(OTP_COOLDOWN)
+        return true
+      }
+      return false
+    } catch (err: any) {
+      setError(err.message || 'Fehler beim erneuten Senden')
       return false
     } finally {
       setIsLoading(false)
@@ -256,9 +280,8 @@ export default function MobileRegistration({
       setIsLoading(true)
       setError('')
       
-      const response = await authApi.sendOtp?.(phone, 'sms') ||
-        // Fallback if API doesn't exist yet  
-        { otp_id: `phone_${Date.now()}`, expires_at: new Date(Date.now() + 5 * 60000).toISOString() }
+      // Mock for phone OTP until we integrate SMS provider
+      const response = await authApi.sendPhoneOtp(phone)
       
       setPhoneOtpId(response.otp_id)
       setPhoneResendCooldown(OTP_COOLDOWN)
@@ -273,19 +296,27 @@ export default function MobileRegistration({
 
   const verifyEmailOtp = async () => {
     const code = emailOtp.join('')
-    if (code.length !== 6) return false
     
     try {
       setIsLoading(true)
       setError('')
       
-      // For demo purposes, accept any 6-digit code
-      // In production, this would call: await authApi.verifyOtp(emailOtpId, code)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Verify 6-digit PIN via backend
+      if (code.length !== 6) {
+        setError('Bitte geben Sie den 6-stelligen Code ein')
+        return false
+      }
       
-      return true
+      const response = await authApi.verifyEmailOtp(email, code)
+      
+      if (response.success) {
+        return true
+      } else {
+        setError(response.message || 'Ungültiger Code')
+        return false
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Ungültiger Code')
+      setError(err.response?.data?.message || err.message || 'Ungültiger Code')
       return false
     } finally {
       setIsLoading(false)
@@ -300,11 +331,15 @@ export default function MobileRegistration({
       setIsLoading(true)
       setError('')
       
-      // For demo purposes, accept any 6-digit code
-      // In production, this would call: await authApi.verifyOtp(phoneOtpId, code)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Mock verification for phone OTP
+      const response = await authApi.verifyPhoneOtp(phone, code)
       
-      return true
+      if (response.verified) {
+        return true
+      } else {
+        setError('Ungültiger Code')
+        return false
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Ungültiger Code')
       return false
@@ -1203,7 +1238,15 @@ export default function MobileRegistration({
       </div>
 
       {/* Content - A1.1/A6 Fix: Added bottom padding for keyboard and safe area */}
-      <div className="flex-1 px-5 py-6 pb-[120px] overflow-y-auto overscroll-contain">
+      <div 
+        className="flex-1 px-5 py-6 pb-[180px] overflow-y-auto overscroll-contain scroll-smooth"
+        onClick={(e) => {
+          // Only blur if clicking on the container itself, not on inputs
+          if (e.target === e.currentTarget) {
+            (document.activeElement as HTMLElement)?.blur()
+          }
+        }}
+      >
         {step === 'contact' && renderContactStep()}
         {step === 'password' && renderPasswordStep()}
         {step === 'email-verification' && renderEmailVerificationStep()}

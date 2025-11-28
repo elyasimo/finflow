@@ -47,9 +47,23 @@ export default function SettingsPage() {
   const [binanceKeysConfigured, setBinanceKeysConfigured] = useState(false);
   const [binanceApiKeysLoading, setBinanceApiKeysLoading] = useState(false);
 
-  // Notification settings (these would be stored in the database in a real app)
+  // Notification settings - stored locally until backend supports it
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedEmailNotif = localStorage.getItem('emailNotifications');
+      const savedPushNotif = localStorage.getItem('pushNotifications');
+      const savedBiometrics = localStorage.getItem('biometricsEnabled');
+      
+      if (savedEmailNotif !== null) setEmailNotifications(savedEmailNotif === 'true');
+      if (savedPushNotif !== null) setPushNotifications(savedPushNotif === 'true');
+      if (savedBiometrics !== null) setBiometricsEnabled(savedBiometrics === 'true');
+    }
+  }, []);
 
   // Available currencies
   const currencies = [
@@ -349,6 +363,7 @@ export default function SettingsPage() {
         currency={defaultCurrency}
         emailNotifications={emailNotifications}
         pushNotifications={pushNotifications}
+        biometricsEnabled={biometricsEnabled}
         onThemeChange={setTheme}
         onLanguageChange={setLanguage}
         onCurrencyChange={async (currency) => {
@@ -373,13 +388,18 @@ export default function SettingsPage() {
         }}
         onEmailNotificationsChange={async (enabled) => {
           setEmailNotifications(enabled);
-          // In a real app, persist to API
+          localStorage.setItem('emailNotifications', String(enabled));
           toast.success(enabled ? 'E-Mail Benachrichtigungen aktiviert' : 'E-Mail Benachrichtigungen deaktiviert');
         }}
         onPushNotificationsChange={async (enabled) => {
           setPushNotifications(enabled);
-          // In a real app, persist to API
+          localStorage.setItem('pushNotifications', String(enabled));
           toast.success(enabled ? 'Push-Benachrichtigungen aktiviert' : 'Push-Benachrichtigungen deaktiviert');
+        }}
+        onBiometricsChange={async (enabled) => {
+          setBiometricsEnabled(enabled);
+          localStorage.setItem('biometricsEnabled', String(enabled));
+          toast.success(enabled ? 'Face ID / Touch ID aktiviert' : 'Face ID / Touch ID deaktiviert');
         }}
         onUpdateProfile={async (data) => {
           if (data.fullName) setFullName(data.fullName);

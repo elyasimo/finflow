@@ -22,6 +22,7 @@ import { riskMetricsController } from './controllers/risk-metrics.controller.js'
 import { stockTradingController } from './controllers/stock-trading.controller.js';
 import { tradingPerformanceController } from './controllers/trading-performance.controller.js';
 import { priceAlertsController } from './controllers/price-alerts.controller.js';
+import { otpController } from './controllers/otp.controller.js';
 import { authMiddleware } from './middleware/auth.js';
 import { tradingAgentService } from './services/trading-agent.service.js';
 import { webSocketService } from './services/websocket.service.js';
@@ -110,6 +111,11 @@ app.get('/health', async (req, res) => {
 // Auth routes (public)
 app.post('/auth/register', (req, res) => authController.register(req, res));
 app.post('/auth/login', (req, res) => authController.login(req, res));
+
+// OTP routes (public - for registration verification)
+app.post('/auth/otp/send', (req, res) => otpController.sendOtp(req, res));
+app.post('/auth/otp/verify', (req, res) => otpController.verifyOtp(req, res));
+app.post('/auth/otp/resend', (req, res) => otpController.resendOtp(req, res));
 
 // Protected routes
 app.get('/auth/me', authMiddleware, (req, res) => authController.getMe(req, res));

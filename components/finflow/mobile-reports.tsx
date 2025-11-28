@@ -151,31 +151,33 @@ export default function MobileReports({
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide mb-4">
-          {[
-            { id: 'overview', label: 'Übersicht', icon: BarChart3 },
-            { id: 'income', label: 'Einnahmen', icon: TrendingUp },
-            { id: 'expenses', label: 'Ausgaben', icon: PieChart },
-            { id: 'budgets', label: 'Budgets', icon: DollarSign },
-          ].map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all",
-                  activeTab === tab.id
-                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
-                    : "bg-white dark:bg-[#1a2332] text-gray-600 dark:text-gray-400"
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            )
-          })}
+        {/* Tab Navigation - Fixed inside container */}
+        <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-2 mb-4 shadow-sm">
+          <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+            {[
+              { id: 'overview', label: 'Übersicht', icon: BarChart3 },
+              { id: 'income', label: 'Einnahmen', icon: TrendingUp },
+              { id: 'expenses', label: 'Ausgaben', icon: PieChart },
+              { id: 'budgets', label: 'Budgets', icon: DollarSign },
+            ].map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex-1 justify-center",
+                    activeTab === tab.id
+                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#232e40]"
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Overview Tab */}

@@ -43,6 +43,13 @@
       "when": 1764061405780,
       "tag": "0005_sour_punisher",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1764291482589,
+      "tag": "0006_grey_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }

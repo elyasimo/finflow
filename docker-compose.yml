@@ -48,6 +48,10 @@ services:
       ALPACA_API_SECRET: ${ALPACA_API_SECRET}
       ALPACA_PAPER_TRADING: ${ALPACA_PAPER_TRADING:-true}
       ALPACA_BASE_URL: ${ALPACA_BASE_URL:-https://paper-api.alpaca.markets}
+      # Gmail SMTP for email verification
+      GMAIL_USER: ${GMAIL_USER}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      GMAIL_FROM_NAME: ${GMAIL_FROM_NAME:-FinFlow}
     ports:
       - '8081:8080'
     volumes:

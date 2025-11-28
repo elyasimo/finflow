@@ -148,25 +148,33 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
           {/* Currency Icon with Dropdown */}
           <div ref={currRef} className="relative">
             <button
-              onClick={() => {
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 setShowCurrencyMenu(!showCurrencyMenu)
                 setShowLanguageMenu(false)
               }}
-              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors active:scale-95"
             >
               <Coins className="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </button>
             
             {showCurrencyMenu && (
-              <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-50 min-w-[120px]">
+              <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[140px]">
                 {currencyOptions.map(opt => (
                   <button
                     key={opt.code}
-                    onClick={() => handleCurrencyChange(opt.code)}
-                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors ${
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleCurrencyChange(opt.code)
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-3 text-sm transition-colors ${
                       selectedCurrency === opt.code 
                         ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
-                        : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
+                        : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300 active:bg-gray-100'
                     }`}
                   >
                     <span className="text-base">{opt.flag}</span>

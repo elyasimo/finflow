@@ -49,6 +49,11 @@ echo "▶️  Migration 0005..."
 docker exec $API_CONTAINER cat /app/drizzle/migrations/0005_sour_punisher.sql | \
     docker exec -i $POSTGRES_CONTAINER psql -U finflow_prod -d finflow_production
 
+# Migration 0006 - OTP Verifications Table
+echo "▶️  Migration 0006 (otp_verifications)..."
+docker exec $API_CONTAINER cat /app/drizzle/migrations/0006_grey_squadron_sinister.sql | \
+    docker exec -i $POSTGRES_CONTAINER psql -U finflow_prod -d finflow_production
+
 # Migration add-encrypted-api-keys
 echo "▶️  Migration add-encrypted-api-keys..."
 docker exec $API_CONTAINER cat /app/drizzle/migrations/add-encrypted-api-keys.sql | \

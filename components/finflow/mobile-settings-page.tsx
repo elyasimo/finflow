@@ -541,11 +541,11 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowProfileSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] animate-slide-up safe-area-inset-bottom flex flex-col">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">Profil bearbeiten</h2>
               <button
                 onClick={() => setShowProfileSheet(false)}
@@ -554,7 +554,7 @@ export default function MobileSettingsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 overflow-y-auto flex-1 pb-10">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Name
@@ -907,11 +907,11 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => !isSubmitting && setShowApiKeysSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
-            <div className="flex justify-center pt-3 pb-2">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up safe-area-inset-bottom flex flex-col">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
-            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                   <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -927,6 +927,7 @@ export default function MobileSettingsPage({
               </button>
             </div>
             
+            <div className="flex-1 overflow-y-auto">
             {apiKeysSaved ? (
               <div className="p-8 text-center">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-4">
@@ -940,7 +941,7 @@ export default function MobileSettingsPage({
                 </p>
               </div>
             ) : (
-              <div className="p-5 space-y-6">
+              <div className="p-5 pb-10 space-y-6">
                 {/* Binance Section */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
@@ -1127,6 +1128,7 @@ export default function MobileSettingsPage({
                 </button>
               </div>
             )}
+            </div>
           </div>
         </div>
       )}

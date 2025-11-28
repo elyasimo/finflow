@@ -129,6 +129,14 @@ export default function MobileLoginPage({
       { email, password },
       {
         onSuccess: () => {
+          // Debug: Log biometric state
+          console.log('🔐 Login success - Biometric state:', {
+            biometricAvailable,
+            isNative,
+            hasSavedCredentials,
+            shouldShowSetup: biometricAvailable && isNative && !hasSavedCredentials
+          })
+          
           // Offer to save credentials for biometric
           if (biometricAvailable && isNative && !hasSavedCredentials) {
             setShowBiometricSetup(true)

@@ -221,6 +221,18 @@ export const priceAlerts = pgTable('price_alerts', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+// OTP Verification table
+export const otpVerifications = pgTable('otp_verifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  type: text('type').notNull(), // 'email', 'sms'
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  verified: boolean('verified').notNull().default(false),
+  attempts: integer('attempts').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
