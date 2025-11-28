@@ -458,14 +458,14 @@ export default function MobileTradingAgentPage() {
           />
           
           {/* Sheet */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
             {/* Handle */}
-            <div className="flex justify-center pt-3 pb-2">
+            <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between px-4 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 {t('createNewTradingAgent') || 'Neuen Agent erstellen'}
               </h2>
@@ -478,7 +478,7 @@ export default function MobileTradingAgentPage() {
             </div>
             
             {/* Content */}
-            <div className="p-4 space-y-5 pb-8">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-5 pb-[120px]">
               {/* Agent Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -628,7 +628,7 @@ export default function MobileTradingAgentPage() {
               <button
                 onClick={createAgent}
                 disabled={isCreating || selectedAssets.length === 0}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed safe-area-inset-bottom"
               >
                 {isCreating ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

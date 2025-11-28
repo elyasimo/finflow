@@ -56,7 +56,7 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
     balance: new Intl.NumberFormat('en', {
       style: 'currency',
       currency: account.currency || userCurrency
-    }).format((Number(account.balance || 0)) / 100), // Balance is in cents, divide by 100 for display
+    }).format(Number(account.balance || 0)), // Balance is already in currency units from API
     type: mapAccountType(account.type),
   }));
 
@@ -79,8 +79,8 @@ export default function Content({ user, accounts, transactions, budgets }: Conte
 
   // Calculate total balance - only for accounts in the user's selected currency
   const accountsInUserCurrency = accounts.filter(account => account.currency === userCurrency);
-  // Balance is in cents, divide by 100 for currency display
-  const totalBalance = accountsInUserCurrency.reduce((sum, account) => sum + (Number(account.balance) / 100), 0);
+  // Balance is already in currency units from API
+  const totalBalance = accountsInUserCurrency.reduce((sum, account) => sum + Number(account.balance), 0);
   const formattedTotalBalance = new Intl.NumberFormat('en', { 
     style: 'currency', 
     currency: userCurrency 

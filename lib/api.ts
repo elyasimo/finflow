@@ -210,8 +210,8 @@ export const accountsApi = {
     // Transform backend data to frontend format
     return { accounts: response.data.map((account: AccountApiResponse) => ({
       ...account,
-      // Keep balance in cents (do NOT divide by 100 here - let the UI handle formatting)
-      balance: account.currentBalanceCents || account.openingBalanceCents || 0,
+      // Convert cents to currency units (divide by 100)
+      balance: (account.currentBalanceCents || account.openingBalanceCents || 0) / 100,
       // Map backend type to frontend display type
       type: account.type === 'creditCard' ? 'Credit Card' :
             account.type.charAt(0).toUpperCase() + account.type.slice(1),
@@ -222,8 +222,8 @@ export const accountsApi = {
     // Transform backend data to frontend format
     return response.data.map((account: AccountApiResponse) => ({
       ...account,
-      // Keep balance in cents (do NOT divide by 100 here - let the UI handle formatting)
-      balance: account.currentBalanceCents || account.openingBalanceCents || 0,
+      // Convert cents to currency units (divide by 100)
+      balance: (account.currentBalanceCents || account.openingBalanceCents || 0) / 100,
       // Map backend type to frontend display type
       type: account.type === 'creditCard' ? 'Credit Card' :
             account.type === 'savings' ? 'Savings' :

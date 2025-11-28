@@ -129,21 +129,21 @@ export default function MobileReports({
 
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm overflow-hidden">
             <ArrowDownLeft className="w-5 h-5 text-emerald-500 mb-2" />
             <p className="text-xs text-gray-500 dark:text-gray-400">{t('income')}</p>
-            <p className="text-lg font-bold text-emerald-500">{formatCurrency(income)}</p>
+            <p className="text-sm sm:text-lg font-bold text-emerald-500 truncate">{formatCurrency(income)}</p>
           </div>
-          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm overflow-hidden">
             <ArrowUpRight className="w-5 h-5 text-rose-500 mb-2" />
             <p className="text-xs text-gray-500 dark:text-gray-400">{t('expenses')}</p>
-            <p className="text-lg font-bold text-rose-500">{formatCurrency(expenses)}</p>
+            <p className="text-sm sm:text-lg font-bold text-rose-500 truncate">{formatCurrency(expenses)}</p>
           </div>
-          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm">
+          <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-3 shadow-sm overflow-hidden">
             <DollarSign className="w-5 h-5 text-blue-500 mb-2" />
             <p className="text-xs text-gray-500 dark:text-gray-400">{t('balance')}</p>
             <p className={cn(
-              "text-lg font-bold",
+              "text-sm sm:text-lg font-bold truncate",
               balance >= 0 ? "text-emerald-500" : "text-rose-500"
             )}>
               {formatCurrency(balance)}

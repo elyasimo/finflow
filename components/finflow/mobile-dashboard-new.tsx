@@ -330,7 +330,7 @@ export default function MobileDashboard({
                         <div>
                           <p className="text-sm opacity-80 mb-1">{account.name}</p>
                           <p className="text-2xl font-bold">
-                            {formatCurrency(account.balance / 100, account.currency)}
+                            {formatCurrency(account.balance, account.currency)}
                           </p>
                         </div>
                       </div>

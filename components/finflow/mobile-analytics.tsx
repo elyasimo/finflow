@@ -133,34 +133,34 @@ export default function MobileAnalytics({
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-4 text-white overflow-hidden">
             <div className="flex items-center gap-2 mb-2">
-              <ArrowDownCircle className="w-5 h-5 opacity-80" />
+              <ArrowDownCircle className="w-5 h-5 opacity-80 flex-shrink-0" />
               <span className="text-emerald-100 text-sm">{t('income')}</span>
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(totalIncome)}</p>
+            <p className="text-xl sm:text-2xl font-bold truncate">{formatCurrency(totalIncome)}</p>
           </div>
           
-          <div className="bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl p-4 text-white">
+          <div className="bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl p-4 text-white overflow-hidden">
             <div className="flex items-center gap-2 mb-2">
-              <ArrowUpCircle className="w-5 h-5 opacity-80" />
+              <ArrowUpCircle className="w-5 h-5 opacity-80 flex-shrink-0" />
               <span className="text-rose-100 text-sm">{t('expenses')}</span>
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+            <p className="text-xl sm:text-2xl font-bold truncate">{formatCurrency(totalExpenses)}</p>
           </div>
         </div>
 
         {/* Net Balance Card */}
         <div className={cn(
-          "rounded-2xl p-5 mb-6",
+          "rounded-2xl p-5 mb-6 overflow-hidden",
           netBalance >= 0 
             ? "bg-gradient-to-br from-blue-500 to-blue-600" 
             : "bg-gradient-to-br from-orange-500 to-orange-600"
         )}>
           <div className="flex items-center justify-between text-white">
-            <div>
+            <div className="min-w-0 flex-1 mr-3">
               <p className="text-sm opacity-80 mb-1">{t('balance')}</p>
-              <p className="text-3xl font-bold">{formatCurrency(netBalance)}</p>
+              <p className="text-2xl sm:text-3xl font-bold truncate">{formatCurrency(netBalance)}</p>
             </div>
             <div className={cn(
               "w-14 h-14 rounded-2xl flex items-center justify-center",
@@ -313,11 +313,11 @@ export default function MobileAnalytics({
         {activeView === 'crypto' && (
           <div className="space-y-4">
             {/* Crypto Total */}
-            <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-5 text-white">
+            <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-5 text-white overflow-hidden">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="min-w-0 flex-1 mr-3">
                   <p className="text-sm opacity-80 mb-1">Krypto-Portfolio</p>
-                  <p className="text-3xl font-bold">{formatCurrency(totalCryptoValue)}</p>
+                  <p className="text-2xl sm:text-3xl font-bold truncate">{formatCurrency(totalCryptoValue)}</p>
                 </div>
                 <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
                   <Bitcoin className="w-7 h-7" />
