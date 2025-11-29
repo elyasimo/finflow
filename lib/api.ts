@@ -807,6 +807,106 @@ export const riskMetricsApi = {
   },
 };
 
+// Banking API (PSD2/Open Banking)
+export const bankingApi = {
+  getInstitutions: async (country: string = 'CH') => {
+    const response = await api.get(`/banking/institutions?country=${country}`);
+    return response.data;
+  },
+
+  getConnections: async () => {
+    const response = await api.get('/banking/connections');
+    return response.data;
+  },
+
+  createConnection: async (data: {
+    institutionId: string;
+    institutionName: string;
+    institutionLogo?: string;
+  }) => {
+    const response = await api.post('/banking/connect', data);
+    return response.data;
+  },
+
+  checkCallback: async (requisitionId: string) => {
+    const response = await api.get(`/banking/callback/${requisitionId}`);
+    return response.data;
+  },
+
+  deleteConnection: async (connectionId: string) => {
+    const response = await api.delete(`/banking/connections/${connectionId}`);
+    return response.data;
+  },
+
+  linkAccount: async (linkedAccountId: string, finflowAccountId: string) => {
+    const response = await api.post('/banking/accounts/link', {
+      linkedAccountId,
+      finflowAccountId,
+    });
+    return response.data;
+  },
+
+  syncTransactions: async (linkedAccountId: string) => {
+    const response = await api.post(`/banking/accounts/${linkedAccountId}/sync`);
+    return response.data;
+  },
+
+  refreshBalance: async (linkedAccountId: string) => {
+    const response = await api.get(`/banking/accounts/${linkedAccountId}/balance`);
+    return response.data;
+  },
+};
+
+// Notifications API
+export const notificationsApi = {
+  getNotifications: async (unreadOnly: boolean = false, limit: number = 50) => {
+    const response = await api.get(`/notifications?unreadOnly=${unreadOnly}&limit=${limit}`);
+    return response.data;
+  },
+
+  markAsRead: async (notificationId: string) => {
+    const response = await api.put(`/notifications/${notificationId}/read`);
+    return response.data;
+  },
+
+  markAllAsRead: async () => {
+    const response = await api.put('/notifications/read-all');
+    return response.data;
+  },
+
+  getPreferences: async () => {
+    const response = await api.get('/notifications/preferences');
+    return response.data;
+  },
+
+  updatePreferences: async (preferences: {
+    budgetAlerts?: boolean;
+    priceAlerts?: boolean;
+    recurringReminders?: boolean;
+    weeklyReport?: boolean;
+    marketUpdates?: boolean;
+  }) => {
+    const response = await api.put('/notifications/preferences', preferences);
+    return response.data;
+  },
+
+  registerPushToken: async (token: string, platform: string, deviceName?: string) => {
+    const response = await api.post('/notifications/push-token', {
+      token,
+      platform,
+      deviceName,
+    });
+    return response.data;
+  },
+
+  unregisterPushToken: async (token: string) => {
+    const response = await api.delete('/notifications/push-token', {
+      data: { token },
+    });
+    return response.data;
+  },
+};
+
 export default {
   auth: authApi,
   categories: categoriesApi,
@@ -819,4 +919,6 @@ export default {
   apiKeys: apiKeysApi,
   advancedOrders: advancedOrdersApi,
   riskMetrics: riskMetricsApi,
+  banking: bankingApi,
+  notifications: notificationsApi,
 };

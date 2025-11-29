@@ -274,6 +274,68 @@ export const recurringTransactions = pgTable('recurring_transactions', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+// Push Notification Tokens table
+export const pushTokens = pgTable('push_tokens', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  token: text('token').notNull(),
+  platform: text('platform').notNull(), // 'ios', 'android', 'web'
+  deviceName: text('device_name'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Notifications table
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  type: text('type').notNull(), // 'budget_warning', 'price_alert', 'recurring_reminder', 'weekly_report'
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  data: jsonb('data'),
+  read: boolean('read').notNull().default(false),
+  sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
+  readAt: timestamp('read_at', { withTimezone: true }),
+});
+
+// Bank Connections table (PSD2/Open Banking)
+export const bankConnections = pgTable('bank_connections', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  provider: text('provider').notNull().default('gocardless'), // 'gocardless', 'plaid', etc.
+  institutionId: text('institution_id').notNull(),
+  institutionName: text('institution_name').notNull(),
+  institutionLogo: text('institution_logo'),
+  requisitionId: text('requisition_id'), // GoCardless requisition ID
+  agreementId: text('agreement_id'),
+  status: text('status').notNull().default('pending'), // 'pending', 'linked', 'expired', 'error'
+  lastSync: timestamp('last_sync', { withTimezone: true }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+// Linked Bank Accounts table
+export const linkedBankAccounts = pgTable('linked_bank_accounts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  connectionId: uuid('connection_id').references(() => bankConnections.id, { onDelete: 'cascade' }).notNull(),
+  finflowAccountId: uuid('finflow_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+  externalAccountId: text('external_account_id').notNull(),
+  iban: text('iban'),
+  accountName: text('account_name'),
+  accountType: text('account_type'), // 'checking', 'savings', 'credit_card'
+  currency: text('currency').notNull().default('EUR'),
+  balanceCents: bigint('balance_cents', { mode: 'number' }),
+  balanceUpdatedAt: timestamp('balance_updated_at', { withTimezone: true }),
+  autoSync: boolean('auto_sync').notNull().default(true),
+  lastTransactionId: text('last_transaction_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),

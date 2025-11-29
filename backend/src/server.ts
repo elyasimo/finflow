@@ -26,6 +26,9 @@ import { otpController } from './controllers/otp.controller.js';
 import { adminController } from './controllers/admin.controller.js';
 import * as recurringController from './controllers/recurring.controller.js';
 import { reportsController } from './controllers/reports.controller.js';
+import * as notificationsController from './controllers/notifications.controller.js';
+import * as bankingController from './controllers/banking.controller.js';
+import { runScheduledTasks } from './services/cron.service.js';
 import { authMiddleware } from './middleware/auth.js';
 import { adminMiddleware } from './middleware/admin.js';
 import { tradingAgentService } from './services/trading-agent.service.js';
@@ -277,6 +280,36 @@ app.get('/reports/custom', authMiddleware, (req, res) => reportsController.gener
 app.get('/reports/data', authMiddleware, (req, res) => reportsController.getReportData(req, res));
 app.get('/reports/export/csv', authMiddleware, (req, res) => reportsController.exportTransactionsCsv(req, res));
 
+// Notifications routes
+app.get('/notifications', authMiddleware, (req, res) => notificationsController.getNotifications(req, res));
+app.put('/notifications/:id/read', authMiddleware, (req, res) => notificationsController.markNotificationRead(req, res));
+app.put('/notifications/read-all', authMiddleware, (req, res) => notificationsController.markAllNotificationsRead(req, res));
+app.get('/notifications/preferences', authMiddleware, (req, res) => notificationsController.getNotificationPreferences(req, res));
+app.put('/notifications/preferences', authMiddleware, (req, res) => notificationsController.updateNotificationPreferences(req, res));
+app.post('/notifications/push-token', authMiddleware, (req, res) => notificationsController.registerPushToken(req, res));
+app.delete('/notifications/push-token', authMiddleware, (req, res) => notificationsController.unregisterPushToken(req, res));
+app.post('/notifications/cleanup', authMiddleware, adminMiddleware, (req, res) => notificationsController.cleanupOldNotifications(req, res));
+
+// Banking routes (PSD2/Open Banking)
+app.get('/banking/institutions', authMiddleware, (req, res) => bankingController.getInstitutions(req, res));
+app.get('/banking/connections', authMiddleware, (req, res) => bankingController.getBankConnections(req, res));
+app.post('/banking/connect', authMiddleware, (req, res) => bankingController.createBankConnection(req, res));
+app.get('/banking/callback/:requisitionId', authMiddleware, (req, res) => bankingController.handleBankCallback(req, res));
+app.delete('/banking/connections/:id', authMiddleware, (req, res) => bankingController.deleteBankConnection(req, res));
+app.post('/banking/accounts/link', authMiddleware, (req, res) => bankingController.linkToFinFlowAccount(req, res));
+app.post('/banking/accounts/:linkedAccountId/sync', authMiddleware, (req, res) => bankingController.syncBankTransactions(req, res));
+app.get('/banking/accounts/:linkedAccountId/balance', authMiddleware, (req, res) => bankingController.refreshBankBalance(req, res));
+
+// Cron/Scheduler routes (admin only)
+app.post('/cron/run', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    await runScheduledTasks();
+    res.json({ success: true, message: 'Scheduled tasks executed' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to run scheduled tasks' });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
@@ -325,6 +358,33 @@ server.listen(port, async () => {
   // Start price alerts monitor (checks every 60 seconds)
   alertsMonitorService.start(60000);
   console.log(`🔔 Price alerts monitor started`);
+
+  // Schedule daily tasks (recurring transactions, budget warnings, etc.)
+  // Runs at midnight every day
+  const scheduleNextRun = () => {
+    const now = new Date();
+    const nextMidnight = new Date(now);
+    nextMidnight.setDate(nextMidnight.getDate() + 1);
+    nextMidnight.setHours(0, 0, 0, 0);
+    
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+    
+    setTimeout(async () => {
+      console.log('🕛 Running scheduled daily tasks...');
+      try {
+        await runScheduledTasks();
+        console.log('✅ Daily scheduled tasks completed');
+      } catch (error) {
+        console.error('❌ Error running daily tasks:', error);
+      }
+      scheduleNextRun(); // Schedule next run
+    }, msUntilMidnight);
+    
+    console.log(`⏰ Next scheduled run at: ${nextMidnight.toISOString()}`);
+  };
+  
+  scheduleNextRun();
+  console.log(`📅 Daily scheduler initialized`);
 });
 
 // Graceful shutdown

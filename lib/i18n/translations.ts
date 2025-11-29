@@ -340,6 +340,7 @@ export const translations = {
     // Stock Trading Agent
     stockTradingAgent: 'Stock Trading Agent',
     recurring: 'Recurring',
+    banking: 'Banking',
     tradingHistory: 'Trading History',
     tradingPerformance: 'Trading Performance',
     priceAlerts: 'Price Alerts',
@@ -1041,6 +1042,7 @@ export const translations = {
     // Stock Trading Agent
     stockTradingAgent: 'Aktienhandel Agent',
     recurring: 'Wiederkehrend',
+    banking: 'Banking',
     tradingHistory: 'Handelshistorie',
     tradingPerformance: 'Handelsperformance',
     priceAlerts: 'Preisalarme',
@@ -1733,6 +1735,7 @@ export const translations = {
     // Stock Trading Agent
     stockTradingAgent: 'Agent de Trading d\'Actions',
     recurring: 'Récurrent',
+    banking: 'Banque',
     tradingHistory: 'Historique des Transactions',
     tradingPerformance: 'Performance de Trading',
     priceAlerts: 'Alertes de Prix',
@@ -2428,6 +2431,7 @@ export const translations = {
     // Stock Trading Agent
     stockTradingAgent: 'وكيل تداول الأسهم',
     recurring: 'متكرر',
+    banking: 'البنوك',
     tradingHistory: 'سجل التداول',
     tradingPerformance: 'أداء التداول',
     priceAlerts: 'تنبيهات الأسعار',

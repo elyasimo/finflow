@@ -19,7 +19,9 @@ import {
   LogOut,
   ChevronUp,
   Shield,
-  Repeat
+  Repeat,
+  Building2,
+  BellRing
 } from "lucide-react"
 
 import Link from "next/link"
@@ -200,6 +202,9 @@ export default function Sidebar({ user }: SidebarProps) {
                   <NavItem href="/categories" icon={Tags}>
                     {t('categories')}
                   </NavItem>
+                  <NavItem href="/banking" icon={Building2}>
+                    {t('banking')}
+                  </NavItem>
                 </div>
               </div>
 
@@ -242,6 +247,9 @@ export default function Sidebar({ user }: SidebarProps) {
 
           <div className="px-4 py-4 border-t border-gray-200 dark:border-[#232e40]">
             <div className="space-y-1">
+              <NavItem href="/notifications" icon={BellRing}>
+                {t('notifications')}
+              </NavItem>
               <NavItem href="/settings" icon={Settings}>
                 {t('settings')}
               </NavItem>

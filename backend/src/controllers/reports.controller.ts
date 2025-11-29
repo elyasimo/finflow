@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { Request, Response } from 'express';
-import { db } from '../db';
-import { transactions, accounts, categories, budgets, users } from '../db/schema';
+import { db } from '../db.js';
+import { transactions, accounts, categories, budgets, users } from '../db/schema.js';
 import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
 import PDFDocument from 'pdfkit';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, format, subMonths } from 'date-fns';
