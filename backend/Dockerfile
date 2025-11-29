@@ -61,6 +61,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nodejs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder --chown=nodejs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nodejs:nodejs /app/src ./src
+COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
 COPY --from=builder --chown=nodejs:nodejs /app/start.sh ./start.sh
 
 # Make start script executable (do this before switching to nodejs user)

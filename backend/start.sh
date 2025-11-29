@@ -74,4 +74,11 @@ for t in $CRITICAL_TABLES; do
 done
 
 echo "🚀 Starting application..."
+
+# Seed default admin user if not exists
+if [ -f "./scripts/seed-admin.sql" ]; then
+  echo "👤 Checking for default admin user..."
+  psql "$DATABASE_URL" -f ./scripts/seed-admin.sql 2>/dev/null || echo "Admin seed skipped or already exists"
+fi
+
 exec node dist/server.js
