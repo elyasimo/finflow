@@ -75,10 +75,10 @@ done
 
 echo "🚀 Starting application..."
 
-# Seed default admin user if not exists
-if [ -f "./scripts/seed-admin.sql" ]; then
+# Seed default admin user if not exists (using JS for correct bcrypt hashing)
+if [ -f "./scripts/seed-admin.js" ]; then
   echo "👤 Checking for default admin user..."
-  psql "$DATABASE_URL" -f ./scripts/seed-admin.sql 2>/dev/null || echo "Admin seed skipped or already exists"
+  node ./scripts/seed-admin.js || echo "Admin seed skipped or failed"
 fi
 
 exec node dist/server.js
