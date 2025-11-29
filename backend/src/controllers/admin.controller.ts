@@ -243,7 +243,7 @@ export class AdminController {
           role,
           defaultCurrency,
           isActive: true,
-        })
+        } as any)
         .returning({
           id: users.id,
           email: users.email,
@@ -344,7 +344,7 @@ export class AdminController {
       }
 
       const [updatedUser] = await db.update(users)
-        .set({ isActive: !user.isActive })
+        .set({ isActive: !user.isActive } as any)
         .where(eq(users.id, id))
         .returning({
           id: users.id,
@@ -371,7 +371,7 @@ export class AdminController {
       const { id } = req.params;
 
       const [updatedUser] = await db.update(users)
-        .set({ role: 'admin' })
+        .set({ role: 'admin' } as any)
         .where(eq(users.id, id))
         .returning({
           id: users.id,
@@ -406,7 +406,7 @@ export class AdminController {
       }
 
       const [updatedUser] = await db.update(users)
-        .set({ role: 'user' })
+        .set({ role: 'user' } as any)
         .where(eq(users.id, id))
         .returning({
           id: users.id,
