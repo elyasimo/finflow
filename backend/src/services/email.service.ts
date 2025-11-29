@@ -2,39 +2,106 @@ import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 
 /**
- * Email Service using Nodemailer with Gmail SMTP
+ * Email Service using Nodemailer
  * 
- * FREE: Gmail allows 500 emails/day
+ * Primary: Microsoft 365 SMTP (noreply@finflowapp.ch)
+ * Fallback: Gmail SMTP (500 emails/day free)
  * 
- * Setup:
- * 1. Create a Gmail account (e.g., finflow.verify@gmail.com)
- * 2. Enable 2-Factor Authentication in Gmail
- * 3. Generate an "App Password" at: https://myaccount.google.com/apppasswords
- * 4. Use that App Password as GMAIL_APP_PASSWORD
+ * Uses lazy initialization to ensure environment variables are loaded
  */
 
 class EmailService {
   private transporter: Transporter | null = null;
-  private fromEmail: string;
-  private fromName: string;
+  private fromEmail: string = '';
+  private fromName: string = 'FinFlow';
+  private provider: 'microsoft' | 'gmail' | 'none' = 'none';
+  private initialized: boolean = false;
 
-  constructor() {
-    this.fromEmail = process.env.GMAIL_USER || '';
-    this.fromName = process.env.GMAIL_FROM_NAME || 'FinFlow';
-    
+  /**
+   * Initialize the email service - called after dotenv.config()
+   */
+  public init(): void {
+    if (this.initialized) return;
+    this.initialized = true;
+
+    this.fromName = process.env.SMTP_FROM_NAME || process.env.GMAIL_FROM_NAME || 'FinFlow';
     this.initTransporter();
   }
 
-  private initTransporter() {
-    const gmailUser = process.env.GMAIL_USER;
-    const gmailPassword = process.env.GMAIL_APP_PASSWORD;
+  private initTransporter(): void {
+    // Try Microsoft 365 first (primary)
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPassword = process.env.SMTP_PASSWORD;
 
-    if (!gmailUser || !gmailPassword) {
-      console.warn('⚠️ Gmail credentials not configured - emails will not be sent');
-      console.warn('   Set GMAIL_USER and GMAIL_APP_PASSWORD in .env');
+    console.log('📧 Initializing Email Service...');
+    console.log('   SMTP_HOST:', smtpHost || '(not set)');
+    console.log('   SMTP_USER:', smtpUser || '(not set)');
+    console.log('   SMTP_PASSWORD:', smtpPassword ? '***' : '(not set)');
+
+    if (smtpHost && smtpUser && smtpPassword) {
+      this.fromEmail = process.env.SMTP_FROM_EMAIL || smtpUser;
+      this.fromName = process.env.SMTP_FROM_NAME || 'FinFlow';
+      
+      console.log('📧 Attempting Microsoft 365 SMTP connection...');
+      console.log('   Host:', smtpHost);
+      console.log('   Port:', smtpPort || '587');
+      console.log('   Auth User:', smtpUser);
+      console.log('   From:', this.fromEmail);
+      
+      this.transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: parseInt(smtpPort || '587'),
+        secure: false, // Use STARTTLS for port 587
+        auth: {
+          user: smtpUser,
+          pass: smtpPassword,
+        },
+        tls: {
+          ciphers: 'SSLv3',
+          rejectUnauthorized: false
+        }
+      });
+
+      // Verify connection
+      this.transporter.verify((error) => {
+        if (error) {
+          console.error('❌ Microsoft 365 SMTP connection failed:', error.message);
+          console.error('   Error details:', JSON.stringify(error, null, 2));
+          console.log('🔄 Trying Gmail fallback...');
+          this.initGmailFallback();
+        } else {
+          this.provider = 'microsoft';
+          console.log('✅ Microsoft 365 SMTP connected successfully!');
+          console.log('   Sending from:', `"${this.fromName}" <${this.fromEmail}>`);
+        }
+      });
       return;
     }
 
+    // Fallback to Gmail
+    this.initGmailFallback();
+  }
+
+  private initGmailFallback(): void {
+    const gmailUser = process.env.GMAIL_USER;
+    const gmailPassword = process.env.GMAIL_APP_PASSWORD;
+
+    console.log('   GMAIL_USER:', gmailUser || '(not set)');
+    console.log('   GMAIL_APP_PASSWORD:', gmailPassword ? '***' : '(not set)');
+
+    if (!gmailUser || !gmailPassword) {
+      console.warn('⚠️ No email credentials configured - emails will not be sent');
+      console.warn('   Set SMTP_* or GMAIL_* variables in .env');
+      return;
+    }
+
+    this.fromEmail = gmailUser;
+    this.fromName = process.env.GMAIL_FROM_NAME || 'FinFlow';
+
+    console.log('📧 Attempting Gmail SMTP connection...');
+    
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -47,18 +114,32 @@ class EmailService {
     this.transporter.verify((error) => {
       if (error) {
         console.error('❌ Gmail SMTP connection failed:', error.message);
+        this.transporter = null;
       } else {
-        console.log('✅ Gmail SMTP connected - ready to send emails');
+        this.provider = 'gmail';
+        console.log('✅ Gmail SMTP connected (fallback)');
+        console.log('   Sending from:', `"${this.fromName}" <${this.fromEmail}>`);
       }
     });
+  }
+
+  /**
+   * Ensure service is initialized before sending
+   */
+  private ensureInitialized(): void {
+    if (!this.initialized) {
+      this.init();
+    }
   }
 
   /**
    * Send an email
    */
   async sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+    this.ensureInitialized();
+    
     if (!this.transporter) {
-      console.warn('⚠️ Email transporter not configured - skipping email');
+      console.warn('⚠️ Email transporter not configured - skipping email to:', to);
       return false;
     }
 
@@ -70,7 +151,7 @@ class EmailService {
         html,
       });
 
-      console.log(`✅ Email sent to ${to}`);
+      console.log(`✅ Email sent to ${to} via ${this.provider}`);
       return true;
     } catch (error: any) {
       console.error('❌ Failed to send email:', error.message);

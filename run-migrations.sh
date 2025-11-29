@@ -61,7 +61,12 @@ docker exec $API_CONTAINER cat /app/drizzle/migrations/add-encrypted-api-keys.sq
 
 # Migration 0008
 echo "▶️  Migration 0008 (price_alerts)..."
-docker exec $API_CONTAINER cat /app/drizzle/0008_init_price_alerts.sql | \
+docker exec $API_CONTAINER cat /app/drizzle/migrations/0008_init_price_alerts.sql | \
+    docker exec -i $POSTGRES_CONTAINER psql -U finflow_prod -d finflow_production
+
+# Migration 0009 - Admin User Fields
+echo "▶️  Migration 0009 (admin_user_fields)..."
+docker exec $API_CONTAINER cat /app/drizzle/migrations/0009_add_user_admin_fields.sql | \
     docker exec -i $POSTGRES_CONTAINER psql -U finflow_prod -d finflow_production
 
 echo ""

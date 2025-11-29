@@ -23,15 +23,21 @@ import { stockTradingController } from './controllers/stock-trading.controller.j
 import { tradingPerformanceController } from './controllers/trading-performance.controller.js';
 import { priceAlertsController } from './controllers/price-alerts.controller.js';
 import { otpController } from './controllers/otp.controller.js';
+import { adminController } from './controllers/admin.controller.js';
 import { authMiddleware } from './middleware/auth.js';
+import { adminMiddleware } from './middleware/admin.js';
 import { tradingAgentService } from './services/trading-agent.service.js';
 import { webSocketService } from './services/websocket.service.js';
 import { alertsMonitorService } from './services/alerts-monitor.service.js';
+import { emailService } from './services/email.service.js';
 import { db } from './db.js';
 import { sql } from 'drizzle-orm';
 // Migrations now handled by start.sh using drizzle-kit push
 // import { runMigrations } from './utils/migrations.js';
 import http from 'http';
+
+// Initialize email service after dotenv is loaded
+emailService.init();
 
 const app = express();
 const port = process.env.API_PORT || 8080;
@@ -240,6 +246,17 @@ app.get('/users/profile', authMiddleware, (req, res) => authController.getMe(req
 app.put('/users/profile', authMiddleware, (req, res) => {
   res.json({ message: 'Profile update coming soon' });
 });
+
+// Admin routes (requires admin role)
+app.get('/admin/stats', authMiddleware, adminMiddleware, (req, res) => adminController.getStats(req, res));
+app.get('/admin/users', authMiddleware, adminMiddleware, (req, res) => adminController.getUsers(req, res));
+app.get('/admin/users/:id', authMiddleware, adminMiddleware, (req, res) => adminController.getUserDetails(req, res));
+app.post('/admin/users', authMiddleware, adminMiddleware, (req, res) => adminController.createUser(req, res));
+app.put('/admin/users/:id', authMiddleware, adminMiddleware, (req, res) => adminController.updateUser(req, res));
+app.delete('/admin/users/:id', authMiddleware, adminMiddleware, (req, res) => adminController.deleteUser(req, res));
+app.post('/admin/users/:id/toggle-active', authMiddleware, adminMiddleware, (req, res) => adminController.toggleUserActive(req, res));
+app.post('/admin/users/:id/make-admin', authMiddleware, adminMiddleware, (req, res) => adminController.makeAdmin(req, res));
+app.post('/admin/users/:id/remove-admin', authMiddleware, adminMiddleware, (req, res) => adminController.removeAdmin(req, res));
 
 // 404 handler
 app.use((req, res) => {

@@ -198,7 +198,11 @@ export const authApi = {
       id: userData.id,
       email: userData.email,
       fullName: userData.fullName || userData.full_name,
+      name: userData.name,
       phone: userData.phone,
+      role: userData.role || 'user',
+      isAdmin: userData.isAdmin || userData.role === 'admin',
+      isActive: userData.isActive !== false,
       defaultCurrency: userData.defaultCurrency || userData.default_currency || 'CHF',
       createdAt: userData.createdAt || userData.created_at,
     };

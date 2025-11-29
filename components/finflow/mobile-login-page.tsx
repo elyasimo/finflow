@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { FinflowLogo } from "@/components/icons/finflow-logo"
 import { useAuth } from "@/hooks/use-auth"
 import { useBiometric } from "@/hooks/use-biometric"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 interface MobileLoginPageProps {
   onRegister?: () => void
@@ -29,6 +30,7 @@ export default function MobileLoginPage({
   onForgotPassword 
 }: MobileLoginPageProps) {
   const router = useRouter()
+  const { t } = useLanguage()
   const { login, isLoginLoading, loginError } = useAuth()
   const { 
     isAvailable: biometricAvailable, 
@@ -115,11 +117,11 @@ export default function MobileLoginPage({
     try {
       const credentials = await getCredentials()
       if (!credentials) {
-        setError('Keine gespeicherten Anmeldedaten gefunden. Bitte melden Sie sich mit E-Mail und Passwort an.')
+        setError(t('noSavedCredentialsError'))
         return
       }
       
-      const success = await authenticate(`Anmelden mit ${getBiometryLabel()}`)
+      const success = await authenticate(`${t('signInWith')} ${getBiometryLabel()}`)
       if (success) {
         await hapticFeedback('success')
         setIsSubmitting(true)
@@ -130,7 +132,7 @@ export default function MobileLoginPage({
               router.push('/dashboard')
             },
             onError: (error: any) => {
-              setError(error?.message || 'Anmeldung fehlgeschlagen')
+              setError(error?.message || t('loginFailed'))
               setIsSubmitting(false)
             }
           }
@@ -138,7 +140,7 @@ export default function MobileLoginPage({
       }
     } catch (err) {
       await hapticFeedback('error')
-      setError('Biometrische Authentifizierung fehlgeschlagen')
+      setError(t('biometricAuthFailed'))
     }
   }
 
@@ -148,12 +150,12 @@ export default function MobileLoginPage({
     setError('')
     
     if (!isValidEmail(email)) {
-      setError('Bitte geben Sie eine gültige E-Mail-Adresse ein')
+      setError(t('invalidEmailError'))
       return
     }
     
     if (!passwordValidation.hasMinLength) {
-      setError('Das Passwort muss mindestens 8 Zeichen lang sein')
+      setError(t('passwordMinLengthError'))
       return
     }
     
@@ -194,7 +196,7 @@ export default function MobileLoginPage({
           }
         },
         onError: (error: any) => {
-          setError(error?.message || 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Daten.')
+          setError(error?.message || t('loginFailedCheckData'))
           setIsSubmitting(false)
         }
       }
@@ -229,10 +231,10 @@ export default function MobileLoginPage({
         </div>
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Willkommen zurück
+            {t('welcomeBack')}
           </h1>
           <p className="text-gray-400 text-base">
-            Melden Sie sich an, um fortzufahren
+            {t('signInToContinue')}
           </p>
         </div>
       </div>
@@ -254,14 +256,14 @@ export default function MobileLoginPage({
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   "transition-all flex items-center justify-center gap-3"
                 )}
-                aria-label={`Mit ${getBiometryLabel()} anmelden`}
+                aria-label={`${t('signInWith')} ${getBiometryLabel()}`}
               >
                 {isAuthenticating ? (
                   <Loader2 className="w-7 h-7 animate-spin" />
                 ) : (
                   <BiometricIcon className="w-7 h-7" />
                 )}
-                <span>Mit {getBiometryLabel()} anmelden</span>
+                <span>{t('signInWith')} {getBiometryLabel()}</span>
               </button>
             ) : (
               <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
@@ -271,10 +273,10 @@ export default function MobileLoginPage({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-white">
-                      {getBiometryLabel()} einrichten
+                      {t('setupBiometric')} {getBiometryLabel()}
                     </p>
                     <p className="text-xs text-gray-400">
-                      Melden Sie sich einmal mit E-Mail an, um {getBiometryLabel()} zu aktivieren
+                      {t('biometricSetupHint')} {getBiometryLabel()}
                     </p>
                   </div>
                 </div>
@@ -289,7 +291,7 @@ export default function MobileLoginPage({
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-[#1a2332] text-gray-500">
-                  oder mit E-Mail
+                  {t('orWithEmail')}
                 </span>
               </div>
             </div>
@@ -302,13 +304,13 @@ export default function MobileLoginPage({
           {/* Email Input */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              E-Mail-Adresse
+              {t('emailAddress')}
             </label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="email"
-                placeholder="name@beispiel.ch"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={cn(
@@ -324,12 +326,12 @@ export default function MobileLoginPage({
                 )}
                 autoComplete="email"
                 autoCapitalize="off"
-                aria-label="E-Mail-Adresse"
+                aria-label={t('emailAddress')}
               />
             </div>
             {email && !isValidEmail(email) && (
               <p className="text-xs text-rose-400 mt-1.5 ml-1">
-                Bitte geben Sie eine gültige E-Mail ein
+                {t('invalidEmailError')}
               </p>
             )}
           </div>
@@ -338,21 +340,21 @@ export default function MobileLoginPage({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium text-gray-300">
-                Passwort
+                {t('passwordField')}
               </label>
               <button
                 type="button"
                 onClick={() => onForgotPassword?.() || router.push('/forgot-password')}
                 className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
               >
-                Passwort vergessen?
+                {t('forgotPassword')}
               </button>
             </div>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Mindestens 8 Zeichen"
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={cn(
@@ -367,20 +369,20 @@ export default function MobileLoginPage({
                   "focus:outline-none focus:border-blue-500"
                 )}
                 autoComplete="current-password"
-                aria-label="Passwort"
+                aria-label={t('passwordField')}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-400 transition-colors"
-                aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+                aria-label={showPassword ? t('hidePassword') : t('showPassword')}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
             {password && !passwordValidation.hasMinLength && (
               <p className="text-xs text-rose-400 mt-1.5 ml-1">
-                Das Passwort muss mindestens 8 Zeichen lang sein
+                {t('passwordMinLengthError')}
               </p>
             )}
           </div>
@@ -390,7 +392,7 @@ export default function MobileLoginPage({
             <div className="flex items-center gap-2 p-4 bg-rose-950/40 rounded-2xl border border-rose-500/30">
               <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />
               <p className="text-sm text-rose-300">
-                {error || (loginError instanceof Error ? loginError.message : 'Anmeldung fehlgeschlagen')}
+                {error || (loginError instanceof Error ? loginError.message : t('loginFailed'))}
               </p>
             </div>
           )}
@@ -411,11 +413,11 @@ export default function MobileLoginPage({
             {(isSubmitting || isLoginLoading) ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Anmelden...</span>
+                <span>{t('signingIn')}</span>
               </>
             ) : (
               <>
-                <span>Anmelden</span>
+                <span>{t('signIn')}</span>
                 <ChevronRight className="w-5 h-5" />
               </>
             )}
@@ -425,12 +427,12 @@ export default function MobileLoginPage({
         {/* Register Link */}
         <div className="mt-8 text-center">
           <p className="text-gray-400">
-            Noch kein Konto?{' '}
+            {t('noAccountYet')}{' '}
             <button
               onClick={() => onRegister?.() || router.push('/register')}
               className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
             >
-              Jetzt registrieren
+              {t('registerNow')}
             </button>
           </p>
         </div>
@@ -444,10 +446,10 @@ export default function MobileLoginPage({
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">
-                  {getBiometryLabel()} verfügbar
+                  {getBiometryLabel()} {t('biometricAvailable')}
                 </p>
                 <p className="text-xs text-gray-400">
-                  Nach der Anmeldung können Sie {getBiometryLabel()} aktivieren
+                  {t('afterLoginCanEnable')} {getBiometryLabel()}
                 </p>
               </div>
             </div>
@@ -469,11 +471,10 @@ export default function MobileLoginPage({
       {/* Footer */}
       <div className="px-6 pb-8 pt-4">
         <p className="text-center text-xs text-gray-500">
-          Mit der Anmeldung stimmen Sie unseren{' '}
-          <span className="text-blue-400">Nutzungsbedingungen</span>{' '}
-          und der{' '}
-          <span className="text-blue-400">Datenschutzerklärung</span>{' '}
-          zu.
+          {t('termsAgreement')}{' '}
+          <span className="text-blue-400">{t('termsOfService')}</span>{' '}
+          {t('and')}{' '}
+          <span className="text-blue-400">{t('privacyPolicy')}</span>
         </p>
       </div>
 
@@ -490,10 +491,10 @@ export default function MobileLoginPage({
                 <BiometricIcon className="w-10 h-10 text-emerald-400" />
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">
-                {getBiometryLabel()} aktivieren?
+                {t('enableBiometricQuestion')} {getBiometryLabel()}?
               </h3>
               <p className="text-gray-400">
-                Melden Sie sich beim nächsten Mal schneller und sicherer an
+                {t('signInFasterAndSecurer')}
               </p>
             </div>
             
@@ -509,14 +510,14 @@ export default function MobileLoginPage({
                 )}
               >
                 <BiometricIcon className="w-5 h-5" />
-                Ja, {getBiometryLabel()} aktivieren
+                {t('yesEnable')} {getBiometryLabel()}
               </button>
               
               <button
                 onClick={handleSkipBiometric}
                 className="w-full py-4 rounded-2xl font-medium text-gray-400 hover:text-white transition-colors"
               >
-                Später
+                {t('later')}
               </button>
             </div>
           </div>

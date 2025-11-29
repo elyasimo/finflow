@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils"
 import { FinflowLogo } from "@/components/icons/finflow-logo"
 import { authApi, accountsApi } from "@/lib/api"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 /**
  * Registration Flow Steps:
@@ -94,6 +95,8 @@ export default function MobileRegistration({
   onSkip,
   onLogin 
 }: MobileRegistrationProps) {
+  const { t } = useLanguage()
+  
   // Step state
   const [step, setStep] = useState<RegistrationStep>('contact')
   
@@ -517,23 +520,23 @@ export default function MobileRegistration({
           <Shield className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Konto erstellen
+          {t('createAccount')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Wir benötigen E-Mail und Telefon zur Verifikation
+          {t('needEmailAndPhoneForVerification')}
         </p>
       </div>
 
       {/* Email Input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          E-Mail-Adresse *
+          {t('emailAddress')} *
         </label>
         <div className="relative">
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="email"
-            placeholder="name@beispiel.ch"
+            placeholder={t('emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={cn(
@@ -544,7 +547,7 @@ export default function MobileRegistration({
               "focus:outline-none focus:border-blue-500",
               "transition-all"
             )}
-            aria-label="E-Mail-Adresse"
+            aria-label={t('emailAddress')}
             autoComplete="email"
           />
           {email && isValidEmail(email) && (
@@ -556,13 +559,13 @@ export default function MobileRegistration({
       {/* Phone Input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Telefonnummer *
+          {t('phoneNumber')} *
         </label>
         <div className="relative">
           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="tel"
-            placeholder="+41 79 123 45 67"
+            placeholder={t('phonePlaceholder')}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className={cn(
@@ -573,7 +576,7 @@ export default function MobileRegistration({
               "focus:outline-none focus:border-blue-500",
               "transition-all"
             )}
-            aria-label="Telefonnummer"
+            aria-label={t('phoneNumber')}
             autoComplete="tel"
           />
           {phone && isValidPhone(phone) && (
@@ -581,7 +584,7 @@ export default function MobileRegistration({
           )}
         </div>
         <p className="text-xs text-gray-400 mt-2">
-          Für SMS-Verifikation (Schweizer oder internationale Nummer)
+          {t('forSmsVerification')}
         </p>
       </div>
 
@@ -608,7 +611,7 @@ export default function MobileRegistration({
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
           <>
-            Weiter
+            {t('continueBtn')}
             <ArrowRight className="w-5 h-5" />
           </>
         )}
@@ -617,12 +620,12 @@ export default function MobileRegistration({
       {/* Login Link */}
       {onLogin && (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Bereits ein Konto?{' '}
+          {t('alreadyHaveAccount')}{' '}
           <button 
             onClick={onLogin}
             className="text-blue-500 hover:text-blue-600 font-medium"
           >
-            Anmelden
+            {t('signIn')}
           </button>
         </p>
       )}
@@ -630,7 +633,7 @@ export default function MobileRegistration({
       {/* Security Note */}
       <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
         <Lock className="w-4 h-4" />
-        <span>Ihre Daten werden verschlüsselt übertragen</span>
+        <span>{t('dataEncrypted')}</span>
       </div>
     </div>
   )
@@ -638,7 +641,7 @@ export default function MobileRegistration({
   const renderPasswordStep = () => {
     const strength = getPasswordStrength(password)
     const strengthColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500', 'bg-emerald-500']
-    const strengthLabels = ['Sehr schwach', 'Schwach', 'Mittel', 'Gut', 'Stark', 'Sehr stark']
+    const strengthLabels = [t('veryWeak'), t('weak'), t('medium'), t('good'), t('strong'), t('veryStrong')]
     
     return (
       <div className="animate-fade-in space-y-6">
@@ -647,7 +650,7 @@ export default function MobileRegistration({
           className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
         >
           <ArrowLeft className="w-5 h-5" />
-          Zurück
+          {t('back')}
         </button>
 
         <div className="text-center mb-8">
@@ -655,21 +658,21 @@ export default function MobileRegistration({
             <User className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Ihr Profil
+            {t('yourProfile')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Erstellen Sie Ihr sicheres Konto
+            {t('createSecureAccount')}
           </p>
         </div>
 
         {/* Full Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Vollständiger Name *
+            {t('fullNameLabel')} *
           </label>
           <input
             type="text"
-            placeholder="Max Mustermann"
+            placeholder={t('fullNamePlaceholder')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className={cn(
@@ -686,12 +689,12 @@ export default function MobileRegistration({
         {/* Password */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Passwort *
+            {t('passwordField')} *
           </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Mindestens 8 Zeichen"
+              placeholder={t('passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={cn(
@@ -707,7 +710,7 @@ export default function MobileRegistration({
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
+              aria-label={showPassword ? t('hidePassword') : t('showPassword')}
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -731,7 +734,7 @@ export default function MobileRegistration({
                 "text-xs",
                 strength < 3 ? "text-orange-500" : strength < 5 ? "text-lime-500" : "text-emerald-500"
               )}>
-                {strengthLabels[strength - 1] || 'Sehr schwach'}
+                {strengthLabels[strength - 1] || t('veryWeak')}
               </p>
             </div>
           )}
@@ -740,11 +743,11 @@ export default function MobileRegistration({
         {/* Confirm Password */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Passwort bestätigen *
+            {t('confirmPassword')} *
           </label>
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Passwort wiederholen"
+            placeholder={t('repeatPassword')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className={cn(
@@ -764,8 +767,8 @@ export default function MobileRegistration({
               password === confirmPassword ? "text-emerald-500" : "text-rose-500"
             )}>
               {password === confirmPassword 
-                ? "✓ Passwörter stimmen überein" 
-                : "✗ Passwörter stimmen nicht überein"}
+                ? `✓ ${t('passwordsMatch')}` 
+                : `✗ ${t('passwordsNotMatch')}`}
             </p>
           )}
         </div>
@@ -793,7 +796,7 @@ export default function MobileRegistration({
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <>
-              Weiter
+              {t('continueBtn')}
               <ArrowRight className="w-5 h-5" />
             </>
           )}
@@ -809,7 +812,7 @@ export default function MobileRegistration({
         className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
       >
         <ArrowLeft className="w-5 h-5" />
-        Zurück
+        {t('back')}
       </button>
 
       <div className="text-center mb-8">
@@ -817,12 +820,11 @@ export default function MobileRegistration({
           <Mail className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          E-Mail verifizieren
+          {t('verifyEmail')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Wir haben einen 6-stelligen Code an<br />
-          <span className="font-medium text-gray-700 dark:text-gray-300">{email}</span><br />
-          gesendet
+          {t('verificationCodeSent')}<br />
+          <span className="font-medium text-gray-700 dark:text-gray-300">{email}</span>
         </p>
       </div>
 
@@ -850,7 +852,7 @@ export default function MobileRegistration({
               digit ? "border-emerald-500" : "border-transparent",
               "focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30"
             )}
-            aria-label={`Code Ziffer ${index + 1}`}
+            aria-label={`${t('enterCode')} ${index + 1}`}
           />
         ))}
       </div>
@@ -878,7 +880,7 @@ export default function MobileRegistration({
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
           <>
-            Verifizieren
+            {t('verifyCode')}
             <Check className="w-5 h-5" />
           </>
         )}
@@ -897,13 +899,13 @@ export default function MobileRegistration({
       >
         <RefreshCw className="w-4 h-4" />
         {emailResendCooldown > 0 
-          ? `Erneut senden in ${emailResendCooldown}s`
-          : 'Code erneut senden'}
+          ? `${t('resendIn')} ${emailResendCooldown}s`
+          : t('resendCode')}
       </button>
 
       {/* Step indicator */}
       <p className="text-center text-sm text-gray-400">
-        Schritt 1 von 2 • Danach folgt SMS-Verifizierung
+        {t('step')} 1 {t('of')} 2 • {t('smsVerificationNext')}
       </p>
     </div>
   )
@@ -915,7 +917,7 @@ export default function MobileRegistration({
         className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
       >
         <ArrowLeft className="w-5 h-5" />
-        Zurück
+        {t('back')}
       </button>
 
       <div className="text-center mb-8">
@@ -923,12 +925,11 @@ export default function MobileRegistration({
           <Smartphone className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Telefon verifizieren
+          {t('verifyPhone')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Wir haben einen SMS-Code an<br />
-          <span className="font-medium text-gray-700 dark:text-gray-300">{phone}</span><br />
-          gesendet
+          {t('smsCodeSent')}<br />
+          <span className="font-medium text-gray-700 dark:text-gray-300">{phone}</span>
         </p>
       </div>
 
@@ -956,7 +957,7 @@ export default function MobileRegistration({
               digit ? "border-violet-500" : "border-transparent",
               "focus:border-violet-500 focus:ring-2 focus:ring-violet-500/30"
             )}
-            aria-label={`SMS Code Ziffer ${index + 1}`}
+            aria-label={`${t('enterCode')} ${index + 1}`}
           />
         ))}
       </div>
@@ -984,7 +985,7 @@ export default function MobileRegistration({
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
           <>
-            Verifizieren
+            {t('verifyCode')}
             <Check className="w-5 h-5" />
           </>
         )}
@@ -1003,13 +1004,13 @@ export default function MobileRegistration({
       >
         <RefreshCw className="w-4 h-4" />
         {phoneResendCooldown > 0 
-          ? `Erneut senden in ${phoneResendCooldown}s`
-          : 'SMS erneut senden'}
+          ? `${t('resendIn')} ${phoneResendCooldown}s`
+          : t('resendSms')}
       </button>
 
       {/* Step indicator */}
       <p className="text-center text-sm text-gray-400">
-        Schritt 2 von 2 • Fast geschafft!
+        {t('step')} 2 {t('of')} 2 • {t('almostDone')}
       </p>
     </div>
   )
@@ -1020,11 +1021,11 @@ export default function MobileRegistration({
         <CheckCircle2 className="w-14 h-14 text-emerald-500" />
       </div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-        Erfolgreich verifiziert!
+        {t('verificationSuccess')}
       </h1>
       <p className="text-gray-500 dark:text-gray-400">
-        E-Mail und Telefon wurden bestätigt.<br />
-        Lassen Sie uns Ihr erstes Konto einrichten.
+        {t('emailAndPhoneVerified')}<br />
+        {t('letsSetupFirstAccount')}
       </p>
     </div>
   )
@@ -1036,21 +1037,21 @@ export default function MobileRegistration({
           <Building2 className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Erstes Konto einrichten
+          {t('setupFirstAccount')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Verknüpfen Sie Ihr Bankkonto
+          {t('linkYourBankAccount')}
         </p>
       </div>
 
       {/* Bank Selection */}
       <div className="relative">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Bank *
+          {t('bank')} *
         </label>
         <input
           type="text"
-          placeholder="z.B. UBS, Raiffeisen"
+          placeholder={t('bankPlaceholder')}
           value={bankName}
           onChange={(e) => {
             setBankName(e.target.value)
@@ -1091,7 +1092,7 @@ export default function MobileRegistration({
       {/* Account Type */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Kontotyp *
+          {t('accountType')} *
         </label>
         <div className="grid grid-cols-3 gap-3">
           {ACCOUNT_TYPES.map((type) => {
@@ -1126,11 +1127,11 @@ export default function MobileRegistration({
       {/* Display Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Anzeigename *
+          {t('displayName')} *
         </label>
         <input
           type="text"
-          placeholder="z.B. Hauptkonto, Sparkonto"
+          placeholder={t('displayNamePlaceholder')}
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           className={cn(
@@ -1146,7 +1147,7 @@ export default function MobileRegistration({
       {/* IBAN (Optional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          IBAN <span className="text-gray-400">(optional)</span>
+          IBAN <span className="text-gray-400">({t('optional')})</span>
         </label>
         <input
           type="text"
@@ -1186,7 +1187,7 @@ export default function MobileRegistration({
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
           <>
-            Konto erstellen
+            {t('createAccountBtn')}
             <ArrowRight className="w-5 h-5" />
           </>
         )}
@@ -1198,13 +1199,13 @@ export default function MobileRegistration({
           disabled={isLoading}
           className="w-full py-3 text-gray-400 font-medium hover:text-gray-600 transition-colors"
         >
-          Später einrichten
+          {t('setupLater')}
         </button>
       )}
 
       <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
         <Lock className="w-4 h-4" />
-        <span>Bankdaten werden sicher verschlüsselt</span>
+        <span>{t('bankDataEncrypted')}</span>
       </div>
     </div>
   )
@@ -1215,16 +1216,16 @@ export default function MobileRegistration({
         <CheckCircle2 className="w-14 h-14 text-purple-500" />
       </div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-        Alles eingerichtet!
+        {t('allSetUp')}
       </h1>
       <p className="text-gray-500 dark:text-gray-400 mb-8">
-        Ihr Konto wurde erfolgreich erstellt.<br />
-        Willkommen bei FinFlow!
+        {t('accountCreatedSuccess')}<br />
+        {t('welcomeToFinflow')}
       </p>
       <div className="w-16 h-16 mx-auto">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500 mx-auto" />
       </div>
-      <p className="text-sm text-gray-400 mt-4">Weiterleitung zum Dashboard...</p>
+      <p className="text-sm text-gray-400 mt-4">{t('redirectingToDashboard')}</p>
     </div>
   )
 

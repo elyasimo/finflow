@@ -30,13 +30,16 @@ import {
   ExternalLink,
   Copy,
   CheckCircle2,
-  Camera
+  Camera,
+  Crown,
+  Users
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import MobilePageHeader from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
+import { useRouter } from "next/navigation"
 
 // Types
 interface UserProfile {
@@ -93,11 +96,11 @@ const CURRENCIES = [
   { code: 'MAD', label: 'Moroccan Dirham', symbol: 'MAD' },
 ]
 
-// Theme Options
-const THEMES = [
-  { id: 'light', label: 'Hell', icon: Sun },
-  { id: 'dark', label: 'Dunkel', icon: Moon },
-  { id: 'system', label: 'System', icon: Smartphone },
+// Theme Options - labels will be translated dynamically
+const THEME_OPTIONS = [
+  { id: 'light', labelKey: 'themeLight', icon: Sun },
+  { id: 'dark', labelKey: 'themeDark', icon: Moon },
+  { id: 'system', labelKey: 'themeSystem', icon: Smartphone },
 ]
 
 // Settings Section Component
@@ -230,6 +233,7 @@ export default function MobileSettingsPage({
 }: MobileSettingsPageProps) {
   const { t } = useLanguage()
   const { setCurrency: setAppCurrency } = useCurrency()
+  const router = useRouter()
   
   // UI State
   const [showProfileSheet, setShowProfileSheet] = useState(false)
@@ -302,7 +306,7 @@ export default function MobileSettingsPage({
       await onUpdateProfile({ fullName, email })
       setShowProfileSheet(false)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Aktualisieren des Profils')
+      setError(err.message || t('errorUpdatingProfile'))
     } finally {
       setIsSubmitting(false)
     }
@@ -312,11 +316,11 @@ export default function MobileSettingsPage({
     if (!onChangePassword) return
     
     if (newPassword !== confirmPassword) {
-      setError('Passwörter stimmen nicht überein')
+      setError(t('passwordsDontMatch'))
       return
     }
     if (newPassword.length < 8) {
-      setError('Passwort muss mindestens 8 Zeichen haben')
+      setError(t('passwordMinLength'))
       return
     }
     
@@ -329,7 +333,7 @@ export default function MobileSettingsPage({
       setNewPassword('')
       setConfirmPassword('')
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Ändern des Passworts')
+      setError(err.message || t('errorChangingPassword'))
     } finally {
       setIsSubmitting(false)
     }
@@ -394,7 +398,7 @@ export default function MobileSettingsPage({
         setShowApiKeysSheet(false)
       }, 1500)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Speichern der API-Schlüssel')
+      setError(err.message || t('errorSavingApiKeys'))
     } finally {
       setIsSubmitting(false)
     }
@@ -407,7 +411,7 @@ export default function MobileSettingsPage({
       setIsSubmitting(true)
       await onDeleteAccount()
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Löschen des Kontos')
+      setError(err.message || t('errorDeletingAccount'))
     } finally {
       setIsSubmitting(false)
     }
@@ -422,7 +426,11 @@ export default function MobileSettingsPage({
   }
 
   const getCurrentTheme = () => {
-    return THEMES.find(t => t.id === theme) || THEMES[2]
+    const themeOption = THEME_OPTIONS.find(opt => opt.id === theme) || THEME_OPTIONS[2]
+    return {
+      ...themeOption,
+      label: t(themeOption.labelKey as any)
+    }
   }
 
   return (
@@ -462,32 +470,32 @@ export default function MobileSettingsPage({
       {/* Settings List */}
       <div className="px-5 py-6">
         {/* Appearance */}
-        <SettingsSection title="Darstellung">
+        <SettingsSection title={t('displaySection')}>
           <SettingsItem 
             icon={getCurrentTheme().icon} 
-            label="Design"
+            label={t('themeLabel')}
             value={getCurrentTheme().label}
             onClick={() => setShowThemeSheet(true)}
           />
           <SettingsItem 
             icon={Languages} 
-            label="Sprache"
+            label={t('languageLabel')}
             value={`${getCurrentLanguage().flag} ${getCurrentLanguage().label}`}
             onClick={() => setShowLanguageSheet(true)}
           />
           <SettingsItem 
             icon={Wallet} 
-            label="Währung"
+            label={t('currencyLabel')}
             value={`${getCurrentCurrency().symbol} ${getCurrentCurrency().label}`}
             onClick={() => setShowCurrencySheet(true)}
           />
         </SettingsSection>
 
         {/* Notifications */}
-        <SettingsSection title="Benachrichtigungen">
+        <SettingsSection title={t('notificationsSection')}>
           <SettingsItem 
             icon={Mail} 
-            label="E-Mail Benachrichtigungen"
+            label={t('emailNotificationsLabel')}
             showArrow={false}
           >
             <ToggleSwitch 
@@ -497,7 +505,7 @@ export default function MobileSettingsPage({
           </SettingsItem>
           <SettingsItem 
             icon={Bell} 
-            label="Push-Benachrichtigungen"
+            label={t('pushNotificationsLabel')}
             showArrow={false}
           >
             <ToggleSwitch 
@@ -508,15 +516,15 @@ export default function MobileSettingsPage({
         </SettingsSection>
 
         {/* Security */}
-        <SettingsSection title="Sicherheit">
+        <SettingsSection title={t('securitySection')}>
           <SettingsItem 
             icon={Lock} 
-            label="Passwort ändern"
+            label={t('changePasswordLabel')}
             onClick={() => setShowPasswordSheet(true)}
           />
           <SettingsItem 
             icon={ScanFace} 
-            label="Face ID / Touch ID"
+            label={t('biometricsLabel')}
             showArrow={false}
           >
             <ToggleSwitch 
@@ -527,27 +535,40 @@ export default function MobileSettingsPage({
         </SettingsSection>
 
         {/* API Keys & Integrations */}
-        <SettingsSection title="Integrationen">
+        <SettingsSection title={t('apiKeysSection')}>
           <SettingsItem 
             icon={Key} 
-            label="Trading API-Schlüssel"
-            value={binanceApiKey || alpacaApiKey ? 'Konfiguriert' : 'Nicht konfiguriert'}
+            label={t('tradingApiKeys')}
+            value={binanceApiKey || alpacaApiKey ? t('configured') : t('notConfigured')}
             onClick={() => setShowApiKeysSheet(true)}
             accent
           />
         </SettingsSection>
 
+        {/* Admin Section - only visible for admins */}
+        {user?.role === 'admin' && (
+          <SettingsSection title="Admin">
+            <SettingsItem 
+              icon={Crown} 
+              label="Admin Dashboard"
+              value="Benutzer verwalten"
+              onClick={() => router.push('/admin')}
+              accent
+            />
+          </SettingsSection>
+        )}
+
         {/* Account */}
-        <SettingsSection title="Konto">
+        <SettingsSection title={t('account')}>
           <SettingsItem 
             icon={LogOut} 
-            label="Abmelden"
+            label={t('logoutBtn')}
             onClick={onLogout}
           />
           {onDeleteAccount && (
             <SettingsItem 
               icon={Trash2} 
-              label="Konto löschen"
+              label={t('deleteAccountBtn')}
               danger
               onClick={() => setShowDeleteConfirm(true)}
             />
@@ -576,7 +597,7 @@ export default function MobileSettingsPage({
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Profil bearbeiten</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('editProfile')}</h2>
               <button
                 onClick={() => setShowProfileSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
@@ -631,12 +652,12 @@ export default function MobileSettingsPage({
                     <Camera className="w-4 h-4 text-white" />
                   </button>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Tippen Sie auf das Kamera-Symbol zum Ändern</p>
+                <p className="text-xs text-gray-400 mt-2">{t('tapCameraToChange')}</p>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Name
+                  {t('name')}
                 </label>
                 <input
                   type="text"
@@ -652,7 +673,7 @@ export default function MobileSettingsPage({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  E-Mail
+                  {t('email')}
                 </label>
                 <input
                   type="email"
@@ -678,7 +699,7 @@ export default function MobileSettingsPage({
                 className="w-full py-4 rounded-2xl font-semibold bg-blue-500 text-white flex items-center justify-center gap-2 mb-4"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                Speichern
+                {t('save')}
               </button>
               {/* Extra space to ensure button is visible above keyboard/safe area */}
               <div className="h-32" />
@@ -699,7 +720,7 @@ export default function MobileSettingsPage({
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Passwort ändern</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('changePasswordLabel')}</h2>
               <button
                 onClick={() => setShowPasswordSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
@@ -710,7 +731,7 @@ export default function MobileSettingsPage({
             <div className="p-5 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Aktuelles Passwort
+                  {t('currentPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -735,7 +756,7 @@ export default function MobileSettingsPage({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Neues Passwort
+                  {t('newPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -760,7 +781,7 @@ export default function MobileSettingsPage({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Passwort bestätigen
+                  {t('confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -805,34 +826,34 @@ export default function MobileSettingsPage({
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Design wählen</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('selectTheme')}</h2>
             </div>
             <div className="p-5 space-y-2">
-              {THEMES.map((t) => (
+              {THEME_OPTIONS.map((themeOpt) => (
                 <button
-                  key={t.id}
+                  key={themeOpt.id}
                   onClick={() => {
-                    onThemeChange(t.id)
+                    onThemeChange(themeOpt.id)
                     setShowThemeSheet(false)
                   }}
                   className={cn(
                     "flex items-center gap-4 w-full p-4 rounded-xl transition-colors",
-                    theme === t.id 
+                    theme === themeOpt.id 
                       ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500" 
                       : "bg-gray-50 dark:bg-[#232e40]"
                   )}
                 >
-                  <t.icon className={cn(
+                  <themeOpt.icon className={cn(
                     "w-6 h-6",
-                    theme === t.id ? "text-blue-500" : "text-gray-500"
+                    theme === themeOpt.id ? "text-blue-500" : "text-gray-500"
                   )} />
                   <span className={cn(
                     "font-medium",
-                    theme === t.id ? "text-blue-600" : "text-gray-700 dark:text-gray-300"
+                    theme === themeOpt.id ? "text-blue-600" : "text-gray-700 dark:text-gray-300"
                   )}>
-                    {t.label}
+                    {t(themeOpt.labelKey as any)}
                   </span>
-                  {theme === t.id && (
+                  {theme === themeOpt.id && (
                     <Check className="w-5 h-5 text-blue-500 ml-auto" />
                   )}
                 </button>
@@ -854,7 +875,7 @@ export default function MobileSettingsPage({
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Sprache wählen</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('selectLanguage')}</h2>
             </div>
             <div className="p-5 space-y-2">
               {LANGUAGES.map((lang) => (
@@ -900,7 +921,7 @@ export default function MobileSettingsPage({
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="px-5 pb-4 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Währung wählen</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('selectCurrency')}</h2>
             </div>
             <div className="p-5 space-y-2">
               {CURRENCIES.map((curr) => (
@@ -949,10 +970,10 @@ export default function MobileSettingsPage({
                 <Trash2 className="w-8 h-8 text-rose-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Konto löschen?
+                {t('deleteAccountQuestion')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Diese Aktion ist endgültig. Alle Ihre Daten werden unwiderruflich gelöscht.
+                {t('deleteAccountWarning')}
               </p>
             </div>
             <div className="flex gap-3">
@@ -960,7 +981,7 @@ export default function MobileSettingsPage({
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 py-3 rounded-xl font-medium bg-gray-100 dark:bg-[#232e40] text-gray-700 dark:text-gray-300"
               >
-                Abbrechen
+                {t('cancelBtn')}
               </button>
               <button
                 onClick={handleDeleteAccount}
@@ -972,7 +993,7 @@ export default function MobileSettingsPage({
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4" />
-                    Löschen
+                    {t('delete')}
                   </>
                 )}
               </button>
@@ -997,7 +1018,7 @@ export default function MobileSettingsPage({
                 <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                   <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">API-Schlüssel</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('apiKeysSection')}</h2>
               </div>
               <button
                 onClick={() => setShowApiKeysSheet(false)}
@@ -1015,10 +1036,10 @@ export default function MobileSettingsPage({
                   <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Gespeichert!
+                  {t('saved')}!
                 </h3>
                 <p className="text-gray-500">
-                  Ihre API-Schlüssel wurden erfolgreich gespeichert.
+                  {t('apiKeysSavedSuccess')}
                 </p>
               </div>
             ) : (
@@ -1031,12 +1052,12 @@ export default function MobileSettingsPage({
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">Binance</h3>
-                      <p className="text-xs text-gray-500">Für Krypto-Portfolio & Trading</p>
+                      <p className="text-xs text-gray-500">{t('forCryptoPortfolioAndTrading')}</p>
                     </div>
                     {binanceApiKey?.includes('•') && (
                       <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Verbunden</span>
+                        <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">{t('connectedStatus')}</span>
                       </div>
                     )}
                   </div>
@@ -1047,10 +1068,10 @@ export default function MobileSettingsPage({
                         <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5" />
                         <div>
                           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-                            Binance ist verbunden
+                            {t('binanceConnected')}
                           </p>
                           <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                            Ihr Krypto-Portfolio wird automatisch synchronisiert. Um die Verbindung zu ändern, geben Sie neue API-Schlüssel ein.
+                            {t('cryptoPortfolioSync')}
                           </p>
                         </div>
                       </div>
@@ -1065,7 +1086,7 @@ export default function MobileSettingsPage({
                         type="text"
                         value={binanceApiKey}
                         onChange={(e) => setBinanceApiKey(e.target.value)}
-                        placeholder="Binance API Key eingeben"
+                        placeholder={t('enterBinanceApiKey')}
                         className={cn(
                           "w-full px-4 py-3 rounded-xl font-mono text-sm",
                           "bg-gray-50 dark:bg-[#232e40]",
@@ -1083,7 +1104,7 @@ export default function MobileSettingsPage({
                           type={showBinanceSecret ? "text" : "password"}
                           value={binanceSecretKey}
                           onChange={(e) => setBinanceSecretKey(e.target.value)}
-                          placeholder="Binance Secret Key eingeben"
+                          placeholder={t('enterBinanceSecretKey')}
                           className={cn(
                             "w-full px-4 py-3 pr-12 rounded-xl font-mono text-sm",
                             "bg-gray-50 dark:bg-[#232e40]",
@@ -1111,7 +1132,7 @@ export default function MobileSettingsPage({
                     className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 mt-3"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    API-Schlüssel bei Binance erstellen
+                    {t('createApiKeyBinance')}
                   </a>
                   )}
                 </div>
@@ -1127,7 +1148,7 @@ export default function MobileSettingsPage({
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">Alpaca</h3>
-                      <p className="text-xs text-gray-500">Für Aktien-Trading</p>
+                      <p className="text-xs text-gray-500">{t('forStockTrading')}</p>
                     </div>
                   </div>
                   
@@ -1140,7 +1161,7 @@ export default function MobileSettingsPage({
                         type="text"
                         value={alpacaApiKey}
                         onChange={(e) => setAlpacaApiKey(e.target.value)}
-                        placeholder="Alpaca API Key eingeben"
+                        placeholder={t('enterAlpacaApiKey')}
                         className={cn(
                           "w-full px-4 py-3 rounded-xl font-mono text-sm",
                           "bg-gray-50 dark:bg-[#232e40]",
@@ -1151,14 +1172,14 @@ export default function MobileSettingsPage({
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Secret Key
+                        {t('secretKey')}
                       </label>
                       <div className="relative">
                         <input
                           type={showAlpacaSecret ? "text" : "password"}
                           value={alpacaSecretKey}
                           onChange={(e) => setAlpacaSecretKey(e.target.value)}
-                          placeholder="Alpaca Secret Key eingeben"
+                          placeholder={t('enterAlpacaSecretKey')}
                           className={cn(
                             "w-full px-4 py-3 pr-12 rounded-xl font-mono text-sm",
                             "bg-gray-50 dark:bg-[#232e40]",
@@ -1184,7 +1205,7 @@ export default function MobileSettingsPage({
                     className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 mt-3"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    API-Schlüssel bei Alpaca erstellen
+                    {t('createApiKeyAlpaca')}
                   </a>
                 </div>
 
@@ -1194,11 +1215,10 @@ export default function MobileSettingsPage({
                     <Shield className="w-5 h-5 text-blue-500 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                        Sicherheitshinweis
+                        {t('securityNotice')}
                       </p>
                       <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                        Ihre API-Schlüssel werden verschlüsselt gespeichert. Verwenden Sie nur 
-                        Lese-Berechtigungen wenn Sie kein automatisches Trading nutzen möchten.
+                        {t('apiKeysEncrypted')} {t('readOnlyApiKeys')}.
                       </p>
                     </div>
                   </div>
@@ -1228,7 +1248,7 @@ export default function MobileSettingsPage({
                   ) : (
                     <>
                       <Check className="w-5 h-5" />
-                      API-Schlüssel speichern
+                      {t('saveApiKeys')}
                     </>
                   )}
                 </button>

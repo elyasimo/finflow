@@ -162,9 +162,9 @@ export default function MobileDashboard({
   // Get greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Guten Morgen'
-    if (hour < 18) return 'Guten Tag'
-    return 'Guten Abend'
+    if (hour < 12) return t('goodMorningGreeting')
+    if (hour < 18) return t('goodAfternoonGreeting')
+    return t('goodEveningGreeting')
   }
 
   return (
@@ -196,7 +196,7 @@ export default function MobileDashboard({
         {/* Main Balance Display - Large, Elegant Typography */}
         <div className="text-center mb-10">
           <p className="text-sm text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-widest font-medium">
-            Gesamtsaldo
+            {t('totalBalanceLabel')}
           </p>
           <h2 className="text-5xl font-extralight text-gray-900 dark:text-white tracking-tight mb-6">
             {formatCurrency(totalBalance)}
@@ -252,7 +252,7 @@ export default function MobileDashboard({
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-xl font-bold text-gray-900 dark:text-white">{Math.max(savingsRate, 0)}%</span>
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider">Sparrate</span>
+              <span className="text-[10px] text-gray-400 uppercase tracking-wider">{t('savingsRateLabel')}</span>
             </div>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default function MobileDashboard({
             className="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl bg-blue-500 text-white font-semibold shadow-xl shadow-blue-500/30 hover:bg-blue-600 active:scale-[0.98] transition-all"
           >
             <Plus className="w-5 h-5" />
-            Transaktion hinzufügen
+            {t('addTransaction')}
           </Link>
           <Link
             href="/transactions"
@@ -287,7 +287,7 @@ export default function MobileDashboard({
             <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-purple-500" />
             </div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Statistik</span>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('analytics')}</span>
           </Link>
           <Link
             href="/budgets"
@@ -296,7 +296,7 @@ export default function MobileDashboard({
             <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-amber-500" />
             </div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Budgets</span>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('budgets')}</span>
           </Link>
           <Link
             href="/accounts"
@@ -305,7 +305,7 @@ export default function MobileDashboard({
             <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
               <ArrowUpRight className="w-5 h-5 text-emerald-500" />
             </div>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Konten</span>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t('accounts')}</span>
           </Link>
         </div>
 
@@ -315,17 +315,17 @@ export default function MobileDashboard({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Bitcoin className="w-5 h-5 text-orange-500" />
-                Crypto Portfolio
+                {t('cryptoPortfolioTitle')}
               </h3>
               <Link href="/markets" className="text-sm font-medium text-blue-500 flex items-center gap-1">
-                Details <ChevronRight className="w-4 h-4" />
+                {t('details')} <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
             
             {/* Portfolio Summary Card */}
             <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-amber-700 rounded-3xl p-5 text-white shadow-xl mb-4 overflow-hidden">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm opacity-80">Gesamtwert</p>
+                <p className="text-sm opacity-80">{t('totalValue')}</p>
                 {portfolioLoading && <Loader2 className="w-4 h-4 animate-spin opacity-60" />}
               </div>
               <p className="text-3xl font-bold mb-4 truncate">
@@ -379,8 +379,8 @@ export default function MobileDashboard({
               <Bitcoin className="w-6 h-6 text-orange-500" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-white">Binance verbinden</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Crypto Portfolio anzeigen</p>
+              <p className="font-medium text-gray-900 dark:text-white">{t('connectBinance')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('viewCryptoPortfolio')}</p>
             </div>
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </Link>
@@ -444,7 +444,7 @@ export default function MobileDashboard({
                   <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                     <Plus className="w-7 h-7" />
                   </div>
-                  <span className="font-medium">Konto hinzufügen</span>
+                  <span className="font-medium">{t('addAccount')}</span>
                 </Link>
               </div>
               
@@ -493,17 +493,17 @@ export default function MobileDashboard({
                 <Sparkles className="w-10 h-10 text-gray-300 dark:text-gray-600" />
               </div>
               <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                Noch keine Transaktionen
+                {t('noTransactionsYet')}
               </h4>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                Erfassen Sie Ihre erste Transaktion, um zu beginnen
+                {t('addFirstTransaction')}
               </p>
               <Link
                 href="/transactions?action=add"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl font-medium shadow-lg shadow-blue-500/30"
               >
                 <Plus className="w-5 h-5" />
-                Erste Transaktion
+                {t('firstTransaction')}
               </Link>
             </div>
           ) : (
@@ -536,7 +536,7 @@ export default function MobileDashboard({
               >
                 <div className="text-center">
                   <Plus className="w-8 h-8 mx-auto mb-2" />
-                  <span className="text-sm font-medium">Erstes Budget erstellen</span>
+                  <span className="text-sm font-medium">{t('createFirstBudget')}</span>
                 </div>
               </Link>
             ) : (

@@ -3,10 +3,15 @@ import jwt from 'jsonwebtoken';
 
 export interface AuthRequest extends Request {
   userId?: string;
+  user?: {
+    id: string;
+    role: string;
+  };
 }
 
 interface JwtPayload {
   userId: string;
+  role?: string;
 }
 
 export const authMiddleware = (
@@ -27,6 +32,10 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, secret) as JwtPayload;
     req.userId = decoded.userId;
+    req.user = {
+      id: decoded.userId,
+      role: decoded.role || 'user',
+    };
 
     next();
   } catch (error) {

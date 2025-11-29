@@ -126,6 +126,12 @@ export class AuthController {
         return;
       }
 
+      // Check if user is active
+      if (user.isActive === false) {
+        res.status(403).json({ error: 'Account is deactivated. Please contact support.' });
+        return;
+      }
+
       // Verify password
       const isValid = await bcrypt.compare(password, user.passwordHash);
 
@@ -134,9 +140,14 @@ export class AuthController {
         return;
       }
 
-      // Generate JWT
+      // Update last login time
+      await db.update(users)
+        .set({ lastLoginAt: new Date() })
+        .where(eq(users.id, user.id));
+
+      // Generate JWT with role
       const token = jwt.sign(
-        { userId: user.id },
+        { userId: user.id, role: user.role || 'user' },
         process.env.JWT_SECRET || 'your-super-secret-jwt-key',
         { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
       );
@@ -145,6 +156,8 @@ export class AuthController {
         user: {
           id: user.id,
           email: user.email,
+          name: user.name,
+          role: user.role || 'user',
           createdAt: user.createdAt,
         },
         accessToken: token,
@@ -166,6 +179,8 @@ export class AuthController {
         columns: {
           id: true,
           email: true,
+          name: true,
+          role: true,
           defaultCurrency: true,
           createdAt: true,
         },
@@ -180,6 +195,8 @@ export class AuthController {
       const response = {
         id: user.id,
         email: user.email,
+        name: user.name,
+        role: user.role || 'user',
         defaultCurrency: user.defaultCurrency,
         createdAt: user.createdAt,
       };

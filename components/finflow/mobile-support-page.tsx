@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils"
 import MobilePageHeader from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 interface Message {
   id: string
@@ -39,38 +40,48 @@ interface MobileSupportPageProps {
   onSendEmail?: (subject: string, message: string) => Promise<void>
 }
 
-// Pre-defined FAQ responses
-const FAQ_RESPONSES: Record<string, string> = {
-  'konto': 'Um ein neues Konto hinzuzufügen, gehen Sie zu "Konten" → Tippen Sie auf das + Symbol unten rechts → Wählen Sie Ihre Bank und füllen Sie die Details aus.',
-  'transaktion': 'Um eine Transaktion hinzuzufügen, gehen Sie zu "Transaktionen" → Tippen Sie auf das + Symbol → Wählen Sie zwischen Einnahme oder Ausgabe und füllen Sie die Details aus.',
-  'budget': 'Um ein Budget zu erstellen, gehen Sie zu "Budgets" → Tippen Sie auf "Neues Budget" → Wählen Sie eine Kategorie, setzen Sie einen Betrag und wählen Sie den Zeitraum.',
-  'passwort': 'Um Ihr Passwort zu ändern, gehen Sie zu "Einstellungen" → "Sicherheit" → "Passwort ändern". Sie müssen Ihr aktuelles Passwort eingeben.',
-  'faceid': 'Um Face ID zu aktivieren, gehen Sie zu "Einstellungen" → "Sicherheit" → Aktivieren Sie "Face ID / Touch ID". Sie werden beim nächsten Login danach gefragt.',
-  'export': 'Um Ihre Daten zu exportieren, gehen Sie zu "Reports" → Tippen Sie auf das Export-Symbol → Wählen Sie das Format (PDF oder CSV).',
-  'währung': 'Um die Währung zu ändern, gehen Sie zu "Einstellungen" → "Darstellung" → "Währung" → Wählen Sie Ihre bevorzugte Währung.',
-  'sprache': 'Um die Sprache zu ändern, gehen Sie zu "Einstellungen" → "Darstellung" → "Sprache" → Wählen Sie Deutsch, English, Français oder العربية.',
-  'benachrichtigung': 'Um Benachrichtigungen zu verwalten, gehen Sie zu "Einstellungen" → "Benachrichtigungen" → Aktivieren oder deaktivieren Sie die gewünschten Optionen.',
-  'löschen': 'Um Ihr Konto zu löschen, gehen Sie zu "Einstellungen" → Scrollen Sie nach unten → "Konto löschen". Diese Aktion ist endgültig.',
-  'crypto': 'Um Kryptowährungen zu verfolgen, verbinden Sie Ihre Binance-API in "Einstellungen" → "API-Schlüssel" → "Binance". Dann sehen Sie Ihr Portfolio unter "Crypto".',
-  'trading': 'Der Trading Agent hilft Ihnen beim automatischen Risikomanagement. Gehen Sie zu "Trading Agent" → "Neuer Agent" → Konfigurieren Sie Ihre Stop-Loss und Take-Profit Einstellungen.',
-  'api': 'Um API-Schlüssel hinzuzufügen, gehen Sie zu "Einstellungen" → Scrollen Sie zu "API-Schlüssel" → Geben Sie Ihre Binance oder Alpaca Schlüssel ein.',
-  'import': 'Um Transaktionen zu importieren, gehen Sie zu "Transaktionen" → Tippen Sie auf "Importieren" → Wählen Sie Ihre CSV-Datei aus.',
-}
-
-// Quick action suggestions
-const QUICK_ACTIONS = [
-  { icon: HelpCircle, label: 'Wie füge ich ein Konto hinzu?', keyword: 'konto' },
-  { icon: FileText, label: 'Wie erstelle ich ein Budget?', keyword: 'budget' },
-  { icon: Mail, label: 'Wie ändere ich mein Passwort?', keyword: 'passwort' },
-  { icon: Clock, label: 'Wie aktiviere ich Face ID?', keyword: 'faceid' },
-]
-
 export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPageProps) {
+  const { t } = useLanguage()
+  
+  // FAQ responses using translations
+  const FAQ_RESPONSES: Record<string, string> = {
+    'konto': t('faqAccount'),
+    'account': t('faqAccount'),
+    'transaktion': t('faqTransaction'),
+    'transaction': t('faqTransaction'),
+    'budget': t('faqBudget'),
+    'passwort': t('faqPassword'),
+    'password': t('faqPassword'),
+    'faceid': t('faqFaceId'),
+    'face id': t('faqFaceId'),
+    'export': t('faqExport'),
+    'währung': t('faqCurrency'),
+    'currency': t('faqCurrency'),
+    'sprache': t('faqLanguage'),
+    'language': t('faqLanguage'),
+    'benachrichtigung': t('faqNotification'),
+    'notification': t('faqNotification'),
+    'löschen': t('faqDelete'),
+    'delete': t('faqDelete'),
+    'crypto': t('faqCrypto'),
+    'trading': t('faqTrading'),
+    'api': t('faqApi'),
+    'import': t('faqImport'),
+  }
+
+  // Quick action suggestions
+  const QUICK_ACTIONS = [
+    { icon: HelpCircle, label: t('howToAddAccount'), keyword: 'konto' },
+    { icon: FileText, label: t('howToCreateBudget'), keyword: 'budget' },
+    { icon: Mail, label: t('howToChangePassword'), keyword: 'passwort' },
+    { icon: Clock, label: t('howToEnableFaceId'), keyword: 'faceid' },
+  ]
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: `Hallo${user?.fullName ? ` ${user.fullName.split(' ')[0]}` : ''}! 👋 Ich bin Ihr FinFlow-Assistent. Wie kann ich Ihnen heute helfen? Sie können mir eine Frage stellen oder eine der Schnelloptionen unten auswählen.`,
+      content: `${t('supportGreeting')}${user?.fullName ? ` ${user.fullName.split(' ')[0]}` : ''}! 👋 ${t('supportAssistantIntro')}`,
       timestamp: new Date()
     }
   ])
@@ -137,12 +148,12 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     let botResponse: string
     
     if (response === 'CONTACT_FORM') {
-      botResponse = 'Natürlich! Ich öffne das Kontaktformular für Sie. Unser Team antwortet normalerweise innerhalb von 24-48 Stunden.'
+      botResponse = t('openingContactForm')
       setTimeout(() => setShowContactForm(true), 1000)
     } else if (response) {
       botResponse = response
     } else {
-      botResponse = `Ich bin mir nicht ganz sicher, wie ich Ihnen bei "${messageText}" helfen kann. 🤔\n\nSie können:\n• Eine der Schnelloptionen unten wählen\n• "Kontakt" eingeben, um unser Support-Team zu erreichen\n\nOder versuchen Sie, Ihre Frage anders zu formulieren!`
+      botResponse = `${t('notSureHowToHelp')} "${messageText}" 🤔\n\n${t('youCan')}:\n• ${t('chooseQuickOption')}\n• ${t('typeContactToReach')}\n\n${t('orTryRephrasing')}`
     }
     
     setIsTyping(false)
@@ -185,7 +196,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       const confirmMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
-        content: '✅ Ihre Nachricht wurde erfolgreich gesendet! Unser Team wird sich in Kürze bei Ihnen melden.',
+        content: `✅ ${t('messageSentSuccess')}`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, confirmMessage])
@@ -203,7 +214,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       const errorMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
-        content: '❌ Beim Senden Ihrer Nachricht ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut oder senden Sie uns direkt eine E-Mail an info@finflowapp.ch',
+        content: `❌ ${t('messageSendError')} info@finflowapp.ch`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
@@ -216,7 +227,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419] flex flex-col">
       <MobilePageHeader 
         user={user as any} 
-        title="Support"
+        title={t('support')}
       />
 
       {/* Chat Container */}
@@ -286,7 +297,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
 
         {/* Quick Actions - Always visible for continued help */}
         <div className="px-4 pb-4">
-          <p className="text-xs text-gray-500 mb-3">Schnelle Hilfe</p>
+          <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
           <div className="flex flex-wrap gap-2">
             {QUICK_ACTIONS.map((action, index) => (
               <button
@@ -310,7 +321,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                placeholder="Schreiben Sie Ihre Frage..."
+                placeholder={t('writeYourQuestion')}
                 className={cn(
                   "w-full px-4 py-3 rounded-2xl text-base",
                   "bg-gray-50 dark:bg-[#232e40]",
@@ -337,7 +348,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           
           {/* Contact Hint */}
           <p className="text-center text-xs text-gray-400 mt-3">
-            Schreiben Sie "Kontakt" um unser Support-Team zu erreichen
+            {t('typeContactForSupport')}
           </p>
         </div>
       </div>
@@ -358,10 +369,10 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                      Kontakt
+                      {t('contact')}
                     </h2>
                     <p className="text-xs text-gray-500">
-                      Antwort innerhalb von 24-48 Stunden
+                      {t('responseWithin')}
                     </p>
                   </div>
                 </div>
@@ -382,23 +393,23 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                     <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    Nachricht gesendet!
+                    {t('messageSent')}
                   </h3>
                   <p className="text-gray-500">
-                    Wir melden uns in Kürze bei Ihnen.
+                    {t('weWillContactYouSoon')}
                   </p>
                 </div>
               ) : (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Betreff
+                      {t('subject')}
                     </label>
                     <input
                       type="text"
                       value={contactSubject}
                       onChange={(e) => setContactSubject(e.target.value)}
-                      placeholder="Worum geht es?"
+                      placeholder={t('subjectPlaceholder')}
                       className={cn(
                         "w-full px-4 py-3.5 rounded-2xl",
                         "bg-gray-50 dark:bg-[#232e40]",
@@ -411,12 +422,12 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Ihre Nachricht
+                      {t('yourMessage')}
                     </label>
                     <textarea
                       value={contactMessage}
                       onChange={(e) => setContactMessage(e.target.value)}
-                      placeholder="Beschreiben Sie Ihr Anliegen..."
+                      placeholder={t('describeYourConcern')}
                       rows={5}
                       className={cn(
                         "w-full px-4 py-3.5 rounded-2xl resize-none",
@@ -436,7 +447,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                           E-Mail: info@finflowapp.ch
                         </p>
                         <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          Wir antworten so schnell wie möglich
+                          {t('weReplyAsSoonAsPossible')}
                         </p>
                       </div>
                     </div>
@@ -456,12 +467,12 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                     {isSendingEmail ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        Wird gesendet...
+                        {t('sending')}
                       </>
                     ) : (
                       <>
                         <Send className="w-5 h-5" />
-                        Nachricht senden
+                        {t('sendMessage')}
                       </>
                     )}
                   </button>

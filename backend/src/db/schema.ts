@@ -6,6 +6,10 @@ export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
+  name: text('name'),
+  role: text('role').notNull().default('user'), // 'user', 'admin'
+  isActive: boolean('is_active').notNull().default(true),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
   publicKey: text('public_key'),
   defaultCurrency: text('default_currency').notNull().default('EUR'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
