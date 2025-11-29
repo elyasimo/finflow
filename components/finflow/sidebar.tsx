@@ -18,7 +18,8 @@ import {
   Bell,
   LogOut,
   ChevronUp,
-  Shield
+  Shield,
+  Repeat
 } from "lucide-react"
 
 import Link from "next/link"
@@ -192,6 +193,9 @@ export default function Sidebar({ user }: SidebarProps) {
                   </NavItem>
                   <NavItem href="/transactions" icon={Wallet}>
                     {t('transactions')}
+                  </NavItem>
+                  <NavItem href="/recurring" icon={Repeat}>
+                    {t('recurring')}
                   </NavItem>
                   <NavItem href="/categories" icon={Tags}>
                     {t('categories')}

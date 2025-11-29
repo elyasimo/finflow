@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, PieChart, LineChart, Calendar, ArrowUpRight, ArrowDownLeft, DollarSign } from 'lucide-react';
+import { BarChart, PieChart, LineChart, Calendar, ArrowUpRight, ArrowDownLeft, DollarSign, Download, FileText, FileSpreadsheet, RefreshCw } from 'lucide-react';
 import Layout from '@/components/finflow/layout';
 import MobileReports from '@/components/finflow/mobile-reports';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -22,7 +22,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useCurrency } from '@/components/finflow/CurrencyContext';
 
 export default function ReportsPage() {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, user, isLoading: authLoading, token } = useAuth();
   const { accounts, isLoading: accountsLoading } = useAccounts();
   const { transactions, isLoading: transactionsLoading } = useTransactions();
   const { budgets, isLoading: budgetsLoading } = useBudgets();
@@ -33,6 +33,53 @@ export default function ReportsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [selectedAccount, setSelectedAccount] = useState<string>('all');
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+  // Download report function
+  const downloadReport = async (type: 'monthly' | 'yearly' | 'csv') => {
+    setIsDownloading(true);
+    try {
+      let url = '';
+      let filename = '';
+
+      if (type === 'csv') {
+        url = `${API_URL}/reports/export/csv`;
+        filename = `FinFlow_Transaktionen_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      } else if (type === 'monthly') {
+        const month = selectedMonth.getMonth() + 1;
+        const year = selectedMonth.getFullYear();
+        url = `${API_URL}/reports/monthly?month=${month}&year=${year}`;
+        filename = `FinFlow_Monatsbericht_${format(selectedMonth, 'yyyy-MM')}.pdf`;
+      } else {
+        const year = selectedMonth.getFullYear();
+        url = `${API_URL}/reports/yearly?year=${year}`;
+        filename = `FinFlow_Jahresbericht_${year}.pdf`;
+      }
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error('Download failed');
+
+      const blob = await res.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download fehlgeschlagen');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -178,7 +225,28 @@ export default function ReportsPage() {
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">{t('financialReports')}</h1>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 items-center">
+            {/* Download Buttons */}
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => downloadReport('monthly')}
+                disabled={isDownloading}
+              >
+                {isDownloading ? <RefreshCw className="h-4 w-4 mr-1 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
+                PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => downloadReport('csv')}
+                disabled={isDownloading}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-1" />
+                CSV
+              </Button>
+            </div>
             <div className="w-40">
               <Select value={selectedAccount} onValueChange={setSelectedAccount}>
                 <SelectTrigger>

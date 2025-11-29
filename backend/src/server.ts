@@ -24,6 +24,8 @@ import { tradingPerformanceController } from './controllers/trading-performance.
 import { priceAlertsController } from './controllers/price-alerts.controller.js';
 import { otpController } from './controllers/otp.controller.js';
 import { adminController } from './controllers/admin.controller.js';
+import * as recurringController from './controllers/recurring.controller.js';
+import { reportsController } from './controllers/reports.controller.js';
 import { authMiddleware } from './middleware/auth.js';
 import { adminMiddleware } from './middleware/admin.js';
 import { tradingAgentService } from './services/trading-agent.service.js';
@@ -257,6 +259,23 @@ app.delete('/admin/users/:id', authMiddleware, adminMiddleware, (req, res) => ad
 app.post('/admin/users/:id/toggle-active', authMiddleware, adminMiddleware, (req, res) => adminController.toggleUserActive(req, res));
 app.post('/admin/users/:id/make-admin', authMiddleware, adminMiddleware, (req, res) => adminController.makeAdmin(req, res));
 app.post('/admin/users/:id/remove-admin', authMiddleware, adminMiddleware, (req, res) => adminController.removeAdmin(req, res));
+
+// Recurring Transactions routes
+app.get('/recurring', authMiddleware, (req, res) => recurringController.getRecurringTransactions(req, res));
+app.get('/recurring/upcoming', authMiddleware, (req, res) => recurringController.getUpcomingRecurring(req, res));
+app.get('/recurring/:id', authMiddleware, (req, res) => recurringController.getRecurringTransaction(req, res));
+app.post('/recurring', authMiddleware, (req, res) => recurringController.createRecurringTransaction(req, res));
+app.put('/recurring/:id', authMiddleware, (req, res) => recurringController.updateRecurringTransaction(req, res));
+app.delete('/recurring/:id', authMiddleware, (req, res) => recurringController.deleteRecurringTransaction(req, res));
+app.post('/recurring/:id/toggle', authMiddleware, (req, res) => recurringController.toggleRecurringActive(req, res));
+app.post('/recurring/process', authMiddleware, adminMiddleware, (req, res) => recurringController.processDueRecurring(req, res));
+
+// Reports routes
+app.get('/reports/monthly', authMiddleware, (req, res) => reportsController.generateMonthlyReport(req, res));
+app.get('/reports/yearly', authMiddleware, (req, res) => reportsController.generateYearlyReport(req, res));
+app.get('/reports/custom', authMiddleware, (req, res) => reportsController.generateCustomReport(req, res));
+app.get('/reports/data', authMiddleware, (req, res) => reportsController.getReportData(req, res));
+app.get('/reports/export/csv', authMiddleware, (req, res) => reportsController.exportTransactionsCsv(req, res));
 
 // 404 handler
 app.use((req, res) => {

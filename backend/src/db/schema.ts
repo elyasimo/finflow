@@ -237,6 +237,43 @@ export const otpVerifications = pgTable('otp_verifications', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+// Recurring Transactions table
+export const recurringTransactions = pgTable('recurring_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  accountId: uuid('account_id').references(() => accounts.id, { onDelete: 'cascade' }).notNull(),
+  type: text('type').notNull(), // income, expense, transfer
+  amountCents: bigint('amount_cents', { mode: 'number' }).notNull(),
+  currency: text('currency').notNull(),
+  description: text('description'),
+  descriptionTranslations: jsonb('description_translations'),
+  categoryId: uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
+  toAccountId: uuid('to_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+  
+  // Recurrence settings
+  frequency: text('frequency').notNull(), // daily, weekly, monthly, yearly
+  intervalCount: integer('interval_count').notNull().default(1),
+  dayOfMonth: integer('day_of_month'), // for monthly: 1-31
+  dayOfWeek: integer('day_of_week'), // for weekly: 0-6
+  
+  // Schedule
+  startDate: timestamp('start_date', { withTimezone: true }).notNull(),
+  endDate: timestamp('end_date', { withTimezone: true }),
+  nextOccurrence: timestamp('next_occurrence', { withTimezone: true }).notNull(),
+  lastProcessed: timestamp('last_processed', { withTimezone: true }),
+  
+  // Status
+  isActive: boolean('is_active').notNull().default(true),
+  autoPost: boolean('auto_post').notNull().default(true),
+  reminderDays: integer('reminder_days').default(3),
+  
+  // Stats
+  totalOccurrences: integer('total_occurrences').notNull().default(0),
+  
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
