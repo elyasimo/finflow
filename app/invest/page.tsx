@@ -15,7 +15,6 @@ export default function InvestPage() {
       commodities={markets?.commodities || []}
       bonds={[]}
       news={[]}
-      corporateActions={[]}
       isLoading={isLoading}
       onRefresh={() => window.location.reload()}
     />

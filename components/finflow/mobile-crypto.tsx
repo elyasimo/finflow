@@ -1,30 +1,22 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { 
   Search,
-  TrendingUp,
-  TrendingDown,
   ChevronRight,
   Plus,
-  Percent,
-  RefreshCw,
-  Bot,
-  Lightbulb,
   Bell,
-  Star,
   Loader2,
-  Camera,
-  Menu,
-  BarChart3,
-  Layers,
-  Wallet
+  X,
+  Wallet,
+  RefreshCw
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import MobileBottomNav from "./mobile-bottom-nav"
+import Link from "next/link"
 
 interface CryptoMarket {
   id: string
@@ -64,7 +56,7 @@ function Sparkline({ data, positive }: { data: number[], positive: boolean }) {
       <polyline
         points={points}
         fill="none"
-        stroke={positive ? '#00D09C' : '#FF6B6B'}
+        stroke={positive ? '#10b981' : '#ef4444'}
         strokeWidth="2"
         vectorEffect="non-scaling-stroke"
       />
@@ -86,13 +78,12 @@ export default function MobileCrypto({
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const formatCurrency = (amount: number) => {
-    // Schweizer Format wie bei Revolut
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
-      currency: currency === 'CHF' ? 'CHF' : currency,
+      currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: amount < 1 ? 4 : 2,
-    }).format(amount).replace('CHF', 'Fr')
+    }).format(amount)
   }
 
   const formatPercent = (value: number) => {
@@ -105,6 +96,16 @@ export default function MobileCrypto({
     await onRefresh()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
+
+  // Filter by search
+  const filteredCryptos = useMemo(() => {
+    if (!searchQuery) return cryptoMarkets
+    const query = searchQuery.toLowerCase()
+    return cryptoMarkets.filter(c => 
+      c.symbol.toLowerCase().includes(query) || 
+      c.name?.toLowerCase().includes(query)
+    )
+  }, [cryptoMarkets, searchQuery])
 
   // Top Kryptos (BTC, ETH für Hero Cards)
   const heroCoins = useMemo(() => {
@@ -128,22 +129,17 @@ export default function MobileCrypto({
       .slice(0, 6)
   }, [cryptoMarkets])
 
-  // Alle Kryptos (Top 5 für Liste)
+  // Alle Kryptos (Top 8 für Liste)
   const topCryptos = useMemo(() => {
-    return cryptoMarkets.slice(0, 5)
-  }, [cryptoMarkets])
+    return (showSearch ? filteredCryptos : cryptoMarkets).slice(0, 8)
+  }, [cryptoMarkets, filteredCryptos, showSearch])
 
   // Meistgehandelt
   const mostTraded = useMemo(() => {
-    return cryptoMarkets.slice(0, 2).map(c => ({
+    return cryptoMarkets.slice(0, 3).map(c => ({
       ...c,
-      buyPercent: Math.floor(Math.random() * 20) + 75, // Demo: 75-95% Käufe
+      buyPercent: Math.floor(Math.random() * 20) + 75,
     }))
-  }, [cryptoMarkets])
-
-  // Neu hinzugefügt (letzte 4)
-  const newlyAdded = useMemo(() => {
-    return cryptoMarkets.slice(-4).reverse()
   }, [cryptoMarkets])
 
   // Crypto Logo URL
@@ -152,10 +148,9 @@ export default function MobileCrypto({
     return `/logos/cryptocurrency/${baseSymbol}.png`
   }
 
-  // Generate fake sparkline data if not available
+  // Generate sparkline data
   const getSparklineData = (crypto: CryptoMarket) => {
     if (crypto.sparkline && crypto.sparkline.length > 0) return crypto.sparkline
-    // Generate random but consistent sparkline based on symbol
     const seed = crypto.symbol.charCodeAt(0) + crypto.symbol.charCodeAt(1)
     return Array.from({ length: 24 }, (_, i) => {
       const noise = Math.sin(seed + i) * 0.1
@@ -164,64 +159,103 @@ export default function MobileCrypto({
   }
 
   return (
-    <div className="min-h-screen bg-[#121212]">
-      {/* Header - Revolut Style für Krypto */}
-      <div className="sticky top-0 z-50 bg-[#121212]">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Camera Icon (QR Scanner) */}
-          <button className="w-9 h-9 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-            <Camera className="w-4 h-4 text-white" />
-          </button>
+    <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]">
+      {/* Fixed Header */}
+      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b]">
+        <div className="flex items-center justify-between px-4 h-14 pt-safe-top">
+          {/* Portfolio Button */}
+          <Link 
+            href="/accounts"
+            className="w-10 h-10 rounded-full bg-secondary dark:bg-[#1e293b] flex items-center justify-center"
+          >
+            <Wallet className="w-5 h-5 text-foreground dark:text-white" />
+          </Link>
 
           {/* Search Bar */}
-          <button 
-            onClick={() => setShowSearch(true)}
-            className="flex-1 mx-3 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#2a2a2a]"
-          >
-            <Search className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-400 text-sm">Suche</span>
-          </button>
+          {showSearch ? (
+            <div className="flex-1 mx-3 flex items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 px-4 py-2 rounded-full bg-secondary dark:bg-[#1e293b]">
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Krypto suchen..."
+                  className="flex-1 bg-transparent text-sm text-foreground dark:text-white placeholder-muted-foreground focus:outline-none"
+                  autoFocus
+                />
+              </div>
+              <button 
+                onClick={() => {
+                  setShowSearch(false)
+                  setSearchQuery('')
+                }}
+                className="w-10 h-10 rounded-full bg-secondary dark:bg-[#1e293b] flex items-center justify-center"
+              >
+                <X className="w-4 h-4 text-foreground dark:text-white" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <button 
+                onClick={() => setShowSearch(true)}
+                className="flex-1 mx-3 flex items-center gap-2 px-4 py-2 rounded-full bg-secondary dark:bg-[#1e293b]"
+              >
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <span className="text-muted-foreground text-sm">Suche</span>
+              </button>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-2">
-            <button className="w-9 h-9 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-white" />
-            </button>
-            <button className="w-9 h-9 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-              <Menu className="w-4 h-4 text-white" />
-            </button>
-          </div>
+              {/* Right Icons */}
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleRefresh}
+                  className="w-10 h-10 rounded-full bg-secondary dark:bg-[#1e293b] flex items-center justify-center"
+                >
+                  <RefreshCw className={cn(
+                    "w-4 h-4 text-foreground dark:text-white",
+                    isRefreshing && "animate-spin"
+                  )} />
+                </button>
+                <Link 
+                  href="/price-alerts"
+                  className="w-10 h-10 rounded-full bg-secondary dark:bg-[#1e293b] flex items-center justify-center"
+                >
+                  <Bell className="w-4 h-4 text-foreground dark:text-white" />
+                </Link>
+              </div>
+            </>
+          )}
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="pb-28">
+      {/* Scrollable Content */}
+      <main className="flex-1 overflow-y-auto overscroll-contain pb-24">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32">
-            <Loader2 className="w-10 h-10 text-white animate-spin mb-4" />
-            <p className="text-gray-400">Lade Krypto-Daten...</p>
+            <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+            <p className="text-muted-foreground">Lade Krypto-Daten...</p>
           </div>
         ) : (
           <>
-            {/* Hero Section - Gradient Background */}
-            <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-[#3d2a1a] via-[#2a2218] to-[#121212]">
-              <h1 className="text-3xl font-bold text-white text-center mb-1">
-                Dein Weg in die Krypto-Welt
+            {/* Hero Section */}
+            <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-orange-900/30 via-amber-900/20 to-transparent">
+              <h1 className="text-3xl font-bold text-foreground dark:text-white text-center mb-1">
+                Krypto
               </h1>
-              <p className="text-gray-300 text-center text-sm">
-                Trade mit Gebühren ab 0 %, abhängig vom Abo
+              <p className="text-muted-foreground text-center text-sm">
+                Entdecke die Welt der Kryptowährungen
               </p>
 
-              <button 
-                onClick={() => router.push('/trading-agent')}
-                className="mt-6 w-full py-4 rounded-2xl bg-[#3a3a3a]/80 text-white font-medium text-lg"
+              <Link 
+                href="/trading-agent"
+                className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg flex items-center justify-center"
               >
                 Mit dem Trading beginnen
-              </button>
+              </Link>
             </div>
 
             {/* Hero Crypto Cards (BTC, ETH) */}
-            <div className="px-4 -mt-2">
+            <div className="px-4 mt-4">
               <div className="flex gap-3">
                 {heroCoins.map((coin) => {
                   const sparkData = getSparklineData(coin)
@@ -229,10 +263,11 @@ export default function MobileCrypto({
                   return (
                     <button 
                       key={coin.id}
-                      className="flex-1 p-4 rounded-2xl bg-[#1e1e1e]"
+                      onClick={() => router.push(`/crypto/${coin.symbol}`)}
+                      className="flex-1 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <span className="text-gray-400 text-sm">
+                        <span className="text-muted-foreground text-sm">
                           {coin.symbol.replace('EUR', '').replace('USDT', '').replace('CHF', '')}
                         </span>
                         <img 
@@ -245,12 +280,12 @@ export default function MobileCrypto({
                           }}
                         />
                       </div>
-                      <p className="text-white text-xl font-bold mb-1">
+                      <p className="text-foreground dark:text-white text-xl font-bold mb-1">
                         {formatCurrency(coin.current_price)}
                       </p>
                       <p className={cn(
                         "text-sm mb-3",
-                        isPositive ? "text-emerald-400" : "text-rose-400"
+                        isPositive ? "text-emerald-500" : "text-red-500"
                       )}>
                         {formatPercent(coin.price_change_percentage_24h)}
                       </p>
@@ -262,23 +297,20 @@ export default function MobileCrypto({
             </div>
 
             {/* Top Mover */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
+            <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Top Mover</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                <span className="text-muted-foreground font-medium">Top Mover</span>
               </div>
 
               {/* Segment Tabs */}
-              <div className="flex p-1 rounded-xl bg-[#2a2a2a] mb-4">
+              <div className="flex p-1 rounded-xl bg-secondary dark:bg-[#0f1623] mb-4">
                 <button
                   onClick={() => setActiveMoversTab('gainers')}
                   className={cn(
                     "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
                     activeMoversTab === 'gainers' 
-                      ? "bg-[#3a3a3a] text-white" 
-                      : "text-gray-400"
+                      ? "bg-card dark:bg-[#1e293b] text-foreground dark:text-white shadow-sm" 
+                      : "text-muted-foreground"
                   )}
                 >
                   Top-Gewinner
@@ -288,22 +320,23 @@ export default function MobileCrypto({
                   className={cn(
                     "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
                     activeMoversTab === 'losers' 
-                      ? "bg-[#3a3a3a] text-white" 
-                      : "text-gray-400"
+                      ? "bg-card dark:bg-[#1e293b] text-foreground dark:text-white shadow-sm" 
+                      : "text-muted-foreground"
                   )}
                 >
                   Top-Verlierer
                 </button>
               </div>
 
-              {/* Movers Grid 3x2 */}
+              {/* Movers Grid */}
               <div className="grid grid-cols-3 gap-4">
                 {(activeMoversTab === 'gainers' ? topGainers : topLosers).map((crypto) => (
                   <button 
                     key={crypto.id}
-                    className="flex flex-col items-center"
+                    onClick={() => router.push(`/crypto/${crypto.symbol}`)}
+                    className="flex flex-col items-center active:scale-95 transition-transform"
                   >
-                    <div className="w-14 h-14 rounded-full bg-[#2a2a2a] flex items-center justify-center mb-2 overflow-hidden">
+                    <div className="w-14 h-14 rounded-full bg-secondary dark:bg-[#0f1623] flex items-center justify-center mb-2 overflow-hidden">
                       <img 
                         src={getCryptoLogo(crypto.symbol)}
                         alt={crypto.symbol}
@@ -314,12 +347,12 @@ export default function MobileCrypto({
                         }}
                       />
                     </div>
-                    <span className="text-white text-sm font-medium">
+                    <span className="text-foreground dark:text-white text-sm font-medium">
                       {crypto.symbol.replace('EUR', '').replace('USDT', '').replace('CHF', '')}
                     </span>
                     <span className={cn(
                       "text-xs font-medium",
-                      crypto.price_change_percentage_24h >= 0 ? "text-emerald-400" : "text-rose-400"
+                      crypto.price_change_percentage_24h >= 0 ? "text-emerald-500" : "text-red-500"
                     )}>
                       {formatPercent(crypto.price_change_percentage_24h)}
                     </span>
@@ -328,80 +361,21 @@ export default function MobileCrypto({
               </div>
             </div>
 
-            {/* Funktionen */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
-              <h3 className="text-gray-400 mb-4">Funktionen</h3>
-
-              <div className="space-y-1">
-                <button className="w-full flex items-center justify-between p-3 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                      <Percent className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-white font-medium">Verdienen</p>
-                      <p className="text-gray-400 text-sm">Bis zu 22.54% APY</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
-
-                <button 
-                  onClick={() => router.push('/trading-agent')}
-                  className="w-full flex items-center justify-between p-3 rounded-xl"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                      <Bot className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-white font-medium">Strategien</p>
-                      <p className="text-gray-400 text-sm">Trading auf einem neuen Level</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
-
-                <button className="w-full flex items-center justify-between p-3 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                      <Layers className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-white font-medium">Revolut X</p>
-                      <p className="text-gray-400 text-sm">Trading wie ein Profi</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
-
-                <button className="w-full flex items-center justify-between p-3 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                      <Lightbulb className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-white font-medium">Lernen</p>
-                      <p className="text-gray-400 text-sm">Erhalte Fr 7.25 in Krypto</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </button>
-              </div>
-            </div>
-
             {/* Alle Kryptowährungen */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
+            <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Alle Kryptowährungen</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                <span className="text-muted-foreground font-medium">
+                  {showSearch && searchQuery ? `Ergebnisse für "${searchQuery}"` : 'Alle Kryptowährungen'}
+                </span>
               </div>
 
               <div className="space-y-1">
                 {topCryptos.map((crypto) => (
-                  <div key={crypto.id} className="flex items-center justify-between py-3">
+                  <button 
+                    key={crypto.id} 
+                    onClick={() => router.push(`/crypto/${crypto.symbol}`)}
+                    className="w-full flex items-center justify-between py-3 active:bg-secondary/50 dark:active:bg-[#0f1623]/50 rounded-lg transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <img 
                         src={getCryptoLogo(crypto.symbol)}
@@ -412,43 +386,47 @@ export default function MobileCrypto({
                           e.currentTarget.src = '/logos/cryptocurrency/default.png'
                         }}
                       />
-                      <div>
-                        <p className="text-white font-medium">{crypto.name || crypto.symbol}</p>
-                        <p className="text-gray-400 text-xs">
+                      <div className="text-left">
+                        <p className="text-foreground dark:text-white font-medium">{crypto.name || crypto.symbol}</p>
+                        <p className="text-muted-foreground text-xs">
                           {crypto.symbol.replace('EUR', '').replace('USDT', '').replace('CHF', '')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-medium">{formatCurrency(crypto.current_price)}</p>
+                      <p className="text-foreground dark:text-white font-medium">{formatCurrency(crypto.current_price)}</p>
                       <p className={cn(
                         "text-xs",
-                        crypto.price_change_percentage_24h >= 0 ? "text-emerald-400" : "text-rose-400"
+                        crypto.price_change_percentage_24h >= 0 ? "text-emerald-500" : "text-red-500"
                       )}>
                         {formatPercent(crypto.price_change_percentage_24h)}
                       </p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 
-              <button className="w-full mt-4 text-white text-sm">
-                Alle anzeigen
-              </button>
+              <Link 
+                href="/markets"
+                className="w-full mt-4 py-3 text-primary text-sm font-medium flex items-center justify-center gap-1"
+              >
+                Alle anzeigen <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
 
             {/* Am meisten gehandelt */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
+            <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Am meisten gehandelt</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                <span className="text-muted-foreground font-medium">Am meisten gehandelt</span>
               </div>
 
               <div className="space-y-3">
                 {mostTraded.map((crypto) => (
-                  <div key={crypto.id} className="flex items-center justify-between py-2">
+                  <button 
+                    key={crypto.id} 
+                    onClick={() => router.push(`/crypto/${crypto.symbol}`)}
+                    className="w-full flex items-center justify-between py-2 active:bg-secondary/50 dark:active:bg-[#0f1623]/50 rounded-lg transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <img 
                         src={getCryptoLogo(crypto.symbol)}
@@ -459,139 +437,57 @@ export default function MobileCrypto({
                           e.currentTarget.src = '/logos/cryptocurrency/default.png'
                         }}
                       />
-                      <div>
-                        <p className="text-white font-medium">{crypto.name || crypto.symbol}</p>
-                        <p className="text-gray-400 text-xs">
+                      <div className="text-left">
+                        <p className="text-foreground dark:text-white font-medium">{crypto.name || crypto.symbol}</p>
+                        <p className="text-muted-foreground text-xs">
                           {crypto.buyPercent}% Käufe · {100 - crypto.buyPercent}% Verkäufe
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-medium">{formatCurrency(crypto.current_price)}</p>
+                      <p className="text-foreground dark:text-white font-medium">{formatCurrency(crypto.current_price)}</p>
                       <p className={cn(
                         "text-xs",
-                        crypto.price_change_percentage_24h >= 0 ? "text-emerald-400" : "text-rose-400"
+                        crypto.price_change_percentage_24h >= 0 ? "text-emerald-500" : "text-red-500"
                       )}>
                         {formatPercent(crypto.price_change_percentage_24h)}
                       </p>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <button className="w-full mt-4 text-white text-sm">
-                Alle anzeigen
-              </button>
-            </div>
-
-            {/* Alarme */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
-              <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Alarme</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <button 
-                onClick={() => router.push('/price-alerts')}
-                className="w-full flex items-center gap-3 p-3 rounded-xl"
-              >
-                <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                  <Plus className="w-5 h-5 text-gray-400" />
-                </div>
-                <span className="text-white">Alarm hinzufügen</span>
-              </button>
-            </div>
-
-            {/* Beobachtungsliste */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
-              <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Beobachtungsliste</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <button className="w-full flex items-center gap-3 p-3 rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center">
-                  <Plus className="w-5 h-5 text-gray-400" />
-                </div>
-                <span className="text-white">Zur Beobachtungsliste hinzufügen</span>
-              </button>
-            </div>
-
-            {/* Neu hinzugefügt */}
-            <div className="mt-4 mx-4 p-4 rounded-2xl bg-[#1e1e1e]">
-              <div className="flex items-center justify-between mb-4">
-                <button className="flex items-center gap-1 text-gray-400">
-                  <span>Neu hinzugefügt</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-                {newlyAdded.map((crypto) => (
-                  <button 
-                    key={crypto.id}
-                    className="flex flex-col items-center min-w-[72px]"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-[#2a2a2a] flex items-center justify-center mb-2 overflow-hidden">
-                      <img 
-                        src={getCryptoLogo(crypto.symbol)}
-                        alt={crypto.symbol}
-                        className="w-10 h-10 rounded-full"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null
-                          e.currentTarget.src = '/logos/cryptocurrency/default.png'
-                        }}
-                      />
-                    </div>
-                    <span className="text-white text-xs font-medium">
-                      {crypto.symbol.replace('EUR', '').replace('USDT', '').replace('CHF', '').slice(0, 4)}
-                    </span>
-                    <span className={cn(
-                      "text-[10px] font-medium",
-                      crypto.price_change_percentage_24h >= 0 ? "text-emerald-400" : "text-rose-400"
-                    )}>
-                      {formatPercent(crypto.price_change_percentage_24h)}
-                    </span>
                   </button>
                 ))}
               </div>
-
-              {/* Pagination Dots */}
-              <div className="flex justify-center gap-1 mt-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-600" />
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-600" />
-              </div>
             </div>
 
-            {/* Widgets hinzufügen Button */}
-            <div className="mt-6 mb-8 px-4">
-              <button className="w-full py-3 rounded-full bg-[#3a3a3a] text-white font-medium flex items-center justify-center gap-2">
-                <Plus className="w-5 h-5" />
-                Widgets hinzufügen
-              </button>
+            {/* Alarme */}
+            <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-muted-foreground font-medium">Alarme</span>
+              </div>
+
+              <Link 
+                href="/price-alerts"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-secondary dark:bg-[#0f1623] active:scale-[0.98] transition-transform"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Plus className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-foreground dark:text-white font-medium">Alarm hinzufügen</span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
+              </Link>
             </div>
 
             {/* Disclaimer */}
-            <div className="px-4 text-center text-gray-500 text-xs leading-relaxed mb-8">
+            <div className="px-4 py-8 text-center text-muted-foreground text-xs leading-relaxed">
               <p>
-                Die Dienstleistungen werden von FinFlow Digital Assets erbracht. 
-                <span className="text-blue-400 ml-1">Offenlegungen zu Krypto</span>.
-              </p>
-              <p className="mt-2">
                 Die Wertentwicklung in der Vergangenheit ist kein zuverlässiger 
-                Indikator für zukünftige Ergebnisse.
+                Indikator für zukünftige Ergebnisse. Kryptowährungen sind volatil.
               </p>
             </div>
           </>
         )}
-      </div>
+      </main>
 
-      {/* Bottom Navigation */}
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav />
     </div>
   )
