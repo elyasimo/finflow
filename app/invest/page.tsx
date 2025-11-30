@@ -2,34 +2,40 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCryptoMarkets } from '@/hooks/use-crypto-markets';
+import { useMarkets } from '@/hooks/use-markets';
 import { useIsMobile } from '@/hooks/use-mobile';
-import MobileCrypto from '@/components/finflow/mobile-crypto';
+import MobileInvest from '@/components/finflow/mobile-invest';
 import Layout from '@/components/finflow/layout';
 import { useAuth } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
-export default function CryptoPage() {
+export default function InvestPage() {
   const router = useRouter();
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { markets: cryptoMarkets, isLoading } = useCryptoMarkets();
+  const { markets, isLoading, error } = useMarkets();
 
-  // Mobile: Revolut-Style Krypto-Seite
+  // Mobile: Revolut-Style Investment-Seite
   if (isMobile) {
     return (
-      <MobileCrypto
-        cryptoMarkets={cryptoMarkets || []}
+      <MobileInvest
+        stocks={markets?.stocks || []}
+        etfs={[]} // TODO: Add ETFs hook
+        indices={markets?.indices || []}
+        commodities={markets?.commodities || []}
+        bonds={[]} // TODO: Add bonds hook
+        news={[]} // TODO: Add news hook
+        corporateActions={[]} // TODO: Add corporate actions hook
         isLoading={isLoading}
         onRefresh={() => window.location.reload()}
       />
     );
   }
 
-  // Desktop: Redirect zu Markets mit Crypto-Tab
+  // Desktop: Redirect zu Markets
   useEffect(() => {
     if (!isMobile) {
-      router.replace('/markets?tab=crypto');
+      router.replace('/markets?tab=stocks');
     }
   }, [isMobile, router]);
 
