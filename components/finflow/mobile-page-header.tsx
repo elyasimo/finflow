@@ -144,7 +144,7 @@ export default function MobilePageHeader({
       className={cn(
         "lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl",
         "border-b border-gray-200/50 dark:border-[#232e40]/50",
-        "safe-area-inset-top",
+        "pt-[env(safe-area-inset-top)]",
         className
       )}
       role="banner"

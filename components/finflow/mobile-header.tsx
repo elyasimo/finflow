@@ -82,7 +82,7 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const currentLanguage = languageOptions.find(l => l.code === language)
 
   return (
-    <header className="lg:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#0f1623]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50">
+    <header className="lg:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#0f1623]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)]">
       <div className="flex items-center justify-between px-3 h-14">
         {/* Left: Back/Home Icon + Title */}
         <div className="flex items-center gap-2">

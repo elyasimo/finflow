@@ -61,13 +61,131 @@ interface MobileInvestProps {
   onRefresh: () => void
 }
 
-// Produkt-Kategorien mit Links
+// Produkt-Kategorien mit korrekten Links
 const PRODUCT_CATEGORIES = [
   { id: 'stocks', label: 'Aktien', icon: LineChart, href: '/markets' },
-  { id: 'etf', label: 'ETF', icon: BarChart3, href: '/markets' },
-  { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets' },
-  { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/markets' },
+  { id: 'etf', label: 'ETF', icon: BarChart3, href: '/etf' },
+  { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets?tab=bonds' },
+  { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/commodities' },
 ]
+
+// Stock Logo URLs - Using official sources
+const STOCK_LOGOS: Record<string, string> = {
+  // US Tech Giants
+  'AAPL': 'https://logo.clearbit.com/apple.com',
+  'MSFT': 'https://logo.clearbit.com/microsoft.com',
+  'GOOGL': 'https://logo.clearbit.com/google.com',
+  'GOOG': 'https://logo.clearbit.com/google.com',
+  'AMZN': 'https://logo.clearbit.com/amazon.com',
+  'META': 'https://logo.clearbit.com/meta.com',
+  'NVDA': 'https://logo.clearbit.com/nvidia.com',
+  'TSLA': 'https://logo.clearbit.com/tesla.com',
+  'NFLX': 'https://logo.clearbit.com/netflix.com',
+  'AMD': 'https://logo.clearbit.com/amd.com',
+  'INTC': 'https://logo.clearbit.com/intel.com',
+  'CRM': 'https://logo.clearbit.com/salesforce.com',
+  'ORCL': 'https://logo.clearbit.com/oracle.com',
+  'ADBE': 'https://logo.clearbit.com/adobe.com',
+  'PYPL': 'https://logo.clearbit.com/paypal.com',
+  'UBER': 'https://logo.clearbit.com/uber.com',
+  'ABNB': 'https://logo.clearbit.com/airbnb.com',
+  'SQ': 'https://logo.clearbit.com/squareup.com',
+  'SNAP': 'https://logo.clearbit.com/snapchat.com',
+  'SPOT': 'https://logo.clearbit.com/spotify.com',
+  'SHOP': 'https://logo.clearbit.com/shopify.com',
+  'ZM': 'https://logo.clearbit.com/zoom.us',
+  'ROKU': 'https://logo.clearbit.com/roku.com',
+  'TWLO': 'https://logo.clearbit.com/twilio.com',
+  'PLTR': 'https://logo.clearbit.com/palantir.com',
+  'COIN': 'https://logo.clearbit.com/coinbase.com',
+  'RBLX': 'https://logo.clearbit.com/roblox.com',
+  'HOOD': 'https://logo.clearbit.com/robinhood.com',
+  'TTWO': 'https://logo.clearbit.com/take2games.com',
+  'EA': 'https://logo.clearbit.com/ea.com',
+  'ATVI': 'https://logo.clearbit.com/activision.com',
+  // Finance
+  'JPM': 'https://logo.clearbit.com/jpmorganchase.com',
+  'BAC': 'https://logo.clearbit.com/bankofamerica.com',
+  'WFC': 'https://logo.clearbit.com/wellsfargo.com',
+  'GS': 'https://logo.clearbit.com/goldmansachs.com',
+  'MS': 'https://logo.clearbit.com/morganstanley.com',
+  'V': 'https://logo.clearbit.com/visa.com',
+  'MA': 'https://logo.clearbit.com/mastercard.com',
+  'AXP': 'https://logo.clearbit.com/americanexpress.com',
+  // Consumer
+  'KO': 'https://logo.clearbit.com/coca-colacompany.com',
+  'PEP': 'https://logo.clearbit.com/pepsico.com',
+  'MCD': 'https://logo.clearbit.com/mcdonalds.com',
+  'SBUX': 'https://logo.clearbit.com/starbucks.com',
+  'NKE': 'https://logo.clearbit.com/nike.com',
+  'DIS': 'https://logo.clearbit.com/disney.com',
+  'WMT': 'https://logo.clearbit.com/walmart.com',
+  'TGT': 'https://logo.clearbit.com/target.com',
+  'COST': 'https://logo.clearbit.com/costco.com',
+  'HD': 'https://logo.clearbit.com/homedepot.com',
+  // Healthcare
+  'JNJ': 'https://logo.clearbit.com/jnj.com',
+  'PFE': 'https://logo.clearbit.com/pfizer.com',
+  'UNH': 'https://logo.clearbit.com/unitedhealthgroup.com',
+  'ABBV': 'https://logo.clearbit.com/abbvie.com',
+  'MRK': 'https://logo.clearbit.com/merck.com',
+  'LLY': 'https://logo.clearbit.com/lilly.com',
+  // Energy
+  'XOM': 'https://logo.clearbit.com/exxonmobil.com',
+  'CVX': 'https://logo.clearbit.com/chevron.com',
+  // German Stocks (DAX)
+  'SAP': 'https://logo.clearbit.com/sap.com',
+  'SIE': 'https://logo.clearbit.com/siemens.com',
+  'ALV': 'https://logo.clearbit.com/allianz.com',
+  'BAS': 'https://logo.clearbit.com/basf.com',
+  'BAYN': 'https://logo.clearbit.com/bayer.com',
+  'BMW': 'https://logo.clearbit.com/bmw.com',
+  'DAI': 'https://logo.clearbit.com/mercedes-benz.com',
+  'MBG': 'https://logo.clearbit.com/mercedes-benz.com',
+  'VOW': 'https://logo.clearbit.com/volkswagen.com',
+  'ADS': 'https://logo.clearbit.com/adidas.com',
+  'DTE': 'https://logo.clearbit.com/telekom.com',
+  'DBK': 'https://logo.clearbit.com/db.com',
+  'RHM': 'https://logo.clearbit.com/rheinmetall.com',
+  // More
+  'BRK.B': 'https://logo.clearbit.com/berkshirehathaway.com',
+  'BRK.A': 'https://logo.clearbit.com/berkshirehathaway.com',
+}
+
+// Get stock logo URL
+const getStockLogoUrl = (symbol: string): string => {
+  const cleanSymbol = symbol.replace('.DE', '').replace('.US', '').replace('.SW', '').toUpperCase()
+  return STOCK_LOGOS[cleanSymbol] || `https://logo.clearbit.com/${cleanSymbol.toLowerCase()}.com`
+}
+
+// ETF Issuer detection and logos
+const getETFIssuerLogo = (name: string, symbol: string): { logo: string; color: string } => {
+  const lowerName = (name || '').toLowerCase()
+  const lowerSymbol = (symbol || '').toLowerCase()
+  
+  if (lowerName.includes('ishares') || lowerSymbol.startsWith('is') || lowerSymbol.includes('iusu')) {
+    return { logo: 'https://logo.clearbit.com/ishares.com', color: 'bg-emerald-500' }
+  }
+  if (lowerName.includes('vanguard') || lowerSymbol.startsWith('v') || lowerSymbol === 'vuaa') {
+    return { logo: 'https://logo.clearbit.com/vanguard.com', color: 'bg-red-600' }
+  }
+  if (lowerName.includes('xtrackers') || lowerSymbol.startsWith('dbx')) {
+    return { logo: 'https://logo.clearbit.com/dws.com', color: 'bg-orange-500' }
+  }
+  if (lowerName.includes('amundi')) {
+    return { logo: 'https://logo.clearbit.com/amundi.com', color: 'bg-blue-500' }
+  }
+  if (lowerName.includes('lyxor')) {
+    return { logo: 'https://logo.clearbit.com/lyxor.com', color: 'bg-orange-400' }
+  }
+  if (lowerName.includes('spdr')) {
+    return { logo: 'https://logo.clearbit.com/ssga.com', color: 'bg-yellow-500' }
+  }
+  if (lowerName.includes('invesco')) {
+    return { logo: 'https://logo.clearbit.com/invesco.com', color: 'bg-blue-600' }
+  }
+  return { logo: 'https://logo.clearbit.com/ishares.com', color: 'bg-emerald-500' }
+}
 
 // Rohstoffe-Daten
 const COMMODITIES_ELEMENTS = [
@@ -138,6 +256,13 @@ export default function MobileInvest({
   // Beliebte Erstkäufe (Top 6)
   const popularStocks = useMemo(() => (showSearch ? filteredStocks : stocks).slice(0, 6), [stocks, filteredStocks, showSearch])
   const popularETFs = useMemo(() => etfs.slice(0, 6), [etfs])
+
+  // State for failed images
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
+  
+  const handleImageError = (symbol: string) => {
+    setFailedImages(prev => new Set(prev).add(symbol))
+  }
 
   // Meistgehandelt
   const mostTraded = useMemo(() => {
@@ -285,24 +410,49 @@ export default function MobileInvest({
 
               {/* Asset Grid 3x2 */}
               <div className="grid grid-cols-3 gap-4">
-                {(activeAssetTab === 'stocks' ? popularStocks : popularETFs).map((asset) => (
-                  <button 
-                    key={asset.symbol}
-                    onClick={() => router.push(`/markets?symbol=${asset.symbol}`)}
-                    className="flex flex-col items-center active:scale-95 transition-transform"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-2 overflow-hidden text-white font-bold text-lg">
-                      {asset.symbol.slice(0, 2)}
-                    </div>
-                    <span className="text-foreground dark:text-white text-sm font-medium">{asset.symbol}</span>
-                    <span className={cn(
-                      "text-xs font-medium",
-                      asset.changePercent >= 0 ? "text-emerald-500" : "text-red-500"
-                    )}>
-                      {formatPercent(asset.changePercent)}
-                    </span>
-                  </button>
-                ))}
+                {(activeAssetTab === 'stocks' ? popularStocks : popularETFs).map((asset) => {
+                  const isStock = activeAssetTab === 'stocks'
+                  const logoUrl = isStock 
+                    ? getStockLogoUrl(asset.symbol)
+                    : getETFIssuerLogo(asset.name, asset.symbol).logo
+                  const fallbackColor = isStock 
+                    ? 'from-blue-500 to-indigo-600' 
+                    : getETFIssuerLogo(asset.name, asset.symbol).color
+                  const hasFailed = failedImages.has(asset.symbol)
+                  
+                  return (
+                    <button 
+                      key={asset.symbol}
+                      onClick={() => router.push(`/markets?symbol=${asset.symbol}`)}
+                      className="flex flex-col items-center active:scale-95 transition-transform"
+                    >
+                      <div className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center mb-2 overflow-hidden",
+                        hasFailed ? `bg-gradient-to-br ${fallbackColor}` : "bg-white"
+                      )}>
+                        {!hasFailed ? (
+                          <img 
+                            src={logoUrl}
+                            alt={asset.symbol}
+                            className="w-10 h-10 object-contain"
+                            onError={() => handleImageError(asset.symbol)}
+                          />
+                        ) : (
+                          <span className="text-white font-bold text-lg">
+                            {asset.symbol.slice(0, 2)}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-foreground dark:text-white text-sm font-medium">{asset.symbol}</span>
+                      <span className={cn(
+                        "text-xs font-medium",
+                        asset.changePercent >= 0 ? "text-emerald-500" : "text-red-500"
+                      )}>
+                        {formatPercent(asset.changePercent)}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -362,24 +512,45 @@ export default function MobileInvest({
 
               {/* Movers Grid 3x2 */}
               <div className="grid grid-cols-3 gap-4">
-                {(activeMoversTab === 'gainers' ? topGainers : topLosers).map((stock) => (
-                  <button 
-                    key={stock.symbol}
-                    onClick={() => router.push(`/markets?symbol=${stock.symbol}`)}
-                    className="flex flex-col items-center active:scale-95 transition-transform"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-2 overflow-hidden text-white font-bold text-lg">
-                      {stock.symbol.slice(0, 2)}
-                    </div>
-                    <span className="text-foreground dark:text-white text-sm font-medium">{stock.symbol}</span>
-                    <span className={cn(
-                      "text-xs font-medium",
-                      stock.changePercent >= 0 ? "text-emerald-500" : "text-red-500"
-                    )}>
-                      {formatPercent(stock.changePercent)}
-                    </span>
-                  </button>
-                ))}
+                {(activeMoversTab === 'gainers' ? topGainers : topLosers).map((stock) => {
+                  const logoUrl = getStockLogoUrl(stock.symbol)
+                  const hasFailed = failedImages.has(`mover-${stock.symbol}`)
+                  
+                  return (
+                    <button 
+                      key={stock.symbol}
+                      onClick={() => router.push(`/markets?symbol=${stock.symbol}`)}
+                      className="flex flex-col items-center active:scale-95 transition-transform"
+                    >
+                      <div className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center mb-2 overflow-hidden",
+                        hasFailed 
+                          ? `bg-gradient-to-br ${activeMoversTab === 'gainers' ? 'from-emerald-500 to-teal-600' : 'from-red-500 to-rose-600'}` 
+                          : "bg-white"
+                      )}>
+                        {!hasFailed ? (
+                          <img 
+                            src={logoUrl}
+                            alt={stock.symbol}
+                            className="w-10 h-10 object-contain"
+                            onError={() => handleImageError(`mover-${stock.symbol}`)}
+                          />
+                        ) : (
+                          <span className="text-white font-bold text-lg">
+                            {stock.symbol.slice(0, 2)}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-foreground dark:text-white text-sm font-medium">{stock.symbol}</span>
+                      <span className={cn(
+                        "text-xs font-medium",
+                        stock.changePercent >= 0 ? "text-emerald-500" : "text-red-500"
+                      )}>
+                        {formatPercent(stock.changePercent)}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 

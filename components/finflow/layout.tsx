@@ -5,7 +5,7 @@ import Sidebar from "./sidebar"
 import TopNav from "./top-nav"
 import MobileHeader from "./mobile-header"
 import MobileBottomNav from "./mobile-bottom-nav"
-import MobileMenu from "./mobile-menu"
+import MobileMoreMenu from "./mobile-more-menu"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { CurrencyProvider } from './CurrencyContext'
@@ -74,12 +74,11 @@ export default function Layout({ children, user }: LayoutProps) {
             <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
           )}
 
-          {/* Mobile Menu Drawer */}
+          {/* Mobile More Menu - Using new menu component */}
           {isMobile && (
-            <MobileMenu 
+            <MobileMoreMenu 
               isOpen={isMobileMenuOpen} 
               onClose={() => setIsMobileMenuOpen(false)}
-              user={user}
             />
           )}
         </div>

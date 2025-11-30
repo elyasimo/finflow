@@ -230,8 +230,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         title={t('support')}
       />
 
-      {/* Chat Container */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Chat Container - Add padding for fixed input */}
+      <div className="flex-1 flex flex-col overflow-hidden pb-44">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
           {messages.map((message) => (
@@ -312,8 +312,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </div>
         </div>
 
-        {/* Input Area - Fixed at bottom above nav */}
-        <div className="sticky bottom-20 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4">
+        {/* Input Area - Fixed at bottom with keyboard awareness */}
+        <div className="fixed bottom-0 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-[calc(env(safe-area-inset-bottom)+80px)] z-50">
           <div className="flex items-end gap-3">
             <div className="flex-1 relative">
               <input
@@ -335,7 +335,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isTyping}
               className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center",
+                "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
                 "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
                 "hover:bg-blue-600 active:scale-95",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
@@ -347,7 +347,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </div>
           
           {/* Contact Hint */}
-          <p className="text-center text-xs text-gray-400 mt-3">
+          <p className="text-center text-xs text-gray-400 mt-2">
             {t('typeContactForSupport')}
           </p>
         </div>

@@ -142,10 +142,78 @@ export default function MobileCrypto({
     }))
   }, [cryptoMarkets])
 
-  // Crypto Logo URL
-  const getCryptoLogo = (symbol: string) => {
+  // Crypto Logo URL - Using CoinGecko IDs
+  const getCryptoLogo = (symbol: string, id?: string) => {
     const baseSymbol = symbol.replace('EUR', '').replace('USDT', '').replace('CHF', '').toLowerCase()
-    return `/logos/cryptocurrency/${baseSymbol}.png`
+    
+    // Known crypto logos via CoinGecko
+    const CRYPTO_LOGOS: Record<string, string> = {
+      'btc': 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+      'eth': 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+      'bnb': 'https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png',
+      'sol': 'https://assets.coingecko.com/coins/images/4128/small/solana.png',
+      'xrp': 'https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png',
+      'ada': 'https://assets.coingecko.com/coins/images/975/small/cardano.png',
+      'doge': 'https://assets.coingecko.com/coins/images/5/small/dogecoin.png',
+      'dot': 'https://assets.coingecko.com/coins/images/12171/small/polkadot.png',
+      'shib': 'https://assets.coingecko.com/coins/images/11939/small/shiba.png',
+      'matic': 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png',
+      'ltc': 'https://assets.coingecko.com/coins/images/2/small/litecoin.png',
+      'link': 'https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png',
+      'avax': 'https://assets.coingecko.com/coins/images/12559/small/Avalanche_Circle_RedWhite_Trans.png',
+      'atom': 'https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png',
+      'uni': 'https://assets.coingecko.com/coins/images/12504/small/uniswap-uni.png',
+      'xlm': 'https://assets.coingecko.com/coins/images/100/small/Stellar_symbol_black_RGB.png',
+      'etc': 'https://assets.coingecko.com/coins/images/453/small/ethereum-classic-logo.png',
+      'algo': 'https://assets.coingecko.com/coins/images/4380/small/download.png',
+      'xmr': 'https://assets.coingecko.com/coins/images/69/small/monero_logo.png',
+      'bch': 'https://assets.coingecko.com/coins/images/780/small/bitcoin-cash-circle.png',
+      'fil': 'https://assets.coingecko.com/coins/images/12817/small/filecoin.png',
+      'trx': 'https://assets.coingecko.com/coins/images/1094/small/tron-logo.png',
+      'near': 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
+      'apt': 'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
+      'arb': 'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
+      'op': 'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
+      'sui': 'https://assets.coingecko.com/coins/images/26375/small/sui_asset.jpeg',
+      'pepe': 'https://assets.coingecko.com/coins/images/29850/small/pepe-token.jpeg',
+      'sei': 'https://assets.coingecko.com/coins/images/28205/small/Sei_Logo_-_Transparent.png',
+      'inj': 'https://assets.coingecko.com/coins/images/12882/small/Secondary_Symbol.png',
+      'vet': 'https://assets.coingecko.com/coins/images/1167/small/VeChain-Logo-768x725.png',
+      'aave': 'https://assets.coingecko.com/coins/images/12645/small/AAVE.png',
+      'mkr': 'https://assets.coingecko.com/coins/images/1364/small/Mark_Maker.png',
+      'snx': 'https://assets.coingecko.com/coins/images/3406/small/SNX.png',
+      'crv': 'https://assets.coingecko.com/coins/images/12124/small/Curve.png',
+      'ldo': 'https://assets.coingecko.com/coins/images/13573/small/Lido_DAO.png',
+      'grt': 'https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png',
+      'rpl': 'https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png',
+      'render': 'https://assets.coingecko.com/coins/images/11636/small/rndr.png',
+      'imx': 'https://assets.coingecko.com/coins/images/17233/small/immutableX-symbol-BLK-RGB.png',
+      'sand': 'https://assets.coingecko.com/coins/images/12129/small/sandbox_logo.jpg',
+      'mana': 'https://assets.coingecko.com/coins/images/878/small/decentraland-mana.png',
+      'axs': 'https://assets.coingecko.com/coins/images/13029/small/axie_infinity_logo.png',
+      'ftm': 'https://assets.coingecko.com/coins/images/4001/small/Fantom_round.png',
+      'icp': 'https://assets.coingecko.com/coins/images/14495/small/Internet_Computer_logo.png',
+      'hbar': 'https://assets.coingecko.com/coins/images/3688/small/hbar.png',
+      'flow': 'https://assets.coingecko.com/coins/images/13446/small/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.png',
+      'egld': 'https://assets.coingecko.com/coins/images/12335/small/egld-token-logo.png',
+      'theta': 'https://assets.coingecko.com/coins/images/2538/small/theta-token-logo.png',
+      'ape': 'https://assets.coingecko.com/coins/images/24383/small/apecoin.jpg',
+      'kcs': 'https://assets.coingecko.com/coins/images/1047/small/sa9z79.png',
+      'xtz': 'https://assets.coingecko.com/coins/images/976/small/Tezos-logo.png',
+      'neo': 'https://assets.coingecko.com/coins/images/480/small/NEO_512_512.png',
+      'eos': 'https://assets.coingecko.com/coins/images/738/small/eos-eos-logo.png',
+      'cake': 'https://assets.coingecko.com/coins/images/12632/small/pancakeswap-cake-logo_%281%29.png',
+      'osmo': 'https://assets.coingecko.com/coins/images/16724/small/osmo.png',
+      'ton': 'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png',
+      'wbtc': 'https://assets.coingecko.com/coins/images/7598/small/wrapped_bitcoin_wbtc.png',
+      'steth': 'https://assets.coingecko.com/coins/images/13442/small/steth_logo.png',
+      'usdt': 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
+      'usdc': 'https://assets.coingecko.com/coins/images/6319/small/usdc.png',
+      'busd': 'https://assets.coingecko.com/coins/images/9576/small/BUSD.png',
+      'dai': 'https://assets.coingecko.com/coins/images/9956/small/4943.png',
+    }
+    
+    return CRYPTO_LOGOS[baseSymbol] || `/logos/cryptocurrency/${baseSymbol}.png`
   }
 
   // Generate sparkline data
