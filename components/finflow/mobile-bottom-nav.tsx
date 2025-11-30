@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useAuth } from "@/hooks/use-auth"
-import MobileMenu from "./mobile-menu"
+import MobileMoreMenu from "./mobile-more-menu"
 
 interface NavItem {
   href: string
@@ -128,12 +128,11 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile More Menu */}
       {!onMenuClick && (
-        <MobileMenu 
+        <MobileMoreMenu 
           isOpen={showMenu} 
           onClose={() => setShowMenu(false)}
-          user={user as any}
         />
       )}
     </nav>

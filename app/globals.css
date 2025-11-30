@@ -31,6 +31,51 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* Safe area as padding with fallback */
+.pt-safe-top {
+  padding-top: max(env(safe-area-inset-top), 12px);
+}
+
+.pb-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 12px);
+}
+
+/* Mobile Page Layout - Fixed Header & Footer, Scrollable Content */
+.mobile-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.mobile-page-header {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.mobile-page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-page-footer {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+}
+
+/* Bottom nav safe area padding */
+.safe-area-pb {
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
 /* ===== Touch Optimization ===== */
 button, a, [role="button"], input, select, textarea {
   -webkit-tap-highlight-color: transparent;
