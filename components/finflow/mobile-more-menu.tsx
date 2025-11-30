@@ -144,19 +144,19 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 top-0 bg-white dark:bg-[#0a0a0a] z-[101] flex flex-col"
+            className="fixed inset-x-0 bottom-0 top-0 bg-background dark:bg-[#0f1623] z-[101] flex flex-col"
           >
             {/* Header - Fixed */}
-            <div className="flex-shrink-0 px-5 pt-safe-top">
+            <div className="flex-shrink-0 px-5 pt-[env(safe-area-inset-top)]">
               <div className="flex items-center justify-between h-16">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-foreground dark:text-white">
                   Mehr
                 </h2>
                 <button
                   onClick={onClose}
-                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center active:scale-95 transition-transform"
+                  className="w-10 h-10 rounded-full bg-secondary dark:bg-[#1e293b] flex items-center justify-center active:scale-95 transition-transform"
                 >
-                  <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
             </div>
@@ -167,21 +167,21 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
               <div className="px-5 py-4">
                 <button
                   onClick={() => handleNavigate('/settings')}
-                  className="w-full p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#1a1a1a] dark:to-[#141414] active:scale-[0.98] transition-transform"
+                  className="w-full p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f] active:scale-[0.98] transition-transform"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold shadow-lg">
                       {user?.email?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <div className="flex-1 text-left">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <h3 className="text-lg font-semibold text-foreground dark:text-white">
                         {user?.fullName || user?.email?.split('@')[0] || 'User'}
                       </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-muted-foreground">
                         {user?.email || 'Profil verwalten'}
                       </p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>
                 </button>
               </div>
@@ -192,7 +192,7 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                   {/* Theme Toggle */}
                   <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] active:scale-95 transition-transform"
+                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f] active:scale-95 transition-transform"
                   >
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                       {theme === 'dark' ? (
@@ -201,7 +201,7 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                         <Moon className="w-6 h-6 text-white" />
                       )}
                     </div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {theme === 'dark' ? 'Hell' : 'Dunkel'}
                     </span>
                   </button>
@@ -209,12 +209,12 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                   {/* Language */}
                   <button
                     onClick={() => setShowLanguages(!showLanguages)}
-                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] active:scale-95 transition-transform"
+                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f] active:scale-95 transition-transform"
                   >
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
                       <Globe className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {languages.find(l => l.code === language)?.flag} {language.toUpperCase()}
                     </span>
                   </button>
@@ -222,12 +222,12 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                   {/* Currency */}
                   <button
                     onClick={() => setShowCurrencies(!showCurrencies)}
-                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] active:scale-95 transition-transform"
+                    className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f] active:scale-95 transition-transform"
                   >
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
                       <Coins className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-muted-foreground">
                       {currencies.find(c => c.code === currency)?.flag} {currency}
                     </span>
                   </button>
@@ -240,7 +240,7 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="mt-3 overflow-hidden rounded-xl bg-gray-50 dark:bg-[#1a1a1a]"
+                      className="mt-3 overflow-hidden rounded-xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]"
                     >
                       {languages.map(lang => (
                         <button
@@ -281,7 +281,7 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="mt-3 overflow-hidden rounded-xl bg-gray-50 dark:bg-[#1a1a1a]"
+                      className="mt-3 overflow-hidden rounded-xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]"
                     >
                       {currencies.map(curr => (
                         <button
@@ -322,10 +322,10 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
               {/* Menu Sections */}
               {menuSections.map((section) => (
                 <div key={section.id} className="px-5 pb-5">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3 px-1">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">
                     {t(section.titleKey as any)}
                   </h3>
-                  <div className="bg-gray-50 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-[#222]">
+                  <div className="bg-card dark:bg-[#1e293b] rounded-2xl overflow-hidden divide-y divide-border dark:divide-[#2d3a4f] border border-border dark:border-[#2d3a4f]">
                     {section.items.map((item) => {
                       const Icon = item.icon
                       const isActive = pathname === item.href
@@ -335,8 +335,8 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                           key={item.href}
                           onClick={() => handleNavigate(item.href)}
                           className={cn(
-                            "w-full flex items-center gap-4 px-4 py-3.5 transition-colors active:bg-gray-100 dark:active:bg-[#222]",
-                            isActive && "bg-blue-50/50 dark:bg-blue-900/10"
+                            "w-full flex items-center gap-4 px-4 py-3.5 transition-colors active:bg-secondary/50 dark:active:bg-[#0f1623]/50",
+                            isActive && "bg-primary/5"
                           )}
                         >
                           <div className={cn(
@@ -348,12 +348,12 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                           <span className={cn(
                             "flex-1 text-left font-medium",
                             isActive 
-                              ? "text-blue-600 dark:text-blue-400" 
-                              : "text-gray-900 dark:text-white"
+                              ? "text-primary" 
+                              : "text-foreground dark:text-white"
                           )}>
                             {t(item.labelKey as any)}
                           </span>
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
                         </button>
                       )
                     })}
@@ -366,16 +366,16 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3 px-1">
                   {t('settings')}
                 </h3>
-                <div className="bg-gray-50 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-[#222]">
+                <div className="bg-gray-50 dark:bg-[#1e293b] rounded-2xl overflow-hidden divide-y divide-gray-100 dark:divide-[#2d3a4f]">
                   {settingsItems.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => handleNavigate(item.href)}
-                        className="w-full flex items-center gap-4 px-4 py-3.5 transition-colors active:bg-gray-100 dark:active:bg-[#222]"
+                        className="w-full flex items-center gap-4 px-4 py-3.5 transition-colors active:bg-gray-100 dark:active:bg-[#0f1623]"
                       >
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-200 dark:bg-[#2a2a2a]">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-200 dark:bg-[#2d3a4f]">
                           <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </div>
                         <span className="flex-1 text-left font-medium text-gray-900 dark:text-white">
@@ -392,7 +392,7 @@ export default function MobileMoreMenu({ isOpen, onClose }: MobileMoreMenuProps)
               <div className="px-5 pb-8">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl bg-red-50 dark:bg-red-900/10 active:scale-[0.98] transition-transform"
+                  className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl bg-red-50 dark:bg-red-500/10 active:scale-[0.98] transition-transform"
                 >
                   <LogOut className="w-5 h-5 text-red-500" />
                   <span className="font-semibold text-red-500">

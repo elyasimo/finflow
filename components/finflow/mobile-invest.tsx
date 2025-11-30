@@ -63,10 +63,10 @@ interface MobileInvestProps {
 
 // Produkt-Kategorien mit Links
 const PRODUCT_CATEGORIES = [
-  { id: 'stocks', label: 'Aktien', icon: LineChart, href: '/markets?tab=stocks' },
-  { id: 'etf', label: 'ETF', icon: BarChart3, href: '/markets?tab=etf' },
-  { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets?tab=bonds' },
-  { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/markets?tab=commodities' },
+  { id: 'stocks', label: 'Aktien', icon: LineChart, href: '/markets' },
+  { id: 'etf', label: 'ETF', icon: BarChart3, href: '/markets' },
+  { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets' },
+  { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/markets' },
 ]
 
 // Rohstoffe-Daten
@@ -156,8 +156,8 @@ export default function MobileInvest({
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]">
       {/* Fixed Header */}
-      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b]">
-        <div className="flex items-center justify-between px-4 h-14 pt-safe-top">
+      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center justify-between px-4 h-14">
           {/* Portfolio Button */}
           <Link 
             href="/accounts"
@@ -291,17 +291,8 @@ export default function MobileInvest({
                     onClick={() => router.push(`/markets?symbol=${asset.symbol}`)}
                     className="flex flex-col items-center active:scale-95 transition-transform"
                   >
-                    <div className="w-14 h-14 rounded-full bg-white dark:bg-white/10 flex items-center justify-center mb-2 overflow-hidden">
-                      <img 
-                        src={getStockLogo(asset.symbol)}
-                        alt={asset.symbol}
-                        className="w-10 h-10 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null
-                          e.currentTarget.src = '/placeholder-stock.png'
-                          e.currentTarget.className = 'w-8 h-8'
-                        }}
-                      />
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-2 overflow-hidden text-white font-bold text-lg">
+                      {asset.symbol.slice(0, 2)}
                     </div>
                     <span className="text-foreground dark:text-white text-sm font-medium">{asset.symbol}</span>
                     <span className={cn(
@@ -377,16 +368,8 @@ export default function MobileInvest({
                     onClick={() => router.push(`/markets?symbol=${stock.symbol}`)}
                     className="flex flex-col items-center active:scale-95 transition-transform"
                   >
-                    <div className="w-14 h-14 rounded-full bg-white dark:bg-white/10 flex items-center justify-center mb-2 overflow-hidden">
-                      <img 
-                        src={getStockLogo(stock.symbol)}
-                        alt={stock.symbol}
-                        className="w-10 h-10 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null
-                          e.currentTarget.src = '/placeholder-stock.png'
-                        }}
-                      />
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-2 overflow-hidden text-white font-bold text-lg">
+                      {stock.symbol.slice(0, 2)}
                     </div>
                     <span className="text-foreground dark:text-white text-sm font-medium">{stock.symbol}</span>
                     <span className={cn(

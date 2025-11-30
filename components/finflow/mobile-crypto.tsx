@@ -161,8 +161,8 @@ export default function MobileCrypto({
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]">
       {/* Fixed Header */}
-      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b]">
-        <div className="flex items-center justify-between px-4 h-14 pt-safe-top">
+      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center justify-between px-4 h-14">
           {/* Portfolio Button */}
           <Link 
             href="/accounts"
@@ -238,7 +238,7 @@ export default function MobileCrypto({
         ) : (
           <>
             {/* Hero Section */}
-            <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-orange-900/30 via-amber-900/20 to-transparent">
+            <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-blue-900/30 via-indigo-900/20 to-transparent">
               <h1 className="text-3xl font-bold text-foreground dark:text-white text-center mb-1">
                 Krypto
               </h1>
