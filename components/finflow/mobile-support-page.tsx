@@ -224,16 +224,16 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419] flex flex-col">
+    <div className="h-screen bg-[#f8f9fc] dark:bg-[#0f1419] flex flex-col overflow-hidden">
       <MobilePageHeader 
         user={user as any} 
         title={t('support')}
       />
 
-      {/* Chat Container - Add padding for fixed input */}
-      <div className="flex-1 flex flex-col overflow-hidden pb-44">
+      {/* Chat Container - Scrollable area */}
+      <div className="flex-1 overflow-y-auto pb-4">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+        <div className="px-4 py-6 space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -295,8 +295,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Actions - Always visible for continued help */}
-        <div className="px-4 pb-4">
+        {/* Quick Actions */}
+        <div className="px-4 pb-32">
           <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
           <div className="flex flex-wrap gap-2">
             {QUICK_ACTIONS.map((action, index) => (
@@ -311,46 +311,46 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Input Area - Fixed at bottom with keyboard awareness */}
-        <div className="fixed bottom-0 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-[calc(env(safe-area-inset-bottom)+80px)] z-50">
-          <div className="flex items-end gap-3">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                placeholder={t('writeYourQuestion')}
-                className={cn(
-                  "w-full px-4 py-3 rounded-2xl text-base",
-                  "bg-gray-50 dark:bg-[#232e40]",
-                  "text-gray-900 dark:text-white placeholder-gray-400",
-                  "border-2 border-transparent",
-                  "focus:outline-none focus:border-blue-500"
-                )}
-              />
-            </div>
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={!inputMessage.trim() || isTyping}
+      {/* Input Area - Fixed at bottom above nav */}
+      <div className="fixed bottom-16 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 z-40 safe-area-pb">
+        <div className="flex items-end gap-3">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              placeholder={t('writeYourQuestion')}
               className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
-                "hover:bg-blue-600 active:scale-95",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-                "transition-all"
+                "w-full px-4 py-3 rounded-2xl text-base",
+                "bg-gray-50 dark:bg-[#232e40]",
+                "text-gray-900 dark:text-white placeholder-gray-400",
+                "border-2 border-transparent",
+                "focus:outline-none focus:border-blue-500"
               )}
-            >
-              <Send className="w-5 h-5" />
-            </button>
+            />
           </div>
-          
-          {/* Contact Hint */}
-          <p className="text-center text-xs text-gray-400 mt-2">
-            {t('typeContactForSupport')}
-          </p>
+          <button
+            onClick={() => handleSendMessage()}
+            disabled={!inputMessage.trim() || isTyping}
+            className={cn(
+              "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
+              "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
+              "hover:bg-blue-600 active:scale-95",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "transition-all"
+            )}
+          >
+            <Send className="w-5 h-5" />
+          </button>
         </div>
+        
+        {/* Contact Hint */}
+        <p className="text-center text-xs text-gray-400 mt-2">
+          {t('typeContactForSupport')}
+        </p>
       </div>
 
       {/* Contact Form Modal */}

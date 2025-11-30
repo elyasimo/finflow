@@ -131,9 +131,9 @@ export default function MobileReports({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+      <div className="h-screen bg-[#f8f9fc] dark:bg-[#0f1623] flex flex-col overflow-hidden">
         <MobileHeader title={t('reports')} />
-        <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="flex-1 flex flex-col items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Lade Berichte...</p>
         </div>
@@ -143,12 +143,13 @@ export default function MobileReports({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Header */}
+    <div className="h-screen bg-[#f8f9fc] dark:bg-[#0f1623] flex flex-col overflow-hidden">
+      {/* Header - stays fixed at top */}
       <MobileHeader title={t('reports')} />
 
-      {/* Content */}
-      <div className="px-4 pt-4 pb-28">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="px-4 pt-4 pb-28">
         {/* Month Selector */}
         <button 
           onClick={() => {
@@ -464,6 +465,7 @@ export default function MobileReports({
             )}
           </div>
         )}
+      </div>
       </div>
 
       {/* Bottom Navigation */}

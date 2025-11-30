@@ -67,6 +67,7 @@ const PRODUCT_CATEGORIES = [
   { id: 'etf', label: 'ETF', icon: BarChart3, href: '/etf' },
   { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets?tab=bonds' },
   { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/commodities' },
+  { id: 'robo', label: 'Robo-Advisor', icon: Bot, href: '/robo-advisor' },
 ]
 
 // Stock Logo URLs - Using official sources
