@@ -460,7 +460,7 @@ export default function MobileInvest({
             {/* Produkte - Mit funktionierenden Links */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <h3 className="text-muted-foreground font-medium mb-4">Produkte</h3>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-5 gap-2">
                 {PRODUCT_CATEGORIES.map((cat) => {
                   const Icon = cat.icon
                   return (
@@ -469,10 +469,10 @@ export default function MobileInvest({
                       href={cat.href}
                       className="flex flex-col items-center active:scale-95 transition-transform"
                     >
-                      <div className="w-14 h-14 rounded-2xl bg-secondary dark:bg-[#0f1623] flex items-center justify-center mb-2">
-                        <Icon className="w-6 h-6 text-foreground dark:text-white" />
+                      <div className="w-12 h-12 rounded-2xl bg-secondary dark:bg-[#0f1623] flex items-center justify-center mb-2">
+                        <Icon className="w-5 h-5 text-foreground dark:text-white" />
                       </div>
-                      <span className="text-foreground dark:text-white text-xs">{cat.label}</span>
+                      <span className="text-foreground dark:text-white text-[10px] text-center leading-tight">{cat.label}</span>
                     </Link>
                   )
                 })}

@@ -81,7 +81,7 @@ export default function MobileCommoditiesPage({ commodities, isLoading }: Mobile
               return (
                 <button
                   key={commodity.symbol}
-                  onClick={() => router.push(`/markets?symbol=${commodity.symbol}`)}
+                  onClick={() => router.push(`/markets?tab=commodities&symbol=${commodity.symbol}`)}
                   className="w-full flex items-center gap-4 px-4 py-4 active:bg-[#2c2c2e] transition-colors"
                 >
                   {/* Element Symbol Circle */}

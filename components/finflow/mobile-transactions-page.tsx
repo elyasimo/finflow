@@ -666,14 +666,17 @@ export default function MobileTransactionsPage({
   )
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      <MobilePageHeader 
-        user={user} 
-        title={t('transactions')}
-        showSearch
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Transaktionen suchen..."
-      />
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1623] pb-24">
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-40">
+        <MobilePageHeader 
+          user={user} 
+          title={t('transactions')}
+          showSearch
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Transaktionen suchen..."
+        />
+      </div>
 
       {/* Type Tabs - Split Income/Expense */}
       <div className="bg-white dark:bg-[#1a2332] px-5 pt-3">
@@ -983,9 +986,9 @@ export default function MobileTransactionsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            {/* A1 Fix: Scrollable content with safe area padding */}
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="p-5 pb-[120px]">
+            {/* Scrollable content with keyboard safe area */}
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
+              <div className="p-5 pb-[200px]">
                 {renderTransactionForm(false)}
               </div>
             </div>

@@ -224,16 +224,17 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   }
 
   return (
-    <div className="h-screen bg-[#f8f9fc] dark:bg-[#0f1419] flex flex-col overflow-hidden">
-      <MobilePageHeader 
-        user={user as any} 
-        title={t('support')}
-      />
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1623] pb-40">
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-40">
+        <MobilePageHeader 
+          user={user as any} 
+          title={t('support')}
+        />
+      </div>
 
-      {/* Chat Container - Scrollable area */}
-      <div className="flex-1 overflow-y-auto pb-4">
-        {/* Messages */}
-        <div className="px-4 py-6 space-y-4">
+      {/* Chat Messages Area */}
+      <div className="px-4 py-6 space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -296,7 +297,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
 
         {/* Quick Actions */}
-        <div className="px-4 pb-32">
+        <div className="px-4 pb-4">
           <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
           <div className="flex flex-wrap gap-2">
             {QUICK_ACTIONS.map((action, index) => (
@@ -313,8 +314,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       </div>
 
-      {/* Input Area - Fixed at bottom above nav */}
-      <div className="fixed bottom-16 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 z-40 safe-area-pb">
+      {/* Input Area - In document flow, above bottom nav */}
+      <div className="sticky bottom-0 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-20 z-40">
         <div className="flex items-end gap-3">
           <div className="flex-1 relative">
             <input
