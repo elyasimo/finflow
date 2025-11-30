@@ -15,6 +15,14 @@ export default function CryptoPage() {
   const { user } = useAuth();
   const { markets: cryptoMarkets, isLoading } = useCryptoMarkets();
 
+  // Desktop: Redirect zu Markets mit Crypto-Tab
+  // WICHTIG: Hooks müssen VOR jedem Return aufgerufen werden!
+  useEffect(() => {
+    if (!isMobile) {
+      router.replace('/markets?tab=crypto');
+    }
+  }, [isMobile, router]);
+
   // Mobile: Revolut-Style Krypto-Seite
   if (isMobile) {
     return (
@@ -26,13 +34,7 @@ export default function CryptoPage() {
     );
   }
 
-  // Desktop: Redirect zu Markets mit Crypto-Tab
-  useEffect(() => {
-    if (!isMobile) {
-      router.replace('/markets?tab=crypto');
-    }
-  }, [isMobile, router]);
-
+  // Desktop: Show loading while redirecting
   return (
     <Layout user={user}>
       <div className="flex h-screen items-center justify-center">
