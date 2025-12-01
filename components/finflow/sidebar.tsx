@@ -216,8 +216,8 @@ export default function Sidebar({ user }: SidebarProps) {
                   <NavItem href="/markets" icon={TrendingUp}>
                     {t('markets')}
                   </NavItem>
-                  <NavItem href="/trading-agent" icon={Bot}>
-                    {t('tradingAgent')}
+                  <NavItem href="/robo-advisor" icon={Bot}>
+                    {t('roboAdvisor')}
                   </NavItem>
                   <NavItem href="/stock-trading-agent" icon={LineChart}>
                     {t('stockTradingAgent')}

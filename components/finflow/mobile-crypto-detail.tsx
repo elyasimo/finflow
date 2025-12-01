@@ -523,13 +523,13 @@ export default function MobileCryptoDetail({ symbol }: MobileCryptoDetailProps) 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 dark:bg-[#0f1623]/80 backdrop-blur-xl border-t border-border dark:border-[#2d3a4f] pb-[calc(env(safe-area-inset-bottom)+16px)]">
         <div className="flex gap-3">
           <button 
-            onClick={() => router.push(`/trading-agent?symbol=${cleanSymbol}&action=sell`)}
+            onClick={() => router.push(`/robo-advisor?symbol=${cleanSymbol}&action=sell`)}
             className="flex-1 py-4 rounded-xl bg-red-500 text-white font-semibold text-lg"
           >
             Verkaufen
           </button>
           <button 
-            onClick={() => router.push(`/trading-agent?symbol=${cleanSymbol}&action=buy`)}
+            onClick={() => router.push(`/robo-advisor?symbol=${cleanSymbol}&action=buy`)}
             className="flex-1 py-4 rounded-xl bg-green-500 text-white font-semibold text-lg"
           >
             Kaufen

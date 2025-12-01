@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
     icon: BarChart3, 
     label: "Investieren",
     labelKey: "invest",
-    matchPaths: ["/invest", "/markets", "/trading-agent", "/stock-trading-agent", "/trading-history", "/trading-performance", "/price-alerts", "/backtesting", "/risk-analysis"]
+    matchPaths: ["/invest", "/markets", "/robo-advisor", "/trading-agent", "/stock-trading-agent", "/trading-history", "/trading-performance", "/price-alerts", "/backtesting", "/risk-analysis"]
   },
   { 
     href: "/crypto", 

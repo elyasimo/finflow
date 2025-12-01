@@ -62,7 +62,7 @@ const menuGroups = [
     titleKey: "trading",
     items: [
       { href: "/markets", icon: TrendingUp, labelKey: "markets" },
-      { href: "/trading-agent", icon: Bot, labelKey: "tradingAgent" },
+      { href: "/robo-advisor", icon: Bot, labelKey: "roboAdvisor" },
       { href: "/stock-trading-agent", icon: LineChart, labelKey: "stockTradingAgent" },
       { href: "/price-alerts", icon: Bell, labelKey: "priceAlerts" },
     ]

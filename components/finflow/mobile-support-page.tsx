@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { 
   Send,
   MessageSquare,
@@ -42,6 +42,36 @@ interface MobileSupportPageProps {
 
 export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPageProps) {
   const { t } = useLanguage()
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Handle keyboard visibility using VisualViewport API
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const currentHeight = window.visualViewport.height
+        const windowHeight = window.innerHeight
+        const keyboardHeight = windowHeight - currentHeight
+        setKeyboardVisible(keyboardHeight > 100)
+        setViewportHeight(currentHeight)
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize)
+      window.visualViewport.addEventListener('scroll', handleResize)
+      handleResize() // Initial call
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize)
+        window.visualViewport.removeEventListener('scroll', handleResize)
+      }
+    }
+  }, [])
   
   // FAQ responses using translations
   const FAQ_RESPONSES: Record<string, string> = {
@@ -224,17 +254,30 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1623] pb-40">
+    <div 
+      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]"
+      style={{ 
+        height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+        paddingTop: 'env(safe-area-inset-top)',
+      }}
+    >
       {/* Fixed Header */}
-      <div className="sticky top-0 z-40">
+      <div className="flex-shrink-0 z-40">
         <MobilePageHeader 
           user={user as any} 
           title={t('support')}
         />
       </div>
 
-      {/* Chat Messages Area */}
-      <div className="px-4 py-6 space-y-4">
+      {/* Scrollable Chat Messages Area */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
+        style={{ 
+          paddingBottom: keyboardVisible ? '8px' : '100px' 
+        }}
+      >
+        <div className="space-y-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -296,33 +339,46 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Actions */}
-        <div className="px-4 pb-4">
-          <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
-          <div className="flex flex-wrap gap-2">
-            {QUICK_ACTIONS.map((action, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuickAction(action.keyword)}
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1a2332] rounded-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <action.icon className="w-4 h-4 text-blue-500" />
-                <span className="truncate">{action.label}</span>
-              </button>
-            ))}
+        {/* Quick Actions - Only show when keyboard is hidden */}
+        {!keyboardVisible && (
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
+            <div className="flex flex-wrap gap-2">
+              {QUICK_ACTIONS.map((action, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleQuickAction(action.keyword)}
+                  className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1a2332] rounded-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm active:scale-95 transition-transform"
+                >
+                  <action.icon className="w-4 h-4 text-blue-500" />
+                  <span className="truncate">{action.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Input Area - In document flow, above bottom nav */}
-      <div className="sticky bottom-0 left-0 right-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] p-4 pb-20 z-40">
+      {/* Fixed Input Area - Always visible above keyboard */}
+      <div 
+        className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3 z-50"
+        style={{
+          paddingBottom: keyboardVisible ? '8px' : 'calc(env(safe-area-inset-bottom) + 80px)'
+        }}
+      >
         <div className="flex items-end gap-3">
           <div className="flex-1 relative">
             <input
+              ref={inputRef}
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              onFocus={() => {
+                setTimeout(() => {
+                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+                }, 300)
+              }}
               placeholder={t('writeYourQuestion')}
               className={cn(
                 "w-full px-4 py-3 rounded-2xl text-base",
@@ -348,11 +404,20 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </button>
         </div>
         
-        {/* Contact Hint */}
-        <p className="text-center text-xs text-gray-400 mt-2">
-          {t('typeContactForSupport')}
-        </p>
+        {/* Contact Hint - only when keyboard hidden */}
+        {!keyboardVisible && (
+          <p className="text-center text-xs text-gray-400 mt-2">
+            {t('typeContactForSupport')}
+          </p>
+        )}
       </div>
+
+      {/* Bottom Navigation - Hidden when keyboard is open */}
+      {!keyboardVisible && (
+        <div className="fixed bottom-0 left-0 right-0 z-40">
+          <MobileBottomNav />
+        </div>
+      )}
 
       {/* Contact Form Modal */}
       {showContactForm && (
@@ -483,21 +548,21 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </div>
         </div>
       )}
-
-      <MobileBottomNav />
       
       {/* Styles */}
       <style jsx>{`
-        @keyframes slide-up {
+        @keyframes scale-in {
           from {
-            transform: translateY(100%);
+            transform: scale(0.95);
+            opacity: 0;
           }
           to {
-            transform: translateY(0);
+            transform: scale(1);
+            opacity: 1;
           }
         }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
+        .animate-scale-in {
+          animation: scale-in 0.2s ease-out;
         }
       `}</style>
     </div>

@@ -368,7 +368,7 @@ export default function MobileInvest({
               </p>
 
               <Link 
-                href="/trading-agent"
+                href="/robo-advisor"
                 className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg flex items-center justify-center"
               >
                 Jetzt investieren
@@ -650,7 +650,7 @@ export default function MobileInvest({
                 {COMMODITIES_ELEMENTS.map((commodity) => (
                   <Link 
                     key={commodity.symbol}
-                    href={`/markets?tab=commodities&symbol=${commodity.symbol}`}
+                    href="/commodities"
                     className="flex flex-col items-center active:scale-95 transition-transform"
                   >
                     <div className={cn(
@@ -694,7 +694,7 @@ export default function MobileInvest({
 
               <div className="space-y-2">
                 <Link 
-                  href="/trading-agent"
+                  href="/robo-advisor"
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-secondary dark:bg-[#0f1623] active:scale-[0.98] transition-transform"
                 >
                   <div className="flex items-center gap-3">
@@ -702,7 +702,7 @@ export default function MobileInvest({
                       <Bot className="w-5 h-5 text-cyan-500" />
                     </div>
                     <div className="text-left">
-                      <p className="text-foreground dark:text-white font-medium">Trading Agent</p>
+                      <p className="text-foreground dark:text-white font-medium">Robo-Advisor</p>
                       <p className="text-muted-foreground text-sm">Automatisiertes Trading</p>
                     </div>
                   </div>

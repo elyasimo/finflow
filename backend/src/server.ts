@@ -194,6 +194,7 @@ app.post('/currency/convert', authMiddleware, (req, res) => currencyController.c
 app.get('/currency/supported', authMiddleware, (req, res) => currencyController.getSupportedCurrencies(req, res));
 
 // API Keys routes (encrypted storage)
+app.get('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.getKeys(req, res));
 app.post('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.storeKeys(req, res));
 app.get('/api-keys/:provider/status', authMiddleware, (req, res) => apiKeysController.checkStatus(req, res));
 app.delete('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.deleteKeys(req, res));

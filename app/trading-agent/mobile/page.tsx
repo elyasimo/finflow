@@ -86,7 +86,7 @@ export default function MobileTradingAgentPage() {
   // Create Agent State
   const [showCreateSheet, setShowCreateSheet] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [newAgentName, setNewAgentName] = useState('Mein Trading Agent');
+  const [newAgentName, setNewAgentName] = useState('Mein Robo-Advisor');
   const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
   const [strategy, setStrategy] = useState<'conservative' | 'moderate' | 'aggressive'>('conservative');
   const [stopLoss, setStopLoss] = useState(8);
@@ -214,7 +214,7 @@ export default function MobileTradingAgentPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] pb-24">
-      <MobileHeader user={user} showLogo={false} title={t('tradingAgent')} />
+      <MobileHeader user={user} showLogo={false} title={t('roboAdvisor') || 'Robo-Advisor'} />
 
       {/* Header Card */}
       <div className="px-4 py-4">
@@ -222,7 +222,7 @@ export default function MobileTradingAgentPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Bot className="w-6 h-6" />
-              <span className="font-semibold">{t('tradingAgent')}</span>
+              <span className="font-semibold">{t('roboAdvisor') || 'Robo-Advisor'}</span>
             </div>
             <button 
               onClick={handleRefresh}

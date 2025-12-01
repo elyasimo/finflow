@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useRef, useCallback } from "react"
+import { useState, useMemo, useRef, useCallback, useEffect } from "react"
 import { 
   Plus,
   Search,
@@ -195,6 +195,34 @@ export default function MobileTransactionsPage({
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  
+  // Handle keyboard visibility using VisualViewport API
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const currentHeight = window.visualViewport.height
+        const windowHeight = window.innerHeight
+        const keyboardHeight = windowHeight - currentHeight
+        setKeyboardVisible(keyboardHeight > 100)
+        setViewportHeight(currentHeight)
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize)
+      window.visualViewport.addEventListener('scroll', handleResize)
+      handleResize()
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize)
+        window.visualViewport.removeEventListener('scroll', handleResize)
+      }
+    }
+  }, [])
   
   // Form State
   const [formData, setFormData] = useState<TransactionFormData>({
@@ -965,12 +993,21 @@ export default function MobileTransactionsPage({
 
       {/* Add Transaction Sheet */}
       {showAddSheet && (
-        <div className="fixed inset-0 z-50">
+        <div 
+          className="fixed inset-0 z-50"
+          style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+        >
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            style={{ 
+              maxHeight: viewportHeight ? `${viewportHeight * 0.9}px` : '90vh',
+              height: keyboardVisible ? `${viewportHeight ? viewportHeight * 0.95 : 95}vh` : 'auto'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -988,7 +1025,7 @@ export default function MobileTransactionsPage({
             </div>
             {/* Scrollable content with keyboard safe area */}
             <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
-              <div className="p-5 pb-[200px]">
+              <div className="p-5" style={{ paddingBottom: keyboardVisible ? '20px' : '200px' }}>
                 {renderTransactionForm(false)}
               </div>
             </div>
@@ -998,12 +1035,21 @@ export default function MobileTransactionsPage({
 
       {/* Edit Transaction Sheet */}
       {showEditSheet && selectedTransaction && (
-        <div className="fixed inset-0 z-50">
+        <div 
+          className="fixed inset-0 z-50"
+          style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
+        >
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            style={{ 
+              maxHeight: viewportHeight ? `${viewportHeight * 0.9}px` : '90vh',
+              height: keyboardVisible ? `${viewportHeight ? viewportHeight * 0.95 : 95}vh` : 'auto'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -1021,7 +1067,7 @@ export default function MobileTransactionsPage({
             </div>
             {/* A1 Fix: Scrollable content with safe area padding */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="p-5 pb-[120px]">
+              <div className="p-5" style={{ paddingBottom: keyboardVisible ? '20px' : '120px' }}>
                 {renderTransactionForm(true)}
               </div>
             </div>

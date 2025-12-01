@@ -315,7 +315,7 @@ export default function MobileCrypto({
               </p>
 
               <Link 
-                href="/trading-agent"
+                href="/robo-advisor"
                 className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg flex items-center justify-center"
               >
                 Mit dem Trading beginnen

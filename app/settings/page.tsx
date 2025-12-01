@@ -221,31 +221,29 @@ export default function SettingsPage() {
 
   // Handle API keys save
   const handleSaveApiKeys = async () => {
+    if (!alpacaApiKey || !alpacaApiSecret) {
+      toast.error('Please enter both API Key and API Secret');
+      return;
+    }
+
     setApiKeysLoading(true);
     try {
-      const keysToSave = [
-        { keyName: 'api_key', keyValue: alpacaApiKey },
-        { keyName: 'api_secret', keyValue: alpacaApiSecret },
-        { keyName: 'is_paper', keyValue: alpacaIsPaper.toString() },
-      ];
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/alpaca`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          apiKey: alpacaApiKey,
+          apiSecret: alpacaApiSecret,
+          permissions: { paper: alpacaIsPaper },
+        }),
+      });
 
-      for (const key of keysToSave) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({
-            provider: 'alpaca',
-            keyName: key.keyName,
-            keyValue: key.keyValue,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to save API key');
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save API keys');
       }
 
       toast.success(t('apiKeysSavedSuccessfully') || 'API keys saved successfully!');
@@ -464,29 +462,22 @@ export default function SettingsPage() {
           if (keys.alpacaApiKey && keys.alpacaSecretKey) {
             setApiKeysLoading(true);
             try {
-              const keysToSave = [
-                { keyName: 'api_key', keyValue: keys.alpacaApiKey },
-                { keyName: 'api_secret', keyValue: keys.alpacaSecretKey },
-                { keyName: 'is_paper', keyValue: 'true' },
-              ];
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/alpaca`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                  apiKey: keys.alpacaApiKey,
+                  apiSecret: keys.alpacaSecretKey,
+                  permissions: { paper: true },
+                }),
+              });
 
-              for (const key of keysToSave) {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                  },
-                  body: JSON.stringify({
-                    provider: 'alpaca',
-                    keyName: key.keyName,
-                    keyValue: key.keyValue,
-                  }),
-                });
-
-                if (!response.ok) {
-                  throw new Error('Failed to save Alpaca API key');
-                }
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save Alpaca API keys');
               }
               
               setAlpacaApiKey(keys.alpacaApiKey);

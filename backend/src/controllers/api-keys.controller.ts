@@ -54,6 +54,50 @@ export class ApiKeysController {
   }
 
   /**
+   * Get API keys for a provider (returns masked keys for security)
+   * GET /api-keys/:provider
+   */
+  async getKeys(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).userId;
+      const { provider } = req.params;
+
+      // Validate provider
+      if (provider !== 'binance' && provider !== 'alpaca') {
+        res.status(400).json({
+          error: 'Invalid provider. Must be "binance" or "alpaca"'
+        });
+        return;
+      }
+
+      const keys = await apiKeysService.getApiKeys(userId, provider);
+
+      if (!keys) {
+        res.status(404).json({
+          error: 'No API keys found for this provider'
+        });
+        return;
+      }
+
+      // Return masked keys for display (only show last 4 chars)
+      res.status(200).json({
+        provider,
+        keys: {
+          api_key: keys.apiKey ? `${'*'.repeat(Math.max(0, keys.apiKey.length - 4))}${keys.apiKey.slice(-4)}` : '',
+          api_secret: keys.apiSecret ? `${'*'.repeat(Math.max(0, keys.apiSecret.length - 4))}${keys.apiSecret.slice(-4)}` : '',
+          is_paper: keys.permissions?.paper ? 'true' : 'false',
+        },
+        configured: true
+      });
+    } catch (error) {
+      console.error('Get API keys error:', error);
+      res.status(500).json({
+        error: 'Failed to get API keys'
+      });
+    }
+  }
+
+  /**
    * Check if user has API keys configured
    * GET /api-keys/:provider/status
    */
