@@ -61,13 +61,13 @@ interface MobileInvestProps {
   onRefresh: () => void
 }
 
-// Produkt-Kategorien mit korrekten Links
+// Produkt-Kategorien mit korrekten Links - Labels werden dynamisch übersetzt
 const PRODUCT_CATEGORIES = [
-  { id: 'stocks', label: 'Aktien', icon: LineChart, href: '/markets' },
-  { id: 'etf', label: 'ETF', icon: BarChart3, href: '/etf' },
-  { id: 'bonds', label: 'Anleihen', icon: Landmark, href: '/markets?tab=bonds' },
-  { id: 'commodities', label: 'Rohstoffe', icon: Coins, href: '/commodities' },
-  { id: 'robo', label: 'Robo-Advisor', icon: Bot, href: '/robo-advisor' },
+  { id: 'stocks', labelKey: 'stocksLabel', icon: LineChart, href: '/markets' },
+  { id: 'etf', labelKey: 'etfLabel', icon: BarChart3, href: '/etf' },
+  { id: 'bonds', labelKey: 'bondsLabel', icon: Landmark, href: '/markets?tab=bonds' },
+  { id: 'commodities', labelKey: 'commoditiesLabel', icon: Coins, href: '/commodities' },
+  { id: 'robo', labelKey: 'roboAdvisorLabel', icon: Bot, href: '/robo-advisor' },
 ]
 
 // Stock Logo URLs - Using official sources
@@ -188,12 +188,12 @@ const getETFIssuerLogo = (name: string, symbol: string): { logo: string; color: 
   return { logo: 'https://logo.clearbit.com/ishares.com', color: 'bg-emerald-500' }
 }
 
-// Rohstoffe-Daten
+// Rohstoffe-Daten - Labels werden dynamisch übersetzt
 const COMMODITIES_ELEMENTS = [
-  { symbol: 'Au', name: 'Gold', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-  { symbol: 'Ag', name: 'Silber', color: 'bg-gray-200 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300' },
-  { symbol: 'Pd', name: 'Palladium', color: 'bg-slate-200 text-slate-700 dark:bg-slate-700/30 dark:text-slate-300' },
-  { symbol: 'Pt', name: 'Platin', color: 'bg-zinc-200 text-zinc-700 dark:bg-zinc-700/30 dark:text-zinc-300' },
+  { symbol: 'Au', labelKey: 'goldLabel', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
+  { symbol: 'Ag', labelKey: 'silverLabel', color: 'bg-gray-200 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300' },
+  { symbol: 'Pd', labelKey: 'palladiumLabel', color: 'bg-slate-200 text-slate-700 dark:bg-slate-700/30 dark:text-slate-300' },
+  { symbol: 'Pt', labelKey: 'platinumLabel', color: 'bg-zinc-200 text-zinc-700 dark:bg-zinc-700/30 dark:text-zinc-300' },
 ]
 
 export default function MobileInvest({
@@ -301,7 +301,7 @@ export default function MobileInvest({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Aktien, ETFs suchen..."
+                  placeholder={t('searchStocksEtfs') || 'Search stocks, ETFs...'}
                   className="flex-1 bg-transparent text-sm text-foreground dark:text-white placeholder-muted-foreground focus:outline-none"
                   autoFocus
                 />
@@ -323,7 +323,7 @@ export default function MobileInvest({
                 className="flex-1 mx-3 flex items-center gap-2 px-4 py-2 rounded-full bg-secondary dark:bg-[#1e293b]"
               >
                 <Search className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground text-sm">Suche</span>
+                <span className="text-muted-foreground text-sm">{t('searchPlaceholder') || 'Search'}</span>
               </button>
 
               {/* Right Icons */}
@@ -354,7 +354,7 @@ export default function MobileInvest({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-            <p className="text-muted-foreground">Lade Marktdaten...</p>
+            <p className="text-muted-foreground">{t('loadingMarketData') || 'Loading market data...'}</p>
           </div>
         ) : (
           <>
@@ -459,7 +459,7 @@ export default function MobileInvest({
 
             {/* Produkte - Mit funktionierenden Links */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
-              <h3 className="text-muted-foreground font-medium mb-4">Produkte</h3>
+              <h3 className="text-muted-foreground font-medium mb-4">{t('products') || 'Products'}</h3>
               <div className="grid grid-cols-5 gap-2">
                 {PRODUCT_CATEGORIES.map((cat) => {
                   const Icon = cat.icon
@@ -472,7 +472,7 @@ export default function MobileInvest({
                       <div className="w-12 h-12 rounded-2xl bg-secondary dark:bg-[#0f1623] flex items-center justify-center mb-2">
                         <Icon className="w-5 h-5 text-foreground dark:text-white" />
                       </div>
-                      <span className="text-foreground dark:text-white text-[10px] text-center leading-tight">{cat.label}</span>
+                      <span className="text-foreground dark:text-white text-[10px] text-center leading-tight">{t(cat.labelKey as any) || cat.labelKey}</span>
                     </Link>
                   )
                 })}
@@ -482,7 +482,7 @@ export default function MobileInvest({
             {/* Top Mover */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Die Top Mover von heute</span>
+                <span className="text-muted-foreground font-medium">{t('topMoversToday') || 'Top Movers Today'}</span>
               </div>
 
               {/* Segment Tabs */}
@@ -496,7 +496,7 @@ export default function MobileInvest({
                       : "text-muted-foreground"
                   )}
                 >
-                  Top-Gewinner
+                  {t('topGainers') || 'Top Gainers'}
                 </button>
                 <button
                   onClick={() => setActiveMoversTab('losers')}
@@ -507,7 +507,7 @@ export default function MobileInvest({
                       : "text-muted-foreground"
                   )}
                 >
-                  Top-Verlierer
+                  {t('topLosers') || 'Top Losers'}
                 </button>
               </div>
 
@@ -558,7 +558,7 @@ export default function MobileInvest({
             {/* Meistgehandelt */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Meistgehandelt diese Woche</span>
+                <span className="text-muted-foreground font-medium">{t('mostTradedWeek') || 'Most Traded This Week'}</span>
               </div>
 
               <div className="space-y-3">
@@ -583,7 +583,7 @@ export default function MobileInvest({
                       <div className="text-left">
                         <p className="text-foreground dark:text-white font-medium">{stock.symbol}</p>
                         <p className="text-muted-foreground text-xs">
-                          {stock.buyPercent}% Käufe · {100 - stock.buyPercent}% Verkäufe
+                          {stock.buyPercent}% {t('buys') || 'Buys'} · {100 - stock.buyPercent}% {t('sells') || 'Sells'}
                         </p>
                       </div>
                     </div>
@@ -604,7 +604,7 @@ export default function MobileInvest({
                 href="/markets"
                 className="w-full mt-4 py-3 text-primary text-sm font-medium flex items-center justify-center gap-1"
               >
-                Alle anzeigen <ChevronRight className="w-4 h-4" />
+                {t('showAll') || 'Show All'} <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -612,7 +612,7 @@ export default function MobileInvest({
             {news && news.length > 0 && (
               <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-muted-foreground font-medium">Neuigkeiten</span>
+                  <span className="text-muted-foreground font-medium">{t('news') || 'News'}</span>
                 </div>
 
                 <div className="space-y-4">
@@ -645,7 +645,7 @@ export default function MobileInvest({
 
             {/* Rohstoffe - Mit Links */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
-              <h3 className="text-muted-foreground font-medium mb-4">Rohstoffe</h3>
+              <h3 className="text-muted-foreground font-medium mb-4">{t('commoditiesLabel') || 'Commodities'}</h3>
               <div className="flex justify-between">
                 {COMMODITIES_ELEMENTS.map((commodity) => (
                   <Link 
@@ -659,7 +659,7 @@ export default function MobileInvest({
                     )}>
                       <span className="text-lg font-bold">{commodity.symbol}</span>
                     </div>
-                    <span className="text-foreground dark:text-white text-xs">{commodity.name}</span>
+                    <span className="text-foreground dark:text-white text-xs">{t(commodity.labelKey as any) || commodity.labelKey}</span>
                   </Link>
                 ))}
               </div>
@@ -668,7 +668,7 @@ export default function MobileInvest({
             {/* Lernen */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Lernen</span>
+                <span className="text-muted-foreground font-medium">{t('learn') || 'Learn'}</span>
               </div>
 
               <Link 
@@ -679,8 +679,8 @@ export default function MobileInvest({
                   <Lightbulb className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-foreground dark:text-white font-medium">Erste Schritte beim Trading</p>
-                  <p className="text-muted-foreground text-sm">Kurse ansehen</p>
+                  <p className="text-foreground dark:text-white font-medium">{t('firstStepsTrading') || 'First Steps in Trading'}</p>
+                  <p className="text-muted-foreground text-sm">{t('viewCourses') || 'View Courses'}</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
               </Link>
@@ -689,7 +689,7 @@ export default function MobileInvest({
             {/* Trading Tools */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Trading Tools</span>
+                <span className="text-muted-foreground font-medium">{t('tradingTools') || 'Trading Tools'}</span>
               </div>
 
               <div className="space-y-2">
@@ -703,7 +703,7 @@ export default function MobileInvest({
                     </div>
                     <div className="text-left">
                       <p className="text-foreground dark:text-white font-medium">Robo-Advisor</p>
-                      <p className="text-muted-foreground text-sm">Automatisiertes Trading</p>
+                      <p className="text-muted-foreground text-sm">{t('automatedTrading') || 'Automated Trading'}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -718,8 +718,8 @@ export default function MobileInvest({
                       <Bell className="w-5 h-5 text-red-500" />
                     </div>
                     <div className="text-left">
-                      <p className="text-foreground dark:text-white font-medium">Preisalarme</p>
-                      <p className="text-muted-foreground text-sm">Benachrichtigungen einrichten</p>
+                      <p className="text-foreground dark:text-white font-medium">{t('priceAlertsLabel') || 'Price Alerts'}</p>
+                      <p className="text-muted-foreground text-sm">{t('setupNotifications') || 'Setup Notifications'}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -730,8 +730,7 @@ export default function MobileInvest({
             {/* Disclaimer */}
             <div className="px-4 py-8 text-center text-muted-foreground text-xs leading-relaxed">
               <p>
-                Die Wertentwicklung in der Vergangenheit ist kein zuverlässiger Indikator für zukünftige Ergebnisse. 
-                Deine Investitionen können im Wert steigen oder fallen.
+                {t('pastPerformanceDisclaimer') || 'Past performance is not a reliable indicator of future results. Your investments may increase or decrease in value.'}
               </p>
             </div>
           </>

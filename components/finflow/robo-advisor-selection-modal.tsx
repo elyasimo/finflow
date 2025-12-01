@@ -20,6 +20,7 @@ interface RoboAdvisorSelectionModalProps {
   isOpen: boolean
   onClose: () => void
   onOpenCreateSheet?: () => void
+  onSelectAgent?: (type: 'crypto' | 'trading') => void
 }
 
 type AgentChoice = 'crypto' | 'trading' | 'configure'
@@ -38,7 +39,8 @@ interface AgentOption {
 export default function RoboAdvisorSelectionModal({ 
   isOpen, 
   onClose,
-  onOpenCreateSheet 
+  onOpenCreateSheet,
+  onSelectAgent
 }: RoboAdvisorSelectionModalProps) {
   const { t } = useLanguage()
   const router = useRouter()
@@ -108,11 +110,14 @@ export default function RoboAdvisorSelectionModal({
         // Navigate to robo-advisor with create param
         router.push('/robo-advisor?action=create')
       }
-    } else if (option.route) {
+    } else if (option.id === 'crypto' || option.id === 'trading') {
+      // Use callback to set agent type directly without page reload
+      if (onSelectAgent) {
+        onSelectAgent(option.id)
+      }
       onClose()
-      router.push(option.route)
     }
-  }, [rememberChoice, onClose, onOpenCreateSheet, router, trackSelection])
+  }, [rememberChoice, onClose, onOpenCreateSheet, onSelectAgent, router, trackSelection])
 
   // Keyboard handling
   useEffect(() => {

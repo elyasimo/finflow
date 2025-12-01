@@ -19,7 +19,7 @@ interface NavItem {
   href: string
   icon: React.ElementType
   label: string
-  labelKey?: string
+  labelKey: 'dashboard' | 'invest' | 'crypto' | 'reports'
   matchPaths?: string[]
 }
 
@@ -61,9 +61,12 @@ interface MobileBottomNavProps {
 
 export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   const pathname = usePathname()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { user } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
+
+  // Debug: Log current language and translations
+  console.log('[BottomNav] Current language:', language, 'dashboard =', t('dashboard' as any), 'invest =', t('invest' as any))
 
   const handleMenuClick = () => {
     if (onMenuClick) {
@@ -108,7 +111,7 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
                   "text-[10px] font-medium leading-tight",
                   active && "font-semibold"
                 )}>
-                  {item.labelKey ? t(item.labelKey) : item.label}
+                  {t(item.labelKey as any) || item.label}
                 </span>
               </Link>
             )

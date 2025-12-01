@@ -38,7 +38,8 @@ import {
   Activity,
   RefreshCw,
   X,
-  Check
+  Check,
+  ChevronRight
 } from 'lucide-react';
 import Layout from "@/components/finflow/layout";
 import { useAuth } from "@/hooks/use-auth";
@@ -133,6 +134,8 @@ export default function RoboAdvisorPage() {
     const typeParam = searchParams.get('type');
     const actionParam = searchParams.get('action');
     
+    console.log('[RoboAdvisor] Checking preferences...', { typeParam, actionParam });
+    
     // If action=create, open the create sheet
     if (actionParam === 'create') {
       setShowCreateSheet(true);
@@ -142,20 +145,28 @@ export default function RoboAdvisorPage() {
     
     // If type is specified in URL, use it
     if (typeParam === 'crypto' || typeParam === 'trading') {
+      console.log('[RoboAdvisor] Using URL type param:', typeParam);
       setAgentType(typeParam);
       setHasCheckedPreference(true);
       return;
     }
     
-    // Check for saved preference
+    // Check for saved preference - but ONLY if not coming from navigation
+    // Skip preference check on direct navigation to /robo-advisor
     const savedPreference = localStorage.getItem('roboAdvisorPreference');
+    console.log('[RoboAdvisor] Saved preference:', savedPreference);
+    
+    // Always show modal on first visit - let user choose
+    // Only use saved preference if "Remember my choice" was checked
     if (savedPreference === 'crypto' || savedPreference === 'trading') {
+      console.log('[RoboAdvisor] Using saved preference:', savedPreference);
       setAgentType(savedPreference);
       setHasCheckedPreference(true);
       return;
     }
     
     // No preference saved and no URL param - show selection modal
+    console.log('[RoboAdvisor] No preference found, showing modal');
     setShowSelectionModal(true);
     setHasCheckedPreference(true);
   }, [searchParams, hasCheckedPreference]);
@@ -291,6 +302,10 @@ export default function RoboAdvisorPage() {
             // If user closes without selecting, go back
             router.back();
           }}
+          onSelectAgent={(type) => {
+            setAgentType(type);
+            setShowSelectionModal(false);
+          }}
           onOpenCreateSheet={() => {
             setShowSelectionModal(false);
             setShowCreateSheet(true);
@@ -314,7 +329,7 @@ export default function RoboAdvisorPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] pb-24">
         <MobileHeader user={user} showLogo={false} title={t('roboAdvisor') || 'Robo-Advisor'} />
 
-        {/* Header Card */}
+        {/* Header Card with Agent Type Selector */}
         <div className="px-4 py-4">
           <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-white">
             <div className="flex items-center justify-between mb-3">
@@ -322,12 +337,27 @@ export default function RoboAdvisorPage() {
                 <Bot className="w-6 h-6" />
                 <span className="font-semibold">{t('roboAdvisor') || 'Robo-Advisor'}</span>
               </div>
-              <button 
-                onClick={handleRefresh}
-                className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
-              >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Switch Agent Button */}
+                <button 
+                  onClick={() => {
+                    // Clear preference and show modal
+                    localStorage.removeItem('roboAdvisorPreference');
+                    setAgentType(null);
+                    setShowSelectionModal(true);
+                  }}
+                  className="px-3 py-1.5 rounded-full bg-white/20 text-xs font-medium flex items-center gap-1"
+                >
+                  {agentType === 'crypto' ? '₿ Krypto' : agentType === 'trading' ? '📈 Trading' : 'Wählen'}
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+                <button 
+                  onClick={handleRefresh}
+                  className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
             <p className="text-3xl font-bold mb-1">
               {convertAndFormat(totalValueEur, 'EUR', currency)}
@@ -335,6 +365,26 @@ export default function RoboAdvisorPage() {
             <p className="text-sm text-white/70">{t('totalValue')}</p>
           </div>
         </div>
+
+        {/* Selection Modal - Can be reopened */}
+        <RoboAdvisorSelectionModal
+          isOpen={showSelectionModal}
+          onClose={() => {
+            setShowSelectionModal(false);
+            // If no agent type selected, go back
+            if (!agentType) {
+              router.back();
+            }
+          }}
+          onSelectAgent={(type) => {
+            setAgentType(type);
+            setShowSelectionModal(false);
+          }}
+          onOpenCreateSheet={() => {
+            setShowSelectionModal(false);
+            setShowCreateSheet(true);
+          }}
+        />
 
         {/* Warning Banner */}
         <div className="px-4 mb-4">

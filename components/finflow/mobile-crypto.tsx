@@ -248,7 +248,7 @@ export default function MobileCrypto({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Krypto suchen..."
+                  placeholder={t('searchCrypto') || 'Search crypto...'}
                   className="flex-1 bg-transparent text-sm text-foreground dark:text-white placeholder-muted-foreground focus:outline-none"
                   autoFocus
                 />
@@ -270,7 +270,7 @@ export default function MobileCrypto({
                 className="flex-1 mx-3 flex items-center gap-2 px-4 py-2 rounded-full bg-secondary dark:bg-[#1e293b]"
               >
                 <Search className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground text-sm">Suche</span>
+                <span className="text-muted-foreground text-sm">{t('searchPlaceholder') || 'Search'}</span>
               </button>
 
               {/* Right Icons */}
@@ -367,7 +367,7 @@ export default function MobileCrypto({
             {/* Top Mover */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Top Mover</span>
+                <span className="text-muted-foreground font-medium">{t('topMoversToday') || 'Top Movers'}</span>
               </div>
 
               {/* Segment Tabs */}
@@ -381,7 +381,7 @@ export default function MobileCrypto({
                       : "text-muted-foreground"
                   )}
                 >
-                  Top-Gewinner
+                  {t('topGainers') || 'Top Gainers'}
                 </button>
                 <button
                   onClick={() => setActiveMoversTab('losers')}
@@ -392,7 +392,7 @@ export default function MobileCrypto({
                       : "text-muted-foreground"
                   )}
                 >
-                  Top-Verlierer
+                  {t('topLosers') || 'Top Losers'}
                 </button>
               </div>
 
@@ -433,7 +433,7 @@ export default function MobileCrypto({
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground font-medium">
-                  {showSearch && searchQuery ? `Ergebnisse für "${searchQuery}"` : 'Alle Kryptowährungen'}
+                  {showSearch && searchQuery ? `${t('resultsFor') || 'Results for'} "${searchQuery}"` : (t('allCryptocurrencies') || 'All Cryptocurrencies')}
                 </span>
               </div>
 
@@ -478,14 +478,14 @@ export default function MobileCrypto({
                 href="/markets"
                 className="w-full mt-4 py-3 text-primary text-sm font-medium flex items-center justify-center gap-1"
               >
-                Alle anzeigen <ChevronRight className="w-4 h-4" />
+                {t('showAll') || 'Show All'} <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
 
             {/* Am meisten gehandelt */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Am meisten gehandelt</span>
+                <span className="text-muted-foreground font-medium">{t('mostTradedWeek') || 'Most Traded'}</span>
               </div>
 
               <div className="space-y-3">
@@ -508,7 +508,7 @@ export default function MobileCrypto({
                       <div className="text-left">
                         <p className="text-foreground dark:text-white font-medium">{crypto.name || crypto.symbol}</p>
                         <p className="text-muted-foreground text-xs">
-                          {crypto.buyPercent}% Käufe · {100 - crypto.buyPercent}% Verkäufe
+                          {crypto.buyPercent}% {t('buys') || 'Buys'} · {100 - crypto.buyPercent}% {t('sells') || 'Sells'}
                         </p>
                       </div>
                     </div>
@@ -529,7 +529,7 @@ export default function MobileCrypto({
             {/* Alarme */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-muted-foreground font-medium">Alarme</span>
+                <span className="text-muted-foreground font-medium">{t('alerts') || 'Alerts'}</span>
               </div>
 
               <Link 
@@ -539,7 +539,7 @@ export default function MobileCrypto({
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <Plus className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-foreground dark:text-white font-medium">Alarm hinzufügen</span>
+                <span className="text-foreground dark:text-white font-medium">{t('addAlert') || 'Add Alert'}</span>
                 <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
               </Link>
             </div>
@@ -547,8 +547,7 @@ export default function MobileCrypto({
             {/* Disclaimer */}
             <div className="px-4 py-8 text-center text-muted-foreground text-xs leading-relaxed">
               <p>
-                Die Wertentwicklung in der Vergangenheit ist kein zuverlässiger 
-                Indikator für zukünftige Ergebnisse. Kryptowährungen sind volatil.
+                {t('cryptoDisclaimer') || 'Past performance is not a reliable indicator of future results. Cryptocurrencies are volatile.'}
               </p>
             </div>
           </>
