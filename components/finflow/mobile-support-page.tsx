@@ -19,9 +19,9 @@ import {
   Sparkles
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import MobilePageHeader from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { ChevronLeft } from "lucide-react"
 
 interface Message {
   id: string
@@ -309,12 +309,34 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         paddingTop: 'env(safe-area-inset-top)',
       }}
     >
-      {/* Fixed Header */}
-      <div className="flex-shrink-0 z-40">
-        <MobilePageHeader 
-          user={user as any} 
-          title={t('support')}
-        />
+      {/* Compact Chat Header */}
+      <div className="flex-shrink-0 z-40 bg-white dark:bg-[#0f1623] border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-3 px-4 h-14">
+          {/* Back Button */}
+          <button
+            onClick={() => window.history.back()}
+            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center"
+            aria-label="Zurück"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
+          
+          {/* Bot Avatar + Title */}
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-base font-semibold text-gray-900 dark:text-white">
+                {t('support') || 'Support'}
+              </h1>
+              <p className="text-xs text-emerald-500 flex items-center gap-1">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                Online
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Scrollable Chat Messages Area */}
@@ -411,7 +433,12 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       <div 
         className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3 z-50"
         style={{
-          paddingBottom: keyboardVisible ? 'env(safe-area-inset-bottom, 8px)' : 'calc(env(safe-area-inset-bottom) + 80px)'
+          position: keyboardVisible ? 'fixed' : 'relative',
+          bottom: keyboardVisible ? 0 : 'auto',
+          left: 0,
+          right: 0,
+          paddingBottom: keyboardVisible ? '8px' : 'calc(env(safe-area-inset-bottom) + 80px)',
+          transform: keyboardVisible ? 'translateY(0)' : 'none',
         }}
       >
         <div className="flex items-end gap-3">
@@ -423,10 +450,13 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               onFocus={() => {
-                // Scroll messages into view after keyboard opens
+                // Scroll input into view and scroll messages after keyboard opens
                 setTimeout(() => {
+                  // Scroll to the end of messages
                   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-                }, 350)
+                  // Also ensure input is visible
+                  inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }, 400)
               }}
               placeholder={t('writeYourQuestion')}
               className={cn(
