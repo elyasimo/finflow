@@ -108,7 +108,7 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
                   "text-[10px] font-medium leading-tight",
                   active && "font-semibold"
                 )}>
-                  {item.label}
+                  {item.labelKey ? t(item.labelKey) : item.label}
                 </span>
               </Link>
             )
@@ -123,7 +123,7 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
             )}
           >
             <MenuIcon className="h-5 w-5" />
-            <span className="text-[10px] font-medium leading-tight">Mehr</span>
+            <span className="text-[10px] font-medium leading-tight">{t('more')}</span>
           </button>
         </div>
       </div>

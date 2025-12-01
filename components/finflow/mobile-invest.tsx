@@ -361,17 +361,17 @@ export default function MobileInvest({
             {/* Hero Section */}
             <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-blue-900/30 via-indigo-900/20 to-transparent">
               <h1 className="text-3xl font-bold text-foreground dark:text-white text-center mb-1">
-                Investieren
+                {t('invest') || 'Investieren'}
               </h1>
               <p className="text-muted-foreground text-center text-sm">
-                Baue langfristig Vermögen auf
+                {t('buildWealthLongTerm') || 'Baue langfristig Vermögen auf'}
               </p>
 
               <Link 
                 href="/robo-advisor"
                 className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg flex items-center justify-center"
               >
-                Jetzt investieren
+                {t('investNow') || 'Jetzt investieren'}
               </Link>
             </div>
 

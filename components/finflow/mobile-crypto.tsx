@@ -301,24 +301,24 @@ export default function MobileCrypto({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-            <p className="text-muted-foreground">Lade Krypto-Daten...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         ) : (
           <>
             {/* Hero Section */}
             <div className="relative px-4 pt-8 pb-6 bg-gradient-to-br from-blue-900/30 via-indigo-900/20 to-transparent">
               <h1 className="text-3xl font-bold text-foreground dark:text-white text-center mb-1">
-                Krypto
+                {t('crypto') || 'Krypto'}
               </h1>
               <p className="text-muted-foreground text-center text-sm">
-                Entdecke die Welt der Kryptowährungen
+                {t('discoverCrypto') || 'Entdecke die Welt der Kryptowährungen'}
               </p>
 
               <Link 
                 href="/robo-advisor"
                 className="mt-6 w-full py-4 rounded-2xl bg-primary text-primary-foreground font-medium text-lg flex items-center justify-center"
               >
-                Mit dem Trading beginnen
+                {t('startTrading') || 'Mit dem Trading beginnen'}
               </Link>
             </div>
 

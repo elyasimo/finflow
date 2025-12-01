@@ -363,7 +363,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       <div 
         className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3 z-50"
         style={{
-          paddingBottom: keyboardVisible ? '8px' : 'calc(env(safe-area-inset-bottom) + 80px)'
+          paddingBottom: keyboardVisible ? 'env(safe-area-inset-bottom, 8px)' : 'calc(env(safe-area-inset-bottom) + 80px)'
         }}
       >
         <div className="flex items-end gap-3">
@@ -375,9 +375,10 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               onFocus={() => {
+                // Scroll messages into view after keyboard opens
                 setTimeout(() => {
-                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-                }, 300)
+                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+                }, 350)
               }}
               placeholder={t('writeYourQuestion')}
               className={cn(
@@ -387,6 +388,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 "border-2 border-transparent",
                 "focus:outline-none focus:border-blue-500"
               )}
+              style={{ fontSize: '16px' }} // Prevents iOS zoom on focus
             />
           </div>
           <button

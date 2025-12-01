@@ -7,6 +7,8 @@ export const translations = {
     accounts: 'Accounts',
     settings: 'Settings',
     reports: 'Reports',
+    invest: 'Invest',
+    crypto: 'Crypto',
     budgets: 'Budgets',
     categories: 'Categories',
     financialMarkets: 'Financial Markets',
@@ -259,6 +261,10 @@ export const translations = {
     totalValueCrypto: 'Total Value',
     monitoredBy: 'Monitored by',
     other: 'Other',
+    investNow: 'Invest now',
+    buildWealthLongTerm: 'Build wealth long-term',
+    discoverCrypto: 'Discover the world of cryptocurrencies',
+    startTrading: 'Start trading',
 
     // Reports
     financialReports: 'Financial Reports',
@@ -710,6 +716,8 @@ export const translations = {
     accounts: 'Konten',
     settings: 'Einstellungen',
     reports: 'Berichte',
+    invest: 'Investieren',
+    crypto: 'Krypto',
     budgets: 'Budgets',
     categories: 'Kategorien',
     financialMarkets: 'Finanzmärkte',
@@ -962,6 +970,10 @@ export const translations = {
     totalValueCrypto: 'Gesamtwert',
     monitoredBy: 'Überwacht von',
     other: 'Sonstiges',
+    investNow: 'Jetzt investieren',
+    buildWealthLongTerm: 'Baue langfristig Vermögen auf',
+    discoverCrypto: 'Entdecke die Welt der Kryptowährungen',
+    startTrading: 'Mit dem Trading beginnen',
 
     // Reports
     financialReports: 'Finanzberichte',
@@ -1415,6 +1427,8 @@ export const translations = {
     accounts: 'Comptes',
     settings: 'Paramètres',
     reports: 'Rapports',
+    invest: 'Investir',
+    crypto: 'Crypto',
     budgets: 'Budgets',
     categories: 'Catégories',
     financialMarkets: 'Marchés Financiers',
@@ -1658,6 +1672,10 @@ export const translations = {
     totalValueCrypto: 'Valeur totale',
     monitoredBy: 'Surveillé par',
     other: 'Autre',
+    investNow: 'Investir maintenant',
+    buildWealthLongTerm: 'Construire un patrimoine à long terme',
+    discoverCrypto: 'Découvrez le monde des cryptomonnaies',
+    startTrading: 'Commencer le trading',
 
     // Reports
     financialReports: 'Rapports financiers',
@@ -2113,6 +2131,8 @@ export const translations = {
     accounts: 'الحسابات',
     settings: 'الإعدادات',
     reports: 'التقارير',
+    invest: 'استثمار',
+    crypto: 'كريبتو',
     budgets: 'الميزانيات',
     categories: 'الفئات',
     financialMarkets: 'الأسواق المالية',
@@ -2355,6 +2375,10 @@ export const translations = {
     totalValueCrypto: 'القيمة الإجمالية',
     monitoredBy: 'مراقب من قبل',
     other: 'أخرى',
+    investNow: 'استثمر الآن',
+    buildWealthLongTerm: 'ابنِ ثروتك على المدى الطويل',
+    discoverCrypto: 'اكتشف عالم العملات المشفرة',
+    startTrading: 'ابدأ التداول',
 
     // Reports
     financialReports: 'التقارير المالية',
