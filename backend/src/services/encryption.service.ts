@@ -4,7 +4,25 @@ import crypto from 'crypto';
 /**
  * EncryptionService - Handles encryption/decryption of sensitive data like API keys
  * Uses AES-256-GCM for authenticated encryption
+ * 
+ * IMPORTANT: ENCRYPTION_MASTER_KEY must be set in environment variables.
+ * Without it, API key encryption is DISABLED and keys cannot be persisted.
+ * 
+ * Generate a key with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
  */
+
+// Global flag to track if encryption is available
+let encryptionEnabled = false;
+let encryptionDisabledReason = '';
+
+export function isEncryptionEnabled(): boolean {
+  return encryptionEnabled;
+}
+
+export function getEncryptionDisabledReason(): string {
+  return encryptionDisabledReason;
+}
+
 export class EncryptionService {
   private algorithm = 'aes-256-gcm';
   private key: Buffer;
@@ -14,18 +32,30 @@ export class EncryptionService {
     const masterKey = process.env.ENCRYPTION_MASTER_KEY;
 
     if (!masterKey) {
-      // Generate a random key for development if not set
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('⚠️  ENCRYPTION_MASTER_KEY not set! Generating random key for development.');
-        console.warn('⚠️  This key will change on restart. Set ENCRYPTION_MASTER_KEY in .env for production!');
-        this.key = crypto.randomBytes(32);
-      } else {
-        throw new Error('ENCRYPTION_MASTER_KEY must be set in production!');
-      }
+      // CRITICAL: Do NOT generate random key - this causes data loss on restart
+      encryptionEnabled = false;
+      encryptionDisabledReason = 'ENCRYPTION_MASTER_KEY environment variable is not set. API key encryption is DISABLED. Set this variable to enable secure API key storage.';
+      console.error('❌ CRITICAL: ' + encryptionDisabledReason);
+      console.error('❌ Generate a key with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+      // Use a dummy key that will never successfully decrypt old data
+      // This prevents silent data corruption
+      this.key = Buffer.alloc(32, 0);
     } else if (masterKey.length !== 64) {
-      throw new Error('ENCRYPTION_MASTER_KEY must be 64 hex characters (32 bytes)');
+      encryptionEnabled = false;
+      encryptionDisabledReason = 'ENCRYPTION_MASTER_KEY must be exactly 64 hex characters (32 bytes). Current length: ' + masterKey.length;
+      console.error('❌ CRITICAL: ' + encryptionDisabledReason);
+      this.key = Buffer.alloc(32, 0);
     } else {
-      this.key = Buffer.from(masterKey, 'hex');
+      try {
+        this.key = Buffer.from(masterKey, 'hex');
+        encryptionEnabled = true;
+        console.log('✅ Encryption service initialized successfully with master key');
+      } catch (error) {
+        encryptionEnabled = false;
+        encryptionDisabledReason = 'Failed to parse ENCRYPTION_MASTER_KEY as hex: ' + (error as Error).message;
+        console.error('❌ CRITICAL: ' + encryptionDisabledReason);
+        this.key = Buffer.alloc(32, 0);
+      }
     }
   }
 

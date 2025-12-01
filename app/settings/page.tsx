@@ -48,6 +48,10 @@ export default function SettingsPage() {
   const [binanceApiKeysLoading, setBinanceApiKeysLoading] = useState(false);
   const [binanceStatusLoaded, setBinanceStatusLoaded] = useState(false);
 
+  // Encryption status
+  const [encryptionEnabled, setEncryptionEnabled] = useState(true);
+  const [encryptionError, setEncryptionError] = useState('');
+
   // Notification settings - stored locally until backend supports it
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
@@ -63,6 +67,32 @@ export default function SettingsPage() {
       if (savedEmailNotif !== null) setEmailNotifications(savedEmailNotif === 'true');
       if (savedPushNotif !== null) setPushNotifications(savedPushNotif === 'true');
       if (savedBiometrics !== null) setBiometricsEnabled(savedBiometrics === 'true');
+    }
+  }, []);
+
+  // Check encryption status on mount
+  useEffect(() => {
+    const checkEncryptionStatus = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api-keys/encryption-status`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setEncryptionEnabled(data.enabled);
+          if (!data.enabled) {
+            setEncryptionError(data.reason || 'Encryption is disabled');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check encryption status:', error);
+      }
+    };
+    
+    if (typeof window !== 'undefined' && localStorage.getItem('accessToken')) {
+      checkEncryptionStatus();
     }
   }, []);
 
@@ -652,6 +682,29 @@ export default function SettingsPage() {
           
           {/* API Keys Tab */}
           <TabsContent value="apikeys" className="space-y-4">
+            {/* Encryption Warning Banner */}
+            {!encryptionEnabled && (
+              <Card className="border-red-500 bg-red-50 dark:bg-red-900/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                    <span className="text-xl">⚠️</span>
+                    API Key Encryption Disabled
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-red-700 dark:text-red-300 mb-2">
+                    {encryptionError}
+                  </p>
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    <strong>Action Required:</strong> Set the <code className="bg-red-100 dark:bg-red-800 px-1 rounded">ENCRYPTION_MASTER_KEY</code> environment variable on the server and restart it to enable secure API key storage.
+                  </p>
+                  <p className="text-xs text-red-500 dark:text-red-400 mt-2">
+                    Generate a key with: <code className="bg-red-100 dark:bg-red-800 px-1 rounded">node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"</code>
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Binance API Keys Card */}
             <Card>
               <CardHeader>

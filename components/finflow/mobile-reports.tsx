@@ -135,7 +135,7 @@ export default function MobileReports({
         <MobileHeader title={t('reports')} />
         <div className="flex-1 flex flex-col items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">Lade Berichte...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('loadingReports') || 'Loading reports...'}</p>
         </div>
         <MobileBottomNav />
       </div>

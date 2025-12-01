@@ -405,6 +405,24 @@ export const translations = {
     etfs: 'ETFs',
     viewAllTrades: 'Complete history of all trading activities',
 
+    // Additional UI strings
+    popularFirstPurchases: 'Popular First Purchases',
+    resultsFor: 'Results for',
+    stocks: 'Stocks',
+    loadingReports: 'Loading reports...',
+    supportHelpTopics: 'I can help you with many topics: accounts, transactions, budgets, settings, trading and more. Just ask me a question!',
+
+    // Robo-Advisor Selection Modal
+    selectAnOption: 'Select an option',
+    cryptoAgent: 'Crypto Agent',
+    cryptoAgentDescription: 'Automated trading and risk management for cryptocurrencies',
+    tradingAgentDescription: 'Automatically trade stocks, ETFs and other financial instruments',
+    configureNewAgent: 'Configure New Agent',
+    configureAgentDescription: 'Create a custom Robo-Advisor with your own settings',
+    rememberMyChoice: 'Remember my choice',
+    roboAdvisorHint: 'You can change your preference at any time in settings.',
+    selectAgentType: 'Select an agent type',
+
     // Login & Registration
     welcomeBack: 'Welcome back',
     signInToContinue: 'Sign in to continue',
@@ -1114,6 +1132,24 @@ export const translations = {
     etfs: 'ETFs',
     viewAllTrades: 'Vollständige Historie aller Handelsaktivitäten',
 
+    // Additional UI strings
+    popularFirstPurchases: 'Beliebte Erstkäufe',
+    resultsFor: 'Ergebnisse für',
+    stocks: 'Aktien',
+    loadingReports: 'Lade Berichte...',
+    supportHelpTopics: 'Ich kann Ihnen bei vielen Themen helfen: Konten, Transaktionen, Budgets, Einstellungen, Trading und mehr. Stellen Sie mir einfach eine Frage!',
+
+    // Robo-Advisor Selection Modal
+    selectAnOption: 'Wähle eine Option',
+    cryptoAgent: 'Krypto Agent',
+    cryptoAgentDescription: 'Automatisiertes Trading und Risikomanagement für Kryptowährungen',
+    tradingAgentDescription: 'Aktien, ETFs und weitere Finanzinstrumente automatisch handeln',
+    configureNewAgent: 'Neuen Agent konfigurieren',
+    configureAgentDescription: 'Erstelle einen individuellen Robo-Advisor mit eigenen Einstellungen',
+    rememberMyChoice: 'Meine Auswahl merken',
+    roboAdvisorHint: 'Du kannst deine Präferenz jederzeit in den Einstellungen ändern.',
+    selectAgentType: 'Wähle einen Agent-Typ',
+
     // Login & Registration
     welcomeBack: 'Willkommen zurück',
     signInToContinue: 'Melden Sie sich an, um fortzufahren',
@@ -1813,6 +1849,24 @@ export const translations = {
     blueChips: 'Blue Chips',
     etfs: 'ETFs',
     viewAllTrades: 'Historique complet de toutes les activités de trading',
+
+    // Additional UI strings
+    popularFirstPurchases: 'Premiers Achats Populaires',
+    resultsFor: 'Résultats pour',
+    stocks: 'Actions',
+    loadingReports: 'Chargement des rapports...',
+    supportHelpTopics: 'Je peux vous aider sur de nombreux sujets: comptes, transactions, budgets, paramètres, trading et plus. Posez-moi simplement une question!',
+
+    // Robo-Advisor Selection Modal
+    selectAnOption: 'Choisissez une option',
+    cryptoAgent: 'Agent Crypto',
+    cryptoAgentDescription: 'Trading automatisé et gestion des risques pour les cryptomonnaies',
+    tradingAgentDescription: 'Négociez automatiquement des actions, ETFs et autres instruments financiers',
+    configureNewAgent: 'Configurer un nouvel agent',
+    configureAgentDescription: 'Créez un Robo-Advisor personnalisé avec vos propres paramètres',
+    rememberMyChoice: 'Se souvenir de mon choix',
+    roboAdvisorHint: 'Vous pouvez modifier votre préférence à tout moment dans les paramètres.',
+    selectAgentType: 'Sélectionnez un type d\'agent',
 
     // Login & Registration
     welcomeBack: 'Bon retour',
@@ -2516,6 +2570,24 @@ export const translations = {
     blueChips: 'الأسهم الممتازة',
     etfs: 'صناديق المؤشرات المتداولة',
     viewAllTrades: 'السجل الكامل لجميع أنشطة التداول',
+
+    // Additional UI strings
+    popularFirstPurchases: 'المشتريات الأولى الشائعة',
+    resultsFor: 'نتائج البحث عن',
+    stocks: 'الأسهم',
+    loadingReports: 'جاري تحميل التقارير...',
+    supportHelpTopics: 'يمكنني مساعدتك في العديد من المواضيع: الحسابات، المعاملات، الميزانيات، الإعدادات، التداول والمزيد. فقط اسألني سؤالاً!',
+
+    // Robo-Advisor Selection Modal
+    selectAnOption: 'اختر خياراً',
+    cryptoAgent: 'وكيل الكريبتو',
+    cryptoAgentDescription: 'تداول آلي وإدارة المخاطر للعملات المشفرة',
+    tradingAgentDescription: 'تداول تلقائي للأسهم وصناديق المؤشرات والأدوات المالية الأخرى',
+    configureNewAgent: 'إعداد وكيل جديد',
+    configureAgentDescription: 'أنشئ روبو-مستشار مخصص بإعداداتك الخاصة',
+    rememberMyChoice: 'تذكر اختياري',
+    roboAdvisorHint: 'يمكنك تغيير تفضيلاتك في أي وقت من الإعدادات.',
+    selectAgentType: 'اختر نوع الوكيل',
 
     // Login & Registration
     welcomeBack: 'مرحباً بعودتك',

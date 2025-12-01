@@ -375,11 +375,11 @@ export default function MobileInvest({
               </Link>
             </div>
 
-            {/* Beliebte Erstkäufe */}
+            {/* Popular First Purchases */}
             <div className="mt-4 mx-4 p-4 rounded-2xl bg-card dark:bg-[#1e293b] border border-border dark:border-[#2d3a4f]">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-muted-foreground font-medium">
-                  {showSearch && searchQuery ? `Ergebnisse für "${searchQuery}"` : 'Beliebte Erstkäufe'}
+                  {showSearch && searchQuery ? `${t('resultsFor') || 'Results for'} "${searchQuery}"` : (t('popularFirstPurchases') || 'Popular First Purchases')}
                 </span>
               </div>
 
@@ -394,7 +394,7 @@ export default function MobileInvest({
                       : "text-muted-foreground"
                   )}
                 >
-                  Aktien
+                  {t('stocks') || 'Stocks'}
                 </button>
                 <button
                   onClick={() => setActiveAssetTab('etf')}

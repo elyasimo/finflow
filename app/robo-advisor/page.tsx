@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +50,7 @@ import CryptoSelector from '@/components/trading/CryptoSelector';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import MobileHeader from '@/components/finflow/mobile-header';
 import MobileBottomNav from '@/components/finflow/mobile-bottom-nav';
+import RoboAdvisorSelectionModal from '@/components/finflow/robo-advisor-selection-modal';
 
 // Popular cryptos for quick selection
 const POPULAR_CRYPTOS = [
@@ -99,7 +100,13 @@ export default function RoboAdvisorPage() {
   const { currency } = useCurrency();
   const { convertAndFormat } = useExchangeRates();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isMobile = useMediaQuery("(max-width: 1023px)");
+  
+  // Selection modal state
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const [agentType, setAgentType] = useState<'crypto' | 'trading' | null>(null);
+  const [hasCheckedPreference, setHasCheckedPreference] = useState(false);
   
   const [agents, setAgents] = useState<TradingAgent[]>([]);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
@@ -119,9 +126,43 @@ export default function RoboAdvisorPage() {
   const [maxDailyTrades, setMaxDailyTrades] = useState(100);
   const [maxSingleTrade, setMaxSingleTrade] = useState(50);
 
+  // Check for URL params or saved preference on mount
+  useEffect(() => {
+    if (hasCheckedPreference) return;
+    
+    const typeParam = searchParams.get('type');
+    const actionParam = searchParams.get('action');
+    
+    // If action=create, open the create sheet
+    if (actionParam === 'create') {
+      setShowCreateSheet(true);
+      setHasCheckedPreference(true);
+      return;
+    }
+    
+    // If type is specified in URL, use it
+    if (typeParam === 'crypto' || typeParam === 'trading') {
+      setAgentType(typeParam);
+      setHasCheckedPreference(true);
+      return;
+    }
+    
+    // Check for saved preference
+    const savedPreference = localStorage.getItem('roboAdvisorPreference');
+    if (savedPreference === 'crypto' || savedPreference === 'trading') {
+      setAgentType(savedPreference);
+      setHasCheckedPreference(true);
+      return;
+    }
+    
+    // No preference saved and no URL param - show selection modal
+    setShowSelectionModal(true);
+    setHasCheckedPreference(true);
+  }, [searchParams, hasCheckedPreference]);
+
   useEffect(() => {
     loadData();
-  }, []);
+  }, [agentType]);
 
   const loadData = async () => {
     try {
@@ -228,6 +269,36 @@ export default function RoboAdvisorPage() {
       default: return 'bg-gray-500';
     }
   };
+
+  // Show selection modal if no type selected yet
+  if (showSelectionModal) {
+    return (
+      <>
+        <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] flex items-center justify-center">
+          <div className="text-center">
+            <Bot className="w-16 h-16 mx-auto text-blue-500 mb-4" />
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              {t('roboAdvisor') || 'Robo-Advisor'}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              {t('selectAgentType') || 'Wähle einen Agent-Typ'}
+            </p>
+          </div>
+        </div>
+        <RoboAdvisorSelectionModal
+          isOpen={showSelectionModal}
+          onClose={() => {
+            // If user closes without selecting, go back
+            router.back();
+          }}
+          onOpenCreateSheet={() => {
+            setShowSelectionModal(false);
+            setShowCreateSheet(true);
+          }}
+        />
+      </>
+    );
+  }
 
   if (isLoading) {
     return (

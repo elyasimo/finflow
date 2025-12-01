@@ -194,11 +194,13 @@ app.post('/currency/convert', authMiddleware, (req, res) => currencyController.c
 app.get('/currency/supported', authMiddleware, (req, res) => currencyController.getSupportedCurrencies(req, res));
 
 // API Keys routes (encrypted storage)
+// IMPORTANT: encryption-status must come BEFORE :provider to avoid being caught by the param route
+app.get('/api-keys/encryption-status', authMiddleware, (req, res) => apiKeysController.getEncryptionStatus(req, res));
+app.get('/api-keys/providers', authMiddleware, (req, res) => apiKeysController.listProviders(req, res));
 app.get('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.getKeys(req, res));
 app.post('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.storeKeys(req, res));
 app.get('/api-keys/:provider/status', authMiddleware, (req, res) => apiKeysController.checkStatus(req, res));
 app.delete('/api-keys/:provider', authMiddleware, (req, res) => apiKeysController.deleteKeys(req, res));
-app.get('/api-keys/providers', authMiddleware, (req, res) => apiKeysController.listProviders(req, res));
 
 // Backtesting routes
 app.post('/backtesting/run', authMiddleware, (req, res) => backtestingController.runBacktest(req, res));

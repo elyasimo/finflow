@@ -44,31 +44,79 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   const { t } = useLanguage()
   const [keyboardVisible, setKeyboardVisible] = useState(false)
   const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const initialHeightRef = useRef<number>(0)
   
-  // Handle keyboard visibility using VisualViewport API
+  // Handle keyboard visibility using VisualViewport API with iOS/Android fixes
   useEffect(() => {
-    const handleResize = () => {
+    // Store initial window height
+    initialHeightRef.current = window.innerHeight
+    
+    const handleViewportResize = () => {
       if (window.visualViewport) {
         const currentHeight = window.visualViewport.height
         const windowHeight = window.innerHeight
-        const keyboardHeight = windowHeight - currentHeight
-        setKeyboardVisible(keyboardHeight > 100)
+        const calculatedKeyboardHeight = windowHeight - currentHeight
+        
+        // Only consider keyboard visible if height difference > 100px
+        const isKeyboardOpen = calculatedKeyboardHeight > 100
+        setKeyboardVisible(isKeyboardOpen)
+        setKeyboardHeight(isKeyboardOpen ? calculatedKeyboardHeight : 0)
         setViewportHeight(currentHeight)
+        
+        // Debug logging (remove in production)
+        console.log('[Keyboard]', { 
+          windowHeight, 
+          viewportHeight: currentHeight, 
+          keyboardHeight: calculatedKeyboardHeight,
+          isOpen: isKeyboardOpen 
+        })
       }
     }
 
+    // Fallback for browsers without VisualViewport
+    const handleFocusIn = () => {
+      if (!window.visualViewport) {
+        // iOS fallback - use window resize
+        setTimeout(() => {
+          const heightDiff = initialHeightRef.current - window.innerHeight
+          if (heightDiff > 100) {
+            setKeyboardVisible(true)
+            setKeyboardHeight(heightDiff)
+            setViewportHeight(window.innerHeight)
+          }
+        }, 300)
+      }
+    }
+
+    const handleFocusOut = () => {
+      if (!window.visualViewport) {
+        setKeyboardVisible(false)
+        setKeyboardHeight(0)
+        setViewportHeight(null)
+      }
+    }
+
+    // Add listeners
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      window.visualViewport.addEventListener('scroll', handleResize)
-      handleResize() // Initial call
+      window.visualViewport.addEventListener('resize', handleViewportResize)
+      window.visualViewport.addEventListener('scroll', handleViewportResize)
+      handleViewportResize() // Initial call
+    } else {
+      // Fallback listeners
+      document.addEventListener('focusin', handleFocusIn)
+      document.addEventListener('focusout', handleFocusOut)
     }
 
     return () => {
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-        window.visualViewport.removeEventListener('scroll', handleResize)
+        window.visualViewport.removeEventListener('resize', handleViewportResize)
+        window.visualViewport.removeEventListener('scroll', handleViewportResize)
+      } else {
+        document.removeEventListener('focusin', handleFocusIn)
+        document.removeEventListener('focusout', handleFocusOut)
       }
     }
   }, [])
@@ -142,7 +190,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     
     // Check for common variations
     if (lowerInput.includes('hilfe') || lowerInput.includes('help')) {
-      return 'Ich kann Ihnen bei vielen Themen helfen: Konten, Transaktionen, Budgets, Einstellungen, Trading und mehr. Stellen Sie mir einfach eine Frage!'
+      return t('supportHelpTopics') || 'I can help you with many topics: accounts, transactions, budgets, settings, trading and more. Just ask me a question!'
     }
     
     if (lowerInput.includes('kontakt') || lowerInput.includes('email') || lowerInput.includes('mensch')) {

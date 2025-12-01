@@ -1,17 +1,39 @@
 // @ts-nocheck
 import { Request, Response } from 'express';
 import { apiKeysService } from '../services/api-keys.service';
+import { isEncryptionEnabled, getEncryptionDisabledReason } from '../services/encryption.service';
 
 /**
  * API Keys Controller - Manages encrypted API keys for external services
  */
 export class ApiKeysController {
   /**
+   * Check encryption status
+   * GET /api-keys/encryption-status
+   */
+  async getEncryptionStatus(req: Request, res: Response): Promise<void> {
+    res.status(200).json({
+      enabled: isEncryptionEnabled(),
+      reason: isEncryptionEnabled() ? null : getEncryptionDisabledReason()
+    });
+  }
+
+  /**
    * Store API keys for a provider
    * POST /api-keys/:provider
    */
   async storeKeys(req: Request, res: Response): Promise<void> {
     try {
+      // Check if encryption is enabled BEFORE attempting to store
+      if (!isEncryptionEnabled()) {
+        res.status(503).json({
+          error: 'API key encryption is disabled',
+          reason: getEncryptionDisabledReason(),
+          action: 'Set ENCRYPTION_MASTER_KEY environment variable and restart the server'
+        });
+        return;
+      }
+
       const userId = (req as any).userId;
       const { provider } = req.params;
       const { apiKey, apiSecret, permissions } = req.body;
@@ -40,6 +62,9 @@ export class ApiKeysController {
         apiSecret,
         permissions
       );
+
+      // Log success without exposing keys
+      console.log(`API keys stored successfully for user ${userId}, provider ${provider}`);
 
       res.status(200).json({
         success: true,
