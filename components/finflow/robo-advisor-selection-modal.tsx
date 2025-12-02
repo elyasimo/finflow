@@ -103,13 +103,15 @@ export default function RoboAdvisorSelectionModal({
       localStorage.setItem('roboAdvisorPreference', option.id)
     }
 
-    onClose()
-    
-    // Navigate to the correct page
+    // Navigate FIRST, then close modal
+    // This prevents the robo-advisor page from re-rendering and showing modal again
     if (option.route) {
-      router.push(option.route)
+      // Use window.location for reliable navigation in Capacitor
+      window.location.href = option.route
+    } else {
+      onClose()
     }
-  }, [rememberChoice, onClose, router, trackSelection])
+  }, [rememberChoice, onClose, trackSelection])
 
   // Keyboard handling
   useEffect(() => {
