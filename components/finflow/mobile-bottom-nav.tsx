@@ -61,12 +61,9 @@ interface MobileBottomNavProps {
 
 export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   const pathname = usePathname()
-  const { t, language } = useLanguage()
+  const { t, language, isLoaded } = useLanguage()
   const { user } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
-
-  // Debug: Log current language and translations
-  console.log('[BottomNav] Current language:', language, 'dashboard =', t('dashboard' as any), 'invest =', t('invest' as any))
 
   const handleMenuClick = () => {
     if (onMenuClick) {

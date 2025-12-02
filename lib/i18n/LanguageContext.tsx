@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { translations, Language, TranslationKey } from './translations';
 
 interface LanguageContextType {
@@ -9,29 +9,46 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: TranslationKey) => string;
   direction: 'ltr' | 'rtl';
+  isLoaded: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
-
-  useEffect(() => {
-    // Load language from localStorage
+// Helper to get initial language (runs on client only)
+function getInitialLanguage(): Language {
+  if (typeof window === 'undefined') return 'de'; // Default to German for SSR
+  
+  try {
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage && translations[savedLanguage]) {
-      setLanguageState(savedLanguage);
-    } else {
-      // Detect browser language
-      const browserLang = navigator.language.split('-')[0];
-      if (browserLang === 'de' || browserLang === 'fr' || browserLang === 'ar') {
-        setLanguageState(browserLang as Language);
-      }
+      return savedLanguage;
     }
+    // Detect browser language
+    const browserLang = navigator.language.split('-')[0];
+    if (browserLang === 'de' || browserLang === 'fr' || browserLang === 'ar' || browserLang === 'en') {
+      return browserLang as Language;
+    }
+  } catch (e) {
+    // localStorage might not be available
+  }
+  return 'de'; // Default to German
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<Language>('de'); // Start with German
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load language on mount
+  useEffect(() => {
+    const initialLang = getInitialLanguage();
+    setLanguageState(initialLang);
+    setIsLoaded(true);
   }, []);
 
+  // Update document direction for RTL languages
   useEffect(() => {
-    // Update document direction for RTL languages
+    if (!isLoaded) return;
+    
     if (language === 'ar') {
       document.documentElement.dir = 'rtl';
       document.documentElement.lang = 'ar';
@@ -39,21 +56,32 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       document.documentElement.dir = 'ltr';
       document.documentElement.lang = language;
     }
-  }, [language]);
+  }, [language, isLoaded]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
+    try {
+      localStorage.setItem('language', lang);
+    } catch (e) {
+      // localStorage might not be available
+    }
   };
 
-  const t = (key: TranslationKey): string => {
-    return translations[language][key as keyof typeof translations.en] || translations.en[key as keyof typeof translations.en] || key;
-  };
+  // Memoize the translation function to use the current language
+  const t = useMemo(() => {
+    return (key: TranslationKey): string => {
+      const currentTranslations = translations[language];
+      const fallbackTranslations = translations.de; // Fallback to German
+      return currentTranslations?.[key as keyof typeof currentTranslations] 
+        || fallbackTranslations?.[key as keyof typeof fallbackTranslations] 
+        || key;
+    };
+  }, [language]);
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, direction }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, direction, isLoaded }}>
       {children}
     </LanguageContext.Provider>
   );

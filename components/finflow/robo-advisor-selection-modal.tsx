@@ -214,7 +214,7 @@ export default function RoboAdvisorSelectionModal({
           <button
             onClick={onClose}
             className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            aria-label={t('close') || 'Schließen'}
+            aria-label={'Schließen'}
           >
             <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
@@ -250,13 +250,13 @@ export default function RoboAdvisorSelectionModal({
                 {/* Content */}
                 <div className="flex-1 text-left">
                   <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {t(option.titleKey) || option.title}
+                    {option.title}
                   </h3>
                   <p 
                     id={`option-${option.id}-desc`}
                     className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2"
                   >
-                    {t(option.descriptionKey) || option.description}
+                    {option.description}
                   </p>
                 </div>
 

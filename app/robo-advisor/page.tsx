@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -95,7 +95,7 @@ interface PortfolioItem {
   monitoredBy: string | null;
 }
 
-export default function RoboAdvisorPage() {
+function RoboAdvisorPageContent() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { currency } = useCurrency();
@@ -561,7 +561,7 @@ export default function RoboAdvisorPage() {
                 <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4" />
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                    {t('createNewAgent') || 'Neuen Agent erstellen'}
+                    {'Neuen Agent erstellen'}
                   </h2>
                   <button onClick={() => setShowCreateSheet(false)} className="p-2">
                     <X className="w-5 h-5 text-gray-500" />
@@ -716,7 +716,7 @@ export default function RoboAdvisorPage() {
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{t('createNewAgent') || 'Neuen Robo-Advisor Agent erstellen'}</DialogTitle>
+                <DialogTitle>{'Neuen Robo-Advisor Agent erstellen'}</DialogTitle>
                 <DialogDescription>
                   {t('configureRiskSettings') || 'Konfiguriere die Risikoeinstellungen'}
                 </DialogDescription>
@@ -937,5 +937,17 @@ export default function RoboAdvisorPage() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+export default function RoboAdvisorPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    }>
+      <RoboAdvisorPageContent />
+    </Suspense>
   );
 }

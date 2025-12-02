@@ -57,46 +57,47 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     const handleViewportResize = () => {
       if (window.visualViewport) {
         const currentHeight = window.visualViewport.height
-        const windowHeight = window.innerHeight
+        const windowHeight = initialHeightRef.current
         const calculatedKeyboardHeight = windowHeight - currentHeight
         
-        // Only consider keyboard visible if height difference > 100px
-        const isKeyboardOpen = calculatedKeyboardHeight > 100
+        // Only consider keyboard visible if height difference > 150px (account for address bar changes)
+        const isKeyboardOpen = calculatedKeyboardHeight > 150
         setKeyboardVisible(isKeyboardOpen)
         setKeyboardHeight(isKeyboardOpen ? calculatedKeyboardHeight : 0)
         setViewportHeight(currentHeight)
-        
-        // Debug logging (remove in production)
-        console.log('[Keyboard]', { 
-          windowHeight, 
-          viewportHeight: currentHeight, 
-          keyboardHeight: calculatedKeyboardHeight,
-          isOpen: isKeyboardOpen 
-        })
       }
     }
 
     // Fallback for browsers without VisualViewport
-    const handleFocusIn = () => {
-      if (!window.visualViewport) {
-        // iOS fallback - use window resize
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        // Wait for keyboard to open
         setTimeout(() => {
-          const heightDiff = initialHeightRef.current - window.innerHeight
-          if (heightDiff > 100) {
-            setKeyboardVisible(true)
-            setKeyboardHeight(heightDiff)
-            setViewportHeight(window.innerHeight)
+          if (window.visualViewport) {
+            handleViewportResize()
+          } else {
+            const heightDiff = initialHeightRef.current - window.innerHeight
+            if (heightDiff > 150) {
+              setKeyboardVisible(true)
+              setKeyboardHeight(heightDiff)
+              setViewportHeight(window.innerHeight)
+            }
           }
         }, 300)
       }
     }
 
     const handleFocusOut = () => {
-      if (!window.visualViewport) {
-        setKeyboardVisible(false)
-        setKeyboardHeight(0)
-        setViewportHeight(null)
-      }
+      // Small delay to check if focus moved to another input
+      setTimeout(() => {
+        const activeEl = document.activeElement as HTMLElement
+        if (activeEl?.tagName !== 'INPUT' && activeEl?.tagName !== 'TEXTAREA') {
+          setKeyboardVisible(false)
+          setKeyboardHeight(0)
+          setViewportHeight(null)
+        }
+      }, 100)
     }
 
     // Add listeners
@@ -104,20 +105,19 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       window.visualViewport.addEventListener('resize', handleViewportResize)
       window.visualViewport.addEventListener('scroll', handleViewportResize)
       handleViewportResize() // Initial call
-    } else {
-      // Fallback listeners
-      document.addEventListener('focusin', handleFocusIn)
-      document.addEventListener('focusout', handleFocusOut)
     }
+    
+    // Always add focus listeners for better reliability
+    document.addEventListener('focusin', handleFocusIn)
+    document.addEventListener('focusout', handleFocusOut)
 
     return () => {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleViewportResize)
         window.visualViewport.removeEventListener('scroll', handleViewportResize)
-      } else {
-        document.removeEventListener('focusin', handleFocusIn)
-        document.removeEventListener('focusout', handleFocusOut)
       }
+      document.removeEventListener('focusin', handleFocusIn)
+      document.removeEventListener('focusout', handleFocusOut)
     }
   }, [])
   
@@ -303,31 +303,34 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]"
+      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623] overflow-hidden"
       style={{ 
         height: viewportHeight ? `${viewportHeight}px` : '100dvh',
-        paddingTop: 'env(safe-area-inset-top)',
+        maxHeight: viewportHeight ? `${viewportHeight}px` : '100dvh',
       }}
     >
       {/* Compact Chat Header */}
-      <div className="flex-shrink-0 z-40 bg-white dark:bg-[#0f1623] border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-3 px-4 h-14">
+      <div 
+        className="flex-shrink-0 z-40 bg-white dark:bg-[#0f1623] border-b border-gray-100 dark:border-gray-800"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="flex items-center gap-3 px-4 h-14 max-w-full">
           {/* Back Button */}
           <button
             onClick={() => window.history.back()}
-            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center"
+            className="w-10 h-10 min-w-[40px] rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center"
             aria-label="Zurück"
           >
             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           
           {/* Bot Avatar + Title */}
-          <div className="flex items-center gap-3 flex-1">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 min-w-[40px] rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-base font-semibold text-gray-900 dark:text-white">
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">
                 {t('support') || 'Support'}
               </h1>
               <p className="text-xs text-emerald-500 flex items-center gap-1">
@@ -344,7 +347,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
         style={{ 
-          paddingBottom: keyboardVisible ? '8px' : '100px' 
+          paddingBottom: keyboardVisible ? '80px' : '100px',
+          minHeight: 0, // Important for flex scroll
         }}
       >
         <div className="space-y-4">
@@ -433,16 +437,11 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       <div 
         className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3 z-50"
         style={{
-          position: keyboardVisible ? 'fixed' : 'relative',
-          bottom: keyboardVisible ? 0 : 'auto',
-          left: 0,
-          right: 0,
-          paddingBottom: keyboardVisible ? '8px' : 'calc(env(safe-area-inset-bottom) + 80px)',
-          transform: keyboardVisible ? 'translateY(0)' : 'none',
+          paddingBottom: keyboardVisible ? '12px' : 'calc(env(safe-area-inset-bottom) + 80px)',
         }}
       >
-        <div className="flex items-end gap-3">
-          <div className="flex-1 relative">
+        <div className="flex items-end gap-3 max-w-full">
+          <div className="flex-1 relative min-w-0">
             <input
               ref={inputRef}
               type="text"
@@ -454,8 +453,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 setTimeout(() => {
                   // Scroll to the end of messages
                   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-                  // Also ensure input is visible
-                  inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                 }, 400)
               }}
               placeholder={t('writeYourQuestion')}
@@ -473,7 +470,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isTyping}
             className={cn(
-              "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
+              "w-12 h-12 min-w-[48px] rounded-full flex items-center justify-center flex-shrink-0",
               "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
               "hover:bg-blue-600 active:scale-95",
               "disabled:opacity-50 disabled:cursor-not-allowed",
