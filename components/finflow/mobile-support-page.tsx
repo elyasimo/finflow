@@ -1,34 +1,28 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { 
   Send,
-  MessageSquare,
-  Bot,
   User,
   Mail,
-  Phone,
   HelpCircle,
   FileText,
   Clock,
-  ChevronRight,
   Loader2,
   CheckCircle2,
   AlertCircle,
   X,
-  Sparkles
+  Sparkles,
+  ChevronLeft
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import MobileBottomNav from "./mobile-bottom-nav"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
-import { ChevronLeft } from "lucide-react"
 
 interface Message {
   id: string
   type: 'user' | 'bot'
   content: string
   timestamp: Date
-  isTyping?: boolean
 }
 
 interface MobileSupportPageProps {
@@ -41,130 +35,22 @@ interface MobileSupportPageProps {
 }
 
 /**
- * Keyboard-aware mobile chat page
- *
- * Änderungen / Verbesserungen gegenüber der ursprünglichen Version:
- * - Nutzt VisualViewport (mit robustem Fallback) um eine verlässlichere keyboardHeight zu ermitteln.
- * - Berechnet dynamisch padding-bottom des Nachrichten-Containers basierend auf tatsächlicher Input-Bar-Höhe + keyboardHeight.
- * - Positioniert die Input-Bar mit einem inline 'bottom' Wert (inkl. env(safe-area-inset-bottom)) statt inkonsistenter class toggles,
- *   so dass sie auf iOS/Android zuverlässig über der Tastatur sitzt.
- * - Scrollt beim Fokus / beim Öffnen der Tastatur die letzte Nachricht in den View.
- * - Kleinere timeouts / rAF für bessere Zuverlässigkeit auf iOS.
+ * Simple chat support page - NO MobileBottomNav, NO complex keyboard handling
+ * Uses simple flexbox layout: Header -> Scrollable Messages -> Fixed Input
  */
-
 export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPageProps) {
   const { t } = useLanguage()
-  const [keyboardVisible, setKeyboardVisible] = useState(false)
-  const [keyboardHeight, setKeyboardHeight] = useState(0)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
-  const inputBarRef = useRef<HTMLDivElement>(null)
+  const [inputMessage, setInputMessage] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [showContactForm, setShowContactForm] = useState(false)
+  const [contactSubject, setContactSubject] = useState('')
+  const [contactMessage, setContactMessage] = useState('')
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const initialHeightRef = useRef<number>(0)
-  const rafRef = useRef<number | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  // store initial height on mount
-  useEffect(() => {
-    initialHeightRef.current = window.innerHeight
-  }, [])
-
-  // VisualViewport handler (with fallback)
-  useEffect(() => {
-    const vv = (window as any).visualViewport as VisualViewport | undefined
-
-    const updateKeyboard = () => {
-      // Use rAF to avoid layout thrashing on some browsers
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      rafRef.current = requestAnimationFrame(() => {
-        const initial = initialHeightRef.current || window.innerHeight
-
-        if (vv) {
-          // visualViewport gives the visible viewport area; offsetTop can be non-zero (iOS)
-          const visibleHeight = vv.height
-          const offsetTop = vv.offsetTop ?? 0
-          const calculated = Math.max(0, initial - visibleHeight - offsetTop)
-          const visible = calculated > 80 // threshold smaller than before for sensitivity
-          setKeyboardHeight(calculated)
-          setKeyboardVisible(visible)
-        } else {
-          // fallback: compare initial innerHeight to current innerHeight
-          const diff = Math.max(0, initial - window.innerHeight)
-          const visible = diff > 80
-          setKeyboardHeight(diff)
-          setKeyboardVisible(visible)
-        }
-      })
-    }
-
-    // focusin/focusout improves reliability across devices
-    const onFocusIn = (e: FocusEvent) => {
-      const target = e.target as HTMLElement | null
-      if (!target) return
-      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || (target as HTMLElement).isContentEditable
-      if (isInput) {
-        // small delay lets viewport settle on some devices
-        setTimeout(updateKeyboard, 50)
-      }
-    }
-
-    const onFocusOut = () => {
-      // delay to let focus move to other element
-      setTimeout(updateKeyboard, 100)
-    }
-
-    if (vv) {
-      vv.addEventListener('resize', updateKeyboard)
-      vv.addEventListener('scroll', updateKeyboard)
-      // initial measurement
-      updateKeyboard()
-    } else {
-      // fallback for browsers without visualViewport
-      window.addEventListener('resize', updateKeyboard)
-    }
-
-    document.addEventListener('focusin', onFocusIn)
-    document.addEventListener('focusout', onFocusOut)
-
-    return () => {
-      if (vv) {
-        vv.removeEventListener('resize', updateKeyboard)
-        vv.removeEventListener('scroll', updateKeyboard)
-      } else {
-        window.removeEventListener('resize', updateKeyboard)
-      }
-      document.removeEventListener('focusin', onFocusIn)
-      document.removeEventListener('focusout', onFocusOut)
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    }
-  }, [])
-
-  // adjust messages container padding-bottom based on input bar height + keyboardHeight
-  const adjustMessagesPadding = useCallback(() => {
-    const container = messagesContainerRef.current
-    const inputBar = inputBarRef.current
-    if (!container || !inputBar) return
-
-    const inputBarHeight = inputBar.offsetHeight
-    // extra spacing so last message isn't flush to input
-    const extra = inputBarHeight + keyboardHeight + 12
-    container.style.paddingBottom = `${extra}px`
-  }, [keyboardHeight])
-
-  useEffect(() => {
-    adjustMessagesPadding()
-    // ensure last message visible when keyboard changes
-    if (keyboardVisible) {
-      // give the browser a moment to layout the input bar above keyboard
-      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100)
-    }
-  }, [keyboardHeight, keyboardVisible, adjustMessagesPadding])
-
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
-
-  // FAQ and chat logic (unchanged, aside from using refs defined above)
   const FAQ_RESPONSES: Record<string, string> = {
     'konto': t('faqAccount'),
     'account': t('faqAccount'),
@@ -205,38 +91,23 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       timestamp: new Date()
     }
   ])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [showContactForm, setShowContactForm] = useState(false)
-  const [contactSubject, setContactSubject] = useState('')
-  const [contactMessage, setContactMessage] = useState('')
-  const [isSendingEmail, setIsSendingEmail] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
 
-  // ensure adjustMessagesPadding reacts if input bar size changes (e.g. when device safe-area changes)
+  // Scroll to bottom when messages change
   useEffect(() => {
-    const ro = new ResizeObserver(() => adjustMessagesPadding())
-    if (inputBarRef.current) ro.observe(inputBarRef.current)
-    return () => ro.disconnect()
-  }, [adjustMessagesPadding])
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
 
   const findResponse = (input: string): string | null => {
     const lowerInput = input.toLowerCase()
-
     for (const [keyword, response] of Object.entries(FAQ_RESPONSES)) {
-      if (lowerInput.includes(keyword)) {
-        return response
-      }
+      if (lowerInput.includes(keyword)) return response
     }
-
     if (lowerInput.includes('hilfe') || lowerInput.includes('help')) {
-      return t('supportHelpTopics') || 'I can help you with many topics: accounts, transactions, budgets, settings, trading and more. Just ask me a question!'
+      return t('supportHelpTopics') || 'Ich kann dir bei vielen Themen helfen!'
     }
-
     if (lowerInput.includes('kontakt') || lowerInput.includes('email') || lowerInput.includes('mensch')) {
       return 'CONTACT_FORM'
     }
-
     return null
   }
 
@@ -258,7 +129,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700))
 
     const response = findResponse(messageText)
-
     let botResponse: string
 
     if (response === 'CONTACT_FORM') {
@@ -267,34 +137,25 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     } else if (response) {
       botResponse = response
     } else {
-      botResponse = `${t('notSureHowToHelp')} "${messageText}" 🤔\n\n${t('youCan')}:\n• ${t('chooseQuickOption')}\n• ${t('typeContactToReach')}\n\n${t('orTryRephrasing')}`
+      botResponse = `${t('notSureHowToHelp')} "${messageText}" 🤔\n\n${t('youCan')}:\n• ${t('chooseQuickOption')}\n• ${t('typeContactToReach')}`
     }
 
     setIsTyping(false)
-
-    const botMessage: Message = {
+    setMessages(prev => [...prev, {
       id: (Date.now() + 1).toString(),
       type: 'bot',
       content: botResponse,
       timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, botMessage])
-
-    // after new bot message, keep scroll at bottom
-    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 120)
+    }])
   }
 
   const handleQuickAction = (keyword: string) => {
-    const response = FAQ_RESPONSES[keyword]
-    if (response) {
-      handleSendMessage(QUICK_ACTIONS.find(q => q.keyword === keyword)?.label || keyword)
-    }
+    const action = QUICK_ACTIONS.find(q => q.keyword === keyword)
+    if (action) handleSendMessage(action.label)
   }
 
   const handleSendContactEmail = async () => {
     if (!contactSubject.trim() || !contactMessage.trim()) return
-
     setIsSendingEmail(true)
 
     try {
@@ -303,58 +164,48 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       } else {
         await new Promise(resolve => setTimeout(resolve, 1500))
       }
-
       setEmailSent(true)
-
-      const confirmMessage: Message = {
+      setMessages(prev => [...prev, {
         id: Date.now().toString(),
         type: 'bot',
         content: `✅ ${t('messageSentSuccess')}`,
         timestamp: new Date()
-      }
-      setMessages(prev => [...prev, confirmMessage])
-
+      }])
       setTimeout(() => {
         setShowContactForm(false)
         setContactSubject('')
         setContactMessage('')
         setEmailSent(false)
       }, 2000)
-    } catch (error) {
-      const errorMessage: Message = {
+    } catch {
+      setMessages(prev => [...prev, {
         id: Date.now().toString(),
         type: 'bot',
         content: `❌ ${t('messageSendError')} info@finflowapp.ch`,
         timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorMessage])
+      }])
     } finally {
       setIsSendingEmail(false)
     }
   }
 
   return (
-    <div 
-      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]"
-    >
-      {/* Compact Chat Header */}
+    <div className="fixed inset-0 flex flex-col bg-[#0f1623]">
+      {/* Header - Fixed at top */}
       <div 
-        className="flex-shrink-0 z-40 bg-[#0f1623] border-b border-gray-800"
+        className="flex-shrink-0 bg-[#0f1623] border-b border-gray-800 z-10"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center gap-3 px-4 h-12">
+        <div className="flex items-center gap-3 px-4 h-14">
           <button
             onClick={() => window.history.back()}
-            className="w-8 h-8 rounded-full bg-[#1e293b] flex items-center justify-center"
-            aria-label="Zurück"
+            className="w-9 h-9 rounded-full bg-[#1e293b] flex items-center justify-center"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-300" />
+            <ChevronLeft className="w-5 h-5 text-gray-300" />
           </button>
-          
-          <h1 className="text-base font-semibold text-white flex-1">
+          <h1 className="text-lg font-semibold text-white flex-1">
             {t('support') || 'Support'}
           </h1>
-          
           <div className="flex items-center gap-1.5 text-xs text-emerald-500">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
             Online
@@ -362,16 +213,9 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       </div>
 
-      {/* Messages area */}
-      <div 
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 bg-[#f8f9fc] dark:bg-[#0f1623]"
-        style={{ 
-          // initial paddingBottom will be adjusted by JS (adjustMessagesPadding)
-          paddingBottom: undefined as any,
-        }}
-      >
-        <div className="space-y-4">
+      {/* Messages - Scrollable area */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="space-y-4 pb-4">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -392,19 +236,18 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                   <Sparkles className="w-5 h-5 text-white" />
                 )}
               </div>
-              
               <div className={cn(
                 "max-w-[75%] rounded-2xl px-4 py-3",
                 message.type === 'user'
                   ? "bg-blue-500 text-white rounded-tr-sm"
-                  : "bg-white dark:bg-[#1a2332] text-gray-800 dark:text-gray-200 rounded-tl-sm shadow-sm"
+                  : "bg-[#1a2332] text-gray-200 rounded-tl-sm"
               )}>
                 <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
                   {message.content}
                 </p>
                 <p className={cn(
                   "text-[10px] mt-1.5",
-                  message.type === 'user' ? "text-blue-100" : "text-gray-400"
+                  message.type === 'user' ? "text-blue-100" : "text-gray-500"
                 )}>
                   {message.timestamp.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })}
                 </p>
@@ -417,7 +260,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-white dark:bg-[#1a2332] rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+              <div className="bg-[#1a2332] rounded-2xl rounded-tl-sm px-4 py-3">
                 <div className="flex gap-1.5">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -427,18 +270,15 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             </div>
           )}
 
-          <div ref={messagesEndRef} />
-        </div>
-
-        {!keyboardVisible && (
-          <div className="mt-4">
+          {/* Quick Actions */}
+          <div className="pt-4">
             <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
             <div className="flex flex-wrap gap-2">
               {QUICK_ACTIONS.map((action, index) => (
                 <button
                   key={index}
                   onClick={() => handleQuickAction(action.keyword)}
-                  className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-[#1a2332] rounded-xl text-sm text-gray-700 dark:text-gray-300 shadow-sm active:scale-95 transition-transform"
+                  className="flex items-center gap-2 px-3 py-2 bg-[#1a2332] rounded-xl text-sm text-gray-300 active:scale-95 transition-transform"
                 >
                   <action.icon className="w-4 h-4 text-blue-500" />
                   <span className="truncate">{action.label}</span>
@@ -446,103 +286,65 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               ))}
             </div>
           </div>
-        )}
+
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Input Bar - always rendered fixed, but bottom is adjusted dynamically with keyboardHeight */}
+      {/* Input Bar - Fixed at bottom, ABOVE everything */}
       <div 
-        ref={inputBarRef}
-        className={cn(
-          "flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3",
-          "fixed left-0 right-0 z-50"
-        )}
-        style={{
-          // when keyboard is visible, push the inputBar above it; otherwise respect safe-area inset
-          bottom: `calc(env(safe-area-inset-bottom, 8px) + ${keyboardVisible ? `${keyboardHeight}px` : '0px'})`,
-          transition: 'bottom 180ms ease'
-        }}
+        className="flex-shrink-0 border-t border-gray-800 bg-[#1a2332] px-4 py-3"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}
       >
         <div className="flex items-center gap-3">
-          <div className="flex-1 relative">
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-              onFocus={() => {
-                // scroll to bottom once keyboard opens (small timeout for iOS)
-                setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 120)
-              }}
-              placeholder={t('writeYourQuestion') || 'Schreibe deine Frage...'}
-              className={cn(
-                "w-full px-4 py-3 rounded-full text-base",
-                "bg-gray-100 dark:bg-[#232e40]",
-                "text-gray-900 dark:text-white placeholder-gray-400",
-                "border-0",
-                "focus:outline-none focus:ring-2 focus:ring-blue-500"
-              )}
-              style={{ fontSize: '16px' }} // Prevents iOS zoom on focus
-            />
-          </div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+            placeholder={t('writeYourQuestion') || 'Schreibe deine Frage...'}
+            className="flex-1 px-4 py-3 rounded-full text-base bg-[#232e40] text-white placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ fontSize: '16px' }}
+          />
           <button
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isTyping}
-            className={cn(
-              "w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0",
-              "bg-blue-500 text-white",
-              "active:scale-95",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-transform"
-            )}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-blue-500 text-white active:scale-95 disabled:opacity-50 transition-transform flex-shrink-0"
           >
             <Send className="w-5 h-5" />
           </button>
         </div>
-        
-        {!keyboardVisible && (
-          <p className="text-center text-xs text-gray-400 mt-2">
-            {t('typeContactForSupport') || 'Schreibe "Kontakt" um unser Support-Team zu erreichen'}
-          </p>
-        )}
+        <p className="text-center text-xs text-gray-500 mt-2">
+          {t('typeContactForSupport') || 'Schreibe "Kontakt" für Support'}
+        </p>
       </div>
 
-      {/* Bottom Navigation - Hidden when keyboard is open */}
-      {!keyboardVisible && (
-        <div className="fixed bottom-0 left-0 right-0 z-40">
-          <MobileBottomNav />
-        </div>
-      )}
-
-      {/* Contact Form Modal (unchanged) */}
+      {/* Contact Form Modal */}
       {showContactForm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60"
             onClick={() => !isSendingEmail && setShowContactForm(false)}
           />
-          <div className="relative bg-white dark:bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto animate-scale-in shadow-2xl">
-            <div className="sticky top-0 bg-white dark:bg-[#1a2332] z-10 px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700 rounded-t-3xl">
+          <div className="relative bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-[#1a2332] z-10 px-5 pt-5 pb-4 border-b border-gray-700 rounded-t-3xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-900/30 flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                      {t('contact')}
-                    </h2>
-                    <p className="text-xs text-gray-500">
-                      {t('responseWithin')}
-                    </p>
+                    <h2 className="text-lg font-bold text-white">{t('contact')}</h2>
+                    <p className="text-xs text-gray-500">{t('responseWithin')}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowContactForm(false)}
                   disabled={isSendingEmail}
-                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-[#232e40] flex items-center justify-center"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
             </div>
@@ -550,80 +352,47 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             <div className="p-5 space-y-4">
               {emailSent ? (
                 <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-emerald-900/30 flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    {t('messageSent')}
-                  </h3>
-                  <p className="text-gray-500">
-                    {t('weWillContactYouSoon')}
-                  </p>
+                  <h3 className="text-xl font-semibold text-white mb-2">{t('messageSent')}</h3>
+                  <p className="text-gray-400">{t('weWillContactYouSoon')}</p>
                 </div>
               ) : (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('subject')}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">{t('subject')}</label>
                     <input
                       type="text"
                       value={contactSubject}
                       onChange={(e) => setContactSubject(e.target.value)}
                       placeholder={t('subjectPlaceholder')}
-                      className={cn(
-                        "w-full px-4 py-3.5 rounded-2xl",
-                        "bg-gray-50 dark:bg-[#232e40]",
-                        "text-gray-900 dark:text-white placeholder-gray-400",
-                        "border-2 border-transparent",
-                        "focus:outline-none focus:border-blue-500"
-                      )}
+                      className="w-full px-4 py-3.5 rounded-2xl bg-[#232e40] text-white placeholder-gray-500 border-2 border-transparent focus:outline-none focus:border-blue-500"
                     />
                   </div>
-                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('yourMessage')}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">{t('yourMessage')}</label>
                     <textarea
                       value={contactMessage}
                       onChange={(e) => setContactMessage(e.target.value)}
                       placeholder={t('describeYourConcern')}
                       rows={5}
-                      className={cn(
-                        "w-full px-4 py-3.5 rounded-2xl resize-none",
-                        "bg-gray-50 dark:bg-[#232e40]",
-                        "text-gray-900 dark:text-white placeholder-gray-400",
-                        "border-2 border-transparent",
-                        "focus:outline-none focus:border-blue-500"
-                      )}
+                      className="w-full px-4 py-3.5 rounded-2xl resize-none bg-[#232e40] text-white placeholder-gray-500 border-2 border-transparent focus:outline-none focus:border-blue-500"
                     />
                   </div>
-                  
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+                  <div className="p-4 bg-blue-900/20 rounded-2xl">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
+                      <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                          E-Mail: info@finflowapp.ch
-                        </p>
-                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                          {t('weReplyAsSoonAsPossible')}
-                        </p>
+                        <p className="text-sm font-medium text-blue-300">E-Mail: info@finflowapp.ch</p>
+                        <p className="text-xs text-blue-400 mt-1">{t('weReplyAsSoonAsPossible')}</p>
                       </div>
                     </div>
                   </div>
-                  
                   <button
                     onClick={handleSendContactEmail}
                     disabled={isSendingEmail || !contactSubject.trim() || !contactMessage.trim()}
-                    className={cn(
-                      "w-full py-4 rounded-2xl font-semibold text-lg",
-                      "bg-blue-500 text-white shadow-lg",
-                      "hover:bg-blue-600 active:scale-[0.98]",
-                      "disabled:opacity-50 disabled:cursor-not-allowed",
-                      "transition-all flex items-center justify-center gap-2"
-                    )}
+                    className="w-full py-4 rounded-2xl font-semibold text-lg bg-blue-500 text-white shadow-lg hover:bg-blue-600 active:scale-[0.98] disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                   >
                     {isSendingEmail ? (
                       <>
@@ -643,22 +412,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </div>
         </div>
       )}
-      
-      <style jsx>{`
-        @keyframes scale-in {
-          from {
-            transform: scale(0.95);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        .animate-scale-in {
-          animation: scale-in 0.2s ease-out;
-        }
-      `}</style>
     </div>
   )
 }
