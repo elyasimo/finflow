@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { 
   Send, User, Mail, HelpCircle, FileText, Clock,
-  Loader2, CheckCircle2, AlertCircle, X, Sparkles, ChevronLeft
+  Loader2, CheckCircle2, X, Sparkles, ChevronLeft
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -29,9 +29,10 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   const [contactMessage, setContactMessage] = useState('')
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
   const [messages, setMessages] = useState<Message[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const FAQ_RESPONSES: Record<string, string> = {
@@ -58,22 +59,51 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     }
   }, [])
 
+  // Keyboard detection using Capacitor Keyboard plugin events
   useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(window.visualViewport?.height || window.innerHeight)
+    const handleKeyboardShow = (e: CustomEvent<{ keyboardHeight: number }>) => {
+      const height = e.detail?.keyboardHeight || 300
+      setKeyboardHeight(height)
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
     }
-    updateHeight()
-    window.visualViewport?.addEventListener('resize', updateHeight)
-    window.addEventListener('resize', updateHeight)
+    
+    const handleKeyboardHide = () => {
+      setKeyboardHeight(0)
+    }
+
+    // Capacitor Keyboard plugin fires these events
+    window.addEventListener('keyboardWillShow', handleKeyboardShow as EventListener)
+    window.addEventListener('keyboardDidShow', handleKeyboardShow as EventListener)
+    window.addEventListener('keyboardWillHide', handleKeyboardHide)
+    window.addEventListener('keyboardDidHide', handleKeyboardHide)
+    
+    // Fallback: visualViewport for browsers
+    const handleViewportResize = () => {
+      if (window.visualViewport) {
+        const heightDiff = window.innerHeight - window.visualViewport.height
+        if (heightDiff > 100) {
+          setKeyboardHeight(heightDiff)
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+        } else {
+          setKeyboardHeight(0)
+        }
+      }
+    }
+    
+    window.visualViewport?.addEventListener('resize', handleViewportResize)
+    
     return () => {
-      window.visualViewport?.removeEventListener('resize', updateHeight)
-      window.removeEventListener('resize', updateHeight)
+      window.removeEventListener('keyboardWillShow', handleKeyboardShow as EventListener)
+      window.removeEventListener('keyboardDidShow', handleKeyboardShow as EventListener)
+      window.removeEventListener('keyboardWillHide', handleKeyboardHide)
+      window.removeEventListener('keyboardDidHide', handleKeyboardHide)
+      window.visualViewport?.removeEventListener('resize', handleViewportResize)
     }
   }, [])
 
   useEffect(() => {
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-  }, [messages, isTyping, viewportHeight])
+  }, [messages, isTyping])
 
   const findResponse = (input: string): string | null => {
     const lower = input.toLowerCase()
@@ -108,15 +138,24 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#0f1623]"
-      style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh', paddingTop: 'env(safe-area-inset-top)' }}>
-      <div className="flex-shrink-0 bg-[#0f1623] border-b border-gray-800">
-        <div className="flex items-center gap-3 px-4 h-14">
-          <button onClick={() => window.history.back()} className="w-9 h-9 rounded-full bg-[#1e293b] flex items-center justify-center">
+    <div 
+      ref={containerRef}
+      className="fixed inset-x-0 top-0 flex flex-col bg-[#0f1623]"
+      style={{ 
+        height: '100%',
+        maxHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+        transition: 'padding-bottom 0.25s ease-out'
+      }}>
+      {/* Header - Fixed width */}
+      <div className="flex-shrink-0 bg-[#0f1623] border-b border-gray-800 w-full max-w-full overflow-hidden">
+        <div className="flex items-center gap-3 px-4 h-14 max-w-full">
+          <button onClick={() => window.history.back()} className="w-9 h-9 rounded-full bg-[#1e293b] flex items-center justify-center flex-shrink-0">
             <ChevronLeft className="w-5 h-5 text-gray-300" />
           </button>
-          <h1 className="text-lg font-semibold text-white flex-1">{t('support') || 'Support'}</h1>
-          <div className="flex items-center gap-1.5 text-xs text-emerald-500">
+          <h1 className="text-lg font-semibold text-white flex-1 truncate">{t('support') || 'Support'}</h1>
+          <div className="flex items-center gap-1.5 text-xs text-emerald-500 flex-shrink-0">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />Online
           </div>
         </div>

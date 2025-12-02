@@ -27,9 +27,9 @@ const config: CapacitorConfig = {
       backgroundColor: '#0a0a0a',
     },
     Keyboard: {
-      resize: 'native',
+      resize: 'none',
       style: 'dark',
-      resizeOnFullScreen: true,
+      resizeOnFullScreen: false,
     },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
