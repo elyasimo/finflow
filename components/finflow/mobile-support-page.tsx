@@ -40,88 +40,131 @@ interface MobileSupportPageProps {
   onSendEmail?: (subject: string, message: string) => Promise<void>
 }
 
+/**
+ * Keyboard-aware mobile chat page
+ *
+ * Änderungen / Verbesserungen gegenüber der ursprünglichen Version:
+ * - Nutzt VisualViewport (mit robustem Fallback) um eine verlässlichere keyboardHeight zu ermitteln.
+ * - Berechnet dynamisch padding-bottom des Nachrichten-Containers basierend auf tatsächlicher Input-Bar-Höhe + keyboardHeight.
+ * - Positioniert die Input-Bar mit einem inline 'bottom' Wert (inkl. env(safe-area-inset-bottom)) statt inkonsistenter class toggles,
+ *   so dass sie auf iOS/Android zuverlässig über der Tastatur sitzt.
+ * - Scrollt beim Fokus / beim Öffnen der Tastatur die letzte Nachricht in den View.
+ * - Kleinere timeouts / rAF für bessere Zuverlässigkeit auf iOS.
+ */
+
 export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPageProps) {
   const { t } = useLanguage()
   const [keyboardVisible, setKeyboardVisible] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const inputBarRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const initialHeightRef = useRef<number>(0)
-  
-  // Handle keyboard visibility using VisualViewport API with iOS/Android fixes
+  const rafRef = useRef<number | null>(null)
+
+  // store initial height on mount
   useEffect(() => {
-    // Store initial window height
     initialHeightRef.current = window.innerHeight
-    
-    const handleViewportResize = () => {
-      if (window.visualViewport) {
-        const currentHeight = window.visualViewport.height
-        const windowHeight = initialHeightRef.current
-        const calculatedKeyboardHeight = windowHeight - currentHeight
-        
-        // Only consider keyboard visible if height difference > 150px (account for address bar changes)
-        const isKeyboardOpen = calculatedKeyboardHeight > 150
-        setKeyboardVisible(isKeyboardOpen)
-        setKeyboardHeight(isKeyboardOpen ? calculatedKeyboardHeight : 0)
-        setViewportHeight(currentHeight)
-      }
-    }
+  }, [])
 
-    // Fallback for browsers without VisualViewport
-    const handleFocusIn = (e: FocusEvent) => {
-      const target = e.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        // Wait for keyboard to open
-        setTimeout(() => {
-          if (window.visualViewport) {
-            handleViewportResize()
-          } else {
-            const heightDiff = initialHeightRef.current - window.innerHeight
-            if (heightDiff > 150) {
-              setKeyboardVisible(true)
-              setKeyboardHeight(heightDiff)
-              setViewportHeight(window.innerHeight)
-            }
-          }
-        }, 300)
-      }
-    }
+  // VisualViewport handler (with fallback)
+  useEffect(() => {
+    const vv = (window as any).visualViewport as VisualViewport | undefined
 
-    const handleFocusOut = () => {
-      // Small delay to check if focus moved to another input
-      setTimeout(() => {
-        const activeEl = document.activeElement as HTMLElement
-        if (activeEl?.tagName !== 'INPUT' && activeEl?.tagName !== 'TEXTAREA') {
-          setKeyboardVisible(false)
-          setKeyboardHeight(0)
-          setViewportHeight(null)
+    const updateKeyboard = () => {
+      // Use rAF to avoid layout thrashing on some browsers
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        const initial = initialHeightRef.current || window.innerHeight
+
+        if (vv) {
+          // visualViewport gives the visible viewport area; offsetTop can be non-zero (iOS)
+          const visibleHeight = vv.height
+          const offsetTop = vv.offsetTop ?? 0
+          const calculated = Math.max(0, initial - visibleHeight - offsetTop)
+          const visible = calculated > 80 // threshold smaller than before for sensitivity
+          setKeyboardHeight(calculated)
+          setKeyboardVisible(visible)
+        } else {
+          // fallback: compare initial innerHeight to current innerHeight
+          const diff = Math.max(0, initial - window.innerHeight)
+          const visible = diff > 80
+          setKeyboardHeight(diff)
+          setKeyboardVisible(visible)
         }
-      }, 100)
+      })
     }
 
-    // Add listeners
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportResize)
-      window.visualViewport.addEventListener('scroll', handleViewportResize)
-      handleViewportResize() // Initial call
+    // focusin/focusout improves reliability across devices
+    const onFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement | null
+      if (!target) return
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || (target as HTMLElement).isContentEditable
+      if (isInput) {
+        // small delay lets viewport settle on some devices
+        setTimeout(updateKeyboard, 50)
+      }
     }
-    
-    // Always add focus listeners for better reliability
-    document.addEventListener('focusin', handleFocusIn)
-    document.addEventListener('focusout', handleFocusOut)
+
+    const onFocusOut = () => {
+      // delay to let focus move to other element
+      setTimeout(updateKeyboard, 100)
+    }
+
+    if (vv) {
+      vv.addEventListener('resize', updateKeyboard)
+      vv.addEventListener('scroll', updateKeyboard)
+      // initial measurement
+      updateKeyboard()
+    } else {
+      // fallback for browsers without visualViewport
+      window.addEventListener('resize', updateKeyboard)
+    }
+
+    document.addEventListener('focusin', onFocusIn)
+    document.addEventListener('focusout', onFocusOut)
 
     return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleViewportResize)
-        window.visualViewport.removeEventListener('scroll', handleViewportResize)
+      if (vv) {
+        vv.removeEventListener('resize', updateKeyboard)
+        vv.removeEventListener('scroll', updateKeyboard)
+      } else {
+        window.removeEventListener('resize', updateKeyboard)
       }
-      document.removeEventListener('focusin', handleFocusIn)
-      document.removeEventListener('focusout', handleFocusOut)
+      document.removeEventListener('focusin', onFocusIn)
+      document.removeEventListener('focusout', onFocusOut)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
   }, [])
-  
-  // FAQ responses using translations
+
+  // adjust messages container padding-bottom based on input bar height + keyboardHeight
+  const adjustMessagesPadding = useCallback(() => {
+    const container = messagesContainerRef.current
+    const inputBar = inputBarRef.current
+    if (!container || !inputBar) return
+
+    const inputBarHeight = inputBar.offsetHeight
+    // extra spacing so last message isn't flush to input
+    const extra = inputBarHeight + keyboardHeight + 12
+    container.style.paddingBottom = `${extra}px`
+  }, [keyboardHeight])
+
+  useEffect(() => {
+    adjustMessagesPadding()
+    // ensure last message visible when keyboard changes
+    if (keyboardVisible) {
+      // give the browser a moment to layout the input bar above keyboard
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 100)
+    }
+  }, [keyboardHeight, keyboardVisible, adjustMessagesPadding])
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
+  // FAQ and chat logic (unchanged, aside from using refs defined above)
   const FAQ_RESPONSES: Record<string, string> = {
     'konto': t('faqAccount'),
     'account': t('faqAccount'),
@@ -147,7 +190,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     'import': t('faqImport'),
   }
 
-  // Quick action suggestions
   const QUICK_ACTIONS = [
     { icon: HelpCircle, label: t('howToAddAccount'), keyword: 'konto' },
     { icon: FileText, label: t('howToCreateBudget'), keyword: 'budget' },
@@ -170,61 +212,55 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   const [contactMessage, setContactMessage] = useState('')
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
 
-  // Find best matching FAQ response
+  // ensure adjustMessagesPadding reacts if input bar size changes (e.g. when device safe-area changes)
+  useEffect(() => {
+    const ro = new ResizeObserver(() => adjustMessagesPadding())
+    if (inputBarRef.current) ro.observe(inputBarRef.current)
+    return () => ro.disconnect()
+  }, [adjustMessagesPadding])
+
   const findResponse = (input: string): string | null => {
     const lowerInput = input.toLowerCase()
-    
+
     for (const [keyword, response] of Object.entries(FAQ_RESPONSES)) {
       if (lowerInput.includes(keyword)) {
         return response
       }
     }
-    
-    // Check for common variations
+
     if (lowerInput.includes('hilfe') || lowerInput.includes('help')) {
       return t('supportHelpTopics') || 'I can help you with many topics: accounts, transactions, budgets, settings, trading and more. Just ask me a question!'
     }
-    
+
     if (lowerInput.includes('kontakt') || lowerInput.includes('email') || lowerInput.includes('mensch')) {
       return 'CONTACT_FORM'
     }
-    
+
     return null
   }
 
-  // Send message
   const handleSendMessage = async (content?: string) => {
     const messageText = content || inputMessage.trim()
     if (!messageText) return
-    
-    // Add user message
+
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
       content: messageText,
       timestamp: new Date()
     }
-    
+
     setMessages(prev => [...prev, userMessage])
     setInputMessage('')
     setIsTyping(true)
-    
-    // Simulate typing delay
+
     await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700))
-    
-    // Find response
+
     const response = findResponse(messageText)
-    
+
     let botResponse: string
-    
+
     if (response === 'CONTACT_FORM') {
       botResponse = t('openingContactForm')
       setTimeout(() => setShowContactForm(true), 1000)
@@ -233,20 +269,22 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     } else {
       botResponse = `${t('notSureHowToHelp')} "${messageText}" 🤔\n\n${t('youCan')}:\n• ${t('chooseQuickOption')}\n• ${t('typeContactToReach')}\n\n${t('orTryRephrasing')}`
     }
-    
+
     setIsTyping(false)
-    
+
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
       type: 'bot',
       content: botResponse,
       timestamp: new Date()
     }
-    
+
     setMessages(prev => [...prev, botMessage])
+
+    // after new bot message, keep scroll at bottom
+    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 120)
   }
 
-  // Handle quick action
   const handleQuickAction = (keyword: string) => {
     const response = FAQ_RESPONSES[keyword]
     if (response) {
@@ -254,23 +292,20 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     }
   }
 
-  // Send contact email
   const handleSendContactEmail = async () => {
     if (!contactSubject.trim() || !contactMessage.trim()) return
-    
+
     setIsSendingEmail(true)
-    
+
     try {
       if (onSendEmail) {
         await onSendEmail(contactSubject, contactMessage)
       } else {
-        // Simulate sending
         await new Promise(resolve => setTimeout(resolve, 1500))
       }
-      
+
       setEmailSent(true)
-      
-      // Add bot message about email sent
+
       const confirmMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
@@ -278,17 +313,14 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         timestamp: new Date()
       }
       setMessages(prev => [...prev, confirmMessage])
-      
-      // Reset form after delay
+
       setTimeout(() => {
         setShowContactForm(false)
         setContactSubject('')
         setContactMessage('')
         setEmailSent(false)
       }, 2000)
-      
     } catch (error) {
-      // Add error message
       const errorMessage: Message = {
         id: Date.now().toString(),
         type: 'bot',
@@ -305,13 +337,12 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
     <div 
       className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]"
     >
-      {/* Compact Chat Header - Same style as other pages */}
+      {/* Compact Chat Header */}
       <div 
         className="flex-shrink-0 z-40 bg-[#0f1623] border-b border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="flex items-center gap-3 px-4 h-12">
-          {/* Back Button */}
           <button
             onClick={() => window.history.back()}
             className="w-8 h-8 rounded-full bg-[#1e293b] flex items-center justify-center"
@@ -320,12 +351,10 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             <ChevronLeft className="w-4 h-4 text-gray-300" />
           </button>
           
-          {/* Title */}
           <h1 className="text-base font-semibold text-white flex-1">
             {t('support') || 'Support'}
           </h1>
           
-          {/* Online indicator */}
           <div className="flex items-center gap-1.5 text-xs text-emerald-500">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
             Online
@@ -333,12 +362,13 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       </div>
 
-      {/* Scrollable Chat Messages Area */}
+      {/* Messages area */}
       <div 
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 bg-[#f8f9fc] dark:bg-[#0f1623]"
         style={{ 
-          paddingBottom: keyboardVisible ? '70px' : '180px',
+          // initial paddingBottom will be adjusted by JS (adjustMessagesPadding)
+          paddingBottom: undefined as any,
         }}
       >
         <div className="space-y-4">
@@ -350,7 +380,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 message.type === 'user' ? "flex-row-reverse" : "flex-row"
               )}
             >
-              {/* Avatar */}
               <div className={cn(
                 "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0",
                 message.type === 'user' 
@@ -364,7 +393,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 )}
               </div>
               
-              {/* Message Bubble */}
               <div className={cn(
                 "max-w-[75%] rounded-2xl px-4 py-3",
                 message.type === 'user'
@@ -383,8 +411,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               </div>
             </div>
           ))}
-          
-          {/* Typing Indicator */}
+
           {isTyping && (
             <div className="flex gap-3">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
@@ -399,11 +426,10 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Actions - Only show when keyboard is hidden */}
         {!keyboardVisible && (
           <div className="mt-4">
             <p className="text-xs text-gray-500 mb-3">{t('quickHelp')}</p>
@@ -423,14 +449,17 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         )}
       </div>
 
-      {/* Fixed Input Area - Always visible */}
+      {/* Input Bar - always rendered fixed, but bottom is adjusted dynamically with keyboardHeight */}
       <div 
+        ref={inputBarRef}
         className={cn(
           "flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3",
-          keyboardVisible ? "fixed bottom-0 left-0 right-0 z-50" : ""
+          "fixed left-0 right-0 z-50"
         )}
         style={{
-          paddingBottom: keyboardVisible ? 'env(safe-area-inset-bottom, 8px)' : 'calc(env(safe-area-inset-bottom) + 70px)',
+          // when keyboard is visible, push the inputBar above it; otherwise respect safe-area inset
+          bottom: `calc(env(safe-area-inset-bottom, 8px) + ${keyboardVisible ? `${keyboardHeight}px` : '0px'})`,
+          transition: 'bottom 180ms ease'
         }}
       >
         <div className="flex items-center gap-3">
@@ -442,10 +471,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               onFocus={() => {
-                // Scroll to bottom when keyboard opens
-                setTimeout(() => {
-                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-                }, 300)
+                // scroll to bottom once keyboard opens (small timeout for iOS)
+                setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 120)
               }}
               placeholder={t('writeYourQuestion') || 'Schreibe deine Frage...'}
               className={cn(
@@ -473,7 +500,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
           </button>
         </div>
         
-        {/* Contact Hint - only when keyboard hidden */}
         {!keyboardVisible && (
           <p className="text-center text-xs text-gray-400 mt-2">
             {t('typeContactForSupport') || 'Schreibe "Kontakt" um unser Support-Team zu erreichen'}
@@ -488,7 +514,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       )}
 
-      {/* Contact Form Modal */}
+      {/* Contact Form Modal (unchanged) */}
       {showContactForm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div 
@@ -618,7 +644,6 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       )}
       
-      {/* Styles */}
       <style jsx>{`
         @keyframes scale-in {
           from {
