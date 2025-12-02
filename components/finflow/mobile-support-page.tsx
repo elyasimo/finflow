@@ -140,7 +140,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-x-0 top-0 flex flex-col bg-[#0f1623]"
+      className="fixed inset-0 flex flex-col bg-[#0f1623] max-w-[100vw] overflow-x-hidden"
       style={{ 
         height: '100%',
         maxHeight: '100dvh',
@@ -148,13 +148,13 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
         transition: 'padding-bottom 0.25s ease-out'
       }}>
-      {/* Header - Fixed width */}
-      <div className="flex-shrink-0 bg-[#0f1623] border-b border-gray-800 w-full max-w-full overflow-hidden">
-        <div className="flex items-center gap-3 px-4 h-14 max-w-full">
-          <button onClick={() => window.history.back()} className="w-9 h-9 rounded-full bg-[#1e293b] flex items-center justify-center flex-shrink-0">
+      {/* Header */}
+      <div className="flex-shrink-0 bg-[#0f1623] border-b border-gray-800 w-full max-w-[100vw] overflow-hidden box-border">
+        <div className="flex items-center gap-3 px-4 h-14 w-full max-w-[100vw] box-border">
+          <button onClick={() => window.history.back()} className="w-9 h-9 min-w-[36px] rounded-full bg-[#1e293b] flex items-center justify-center flex-shrink-0">
             <ChevronLeft className="w-5 h-5 text-gray-300" />
           </button>
-          <h1 className="text-lg font-semibold text-white flex-1 truncate">{t('support') || 'Support'}</h1>
+          <h1 className="text-lg font-semibold text-white flex-1 truncate min-w-0">{t('support') || 'Support'}</h1>
           <div className="flex items-center gap-1.5 text-xs text-emerald-500 flex-shrink-0">
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />Online
           </div>
