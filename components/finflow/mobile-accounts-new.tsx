@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { 
   Wallet, 
   Plus, 
@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
+import { useKeyboard } from "@/hooks/use-keyboard"
 import MobilePageHeader from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 
@@ -111,6 +112,7 @@ export default function MobileAccountsNew({
 }: MobileAccountsNewProps) {
   const { t } = useLanguage()
   const { currency } = useCurrency()
+  const keyboard = useKeyboard()
   
   // UI State
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -614,7 +616,17 @@ export default function MobileAccountsNew({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl overflow-y-auto animate-slide-up transition-all duration-200"
+            style={{
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - 44px)` 
+                : '90vh',
+              paddingBottom: keyboard.isVisible 
+                ? `${keyboard.height + 20}px` 
+                : 'max(20px, env(safe-area-inset-bottom))',
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -629,7 +641,7 @@ export default function MobileAccountsNew({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
+            <div className="p-5">
               {renderAccountForm(false)}
             </div>
           </div>
@@ -643,7 +655,17 @@ export default function MobileAccountsNew({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl overflow-y-auto animate-slide-up transition-all duration-200"
+            style={{
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - 44px)` 
+                : '90vh',
+              paddingBottom: keyboard.isVisible 
+                ? `${keyboard.height + 20}px` 
+                : 'max(20px, env(safe-area-inset-bottom))',
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -658,7 +680,7 @@ export default function MobileAccountsNew({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-5 pb-8">
+            <div className="p-5">
               {renderAccountForm(true)}
             </div>
           </div>

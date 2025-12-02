@@ -145,11 +145,12 @@ export default function MobilePageHeader({
         "lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl",
         "border-b border-gray-200/50 dark:border-[#232e40]/50",
         "pt-[env(safe-area-inset-top)]",
+        "w-full max-w-[100vw] overflow-hidden",
         className
       )}
       role="banner"
     >
-      <div className="flex items-center justify-between px-4 h-14">
+      <div className="flex items-center justify-between px-4 h-14 w-full max-w-full">
         {/* Left: Back/Home + Title */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <button 
@@ -212,7 +213,7 @@ export default function MobilePageHeader({
 
         {/* Right: Actions */}
         {showActions && !showSearchInput && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {/* Search Button (if enabled) */}
             {showSearch && (
               <button

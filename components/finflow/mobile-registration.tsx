@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils"
 import { FinflowLogo } from "@/components/icons/finflow-logo"
 import { authApi, accountsApi } from "@/lib/api"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { useKeyboard } from "@/hooks/use-keyboard"
 
 /**
  * Registration Flow Steps:
@@ -96,6 +97,7 @@ export default function MobileRegistration({
   onLogin 
 }: MobileRegistrationProps) {
   const { t } = useLanguage()
+  const keyboard = useKeyboard()
   
   // Step state
   const [step, setStep] = useState<RegistrationStep>('contact')
@@ -1248,9 +1250,12 @@ export default function MobileRegistration({
         </div>
       </div>
 
-      {/* Content - A1.1/A6 Fix: Added bottom padding for keyboard and safe area */}
+      {/* Content - Keyboard-aware scrolling */}
       <div 
-        className="flex-1 px-5 py-6 pb-[280px] overflow-y-auto overscroll-contain scroll-smooth"
+        className="flex-1 px-5 py-6 overflow-y-auto overscroll-contain scroll-smooth transition-all duration-200"
+        style={{
+          paddingBottom: keyboard.height > 0 ? `${keyboard.height + 40}px` : '120px',
+        }}
         onClick={(e) => {
           // Only blur if clicking on the container itself, not on inputs
           if (e.target === e.currentTarget) {

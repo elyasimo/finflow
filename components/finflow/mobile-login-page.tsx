@@ -19,6 +19,7 @@ import { FinflowLogo } from "@/components/icons/finflow-logo"
 import { useAuth } from "@/hooks/use-auth"
 import { useBiometric } from "@/hooks/use-biometric"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { useKeyboard } from "@/hooks/use-keyboard"
 
 interface MobileLoginPageProps {
   onRegister?: () => void
@@ -31,6 +32,7 @@ export default function MobileLoginPage({
 }: MobileLoginPageProps) {
   const router = useRouter()
   const { t } = useLanguage()
+  const keyboard = useKeyboard()
   const { login, isLoginLoading, loginError } = useAuth()
   const { 
     isAvailable: biometricAvailable, 
@@ -239,8 +241,13 @@ export default function MobileLoginPage({
         </div>
       </div>
 
-      {/* Main Content - A4 Fix: Scrollable with safe area padding */}
-      <div className="flex-1 px-6 py-8 pb-[100px] overflow-y-auto overscroll-contain">
+      {/* Main Content - Keyboard-aware scrolling */}
+      <div 
+        className="flex-1 px-6 py-8 overflow-y-auto overscroll-contain transition-all duration-200"
+        style={{
+          paddingBottom: keyboard.height > 0 ? `${keyboard.height + 40}px` : '100px',
+        }}
+      >
         {/* Face ID Quick Login - Show when credentials are saved OR biometrics enabled but need setup */}
         {biometricAvailable && isNative && (hasSavedCredentials || biometricsEnabledSetting) && (
           <div className="mb-8">

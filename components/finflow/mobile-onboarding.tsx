@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { FinflowLogo } from "@/components/icons/finflow-logo"
+import { useKeyboard } from "@/hooks/use-keyboard"
 
 type OnboardingStep = 'contact' | 'password' | 'verification' | 'verified' | 'account-setup' | 'complete'
 
@@ -65,6 +66,7 @@ const accountTypes = [
 ]
 
 export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardingProps) {
+  const keyboard = useKeyboard()
   const [step, setStep] = useState<OnboardingStep>('contact')
   const [contactType, setContactType] = useState<'email' | 'phone'>('email')
   const [contact, setContact] = useState('')
@@ -680,8 +682,13 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 px-5 py-6">
+      {/* Content - Keyboard-aware scrolling */}
+      <div 
+        className="flex-1 px-5 py-6 overflow-y-auto transition-all duration-200"
+        style={{
+          paddingBottom: keyboard.height > 0 ? `${keyboard.height + 40}px` : '120px',
+        }}
+      >
         {step === 'contact' && renderContactStep()}
         {step === 'password' && renderPasswordStep()}
         {step === 'verification' && renderVerificationStep()}
