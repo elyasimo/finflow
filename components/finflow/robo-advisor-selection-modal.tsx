@@ -58,7 +58,7 @@ export default function RoboAdvisorSelectionModal({
       titleKey: 'cryptoAgent',
       description: 'Automatisiertes Trading und Risikomanagement für Kryptowährungen',
       descriptionKey: 'cryptoAgentDescription',
-      route: '/robo-advisor?type=crypto'
+      route: '/trading-agent'
     },
     {
       id: 'trading',
@@ -68,7 +68,7 @@ export default function RoboAdvisorSelectionModal({
       titleKey: 'tradingAgent',
       description: 'Aktien, ETFs und weitere Finanzinstrumente automatisch handeln',
       descriptionKey: 'tradingAgentDescription',
-      route: '/robo-advisor?type=trading'
+      route: '/stock-trading-agent'
     },
     {
       id: 'configure',
@@ -77,7 +77,8 @@ export default function RoboAdvisorSelectionModal({
       title: 'Neuen Agent konfigurieren',
       titleKey: 'configureNewAgent',
       description: 'Erstelle einen individuellen Robo-Advisor mit eigenen Einstellungen',
-      descriptionKey: 'configureAgentDescription'
+      descriptionKey: 'configureAgentDescription',
+      route: '/robo-advisor/configure'
     }
   ]
 
@@ -102,22 +103,13 @@ export default function RoboAdvisorSelectionModal({
       localStorage.setItem('roboAdvisorPreference', option.id)
     }
 
-    if (option.id === 'configure') {
-      onClose()
-      if (onOpenCreateSheet) {
-        onOpenCreateSheet()
-      } else {
-        // Navigate to robo-advisor with create param
-        router.push('/robo-advisor?action=create')
-      }
-    } else if (option.id === 'crypto' || option.id === 'trading') {
-      // Use callback to set agent type directly without page reload
-      if (onSelectAgent) {
-        onSelectAgent(option.id)
-      }
-      onClose()
+    onClose()
+    
+    // Navigate to the correct page
+    if (option.route) {
+      router.push(option.route)
     }
-  }, [rememberChoice, onClose, onOpenCreateSheet, onSelectAgent, router, trackSelection])
+  }, [rememberChoice, onClose, router, trackSelection])
 
   // Keyboard handling
   useEffect(() => {

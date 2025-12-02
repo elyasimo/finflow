@@ -303,41 +303,32 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623] overflow-hidden"
-      style={{ 
-        height: viewportHeight ? `${viewportHeight}px` : '100dvh',
-        maxHeight: viewportHeight ? `${viewportHeight}px` : '100dvh',
-      }}
+      className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]"
     >
-      {/* Compact Chat Header */}
+      {/* Compact Chat Header - Same style as other pages */}
       <div 
-        className="flex-shrink-0 z-40 bg-white dark:bg-[#0f1623] border-b border-gray-100 dark:border-gray-800"
+        className="flex-shrink-0 z-40 bg-[#0f1623] border-b border-gray-800"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="flex items-center gap-3 px-4 h-14 max-w-full">
+        <div className="flex items-center gap-3 px-4 h-12">
           {/* Back Button */}
           <button
             onClick={() => window.history.back()}
-            className="w-10 h-10 min-w-[40px] rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-[#1e293b] flex items-center justify-center"
             aria-label="Zurück"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <ChevronLeft className="w-4 h-4 text-gray-300" />
           </button>
           
-          {/* Bot Avatar + Title */}
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 min-w-[40px] rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">
-                {t('support') || 'Support'}
-              </h1>
-              <p className="text-xs text-emerald-500 flex items-center gap-1">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                Online
-              </p>
-            </div>
+          {/* Title */}
+          <h1 className="text-base font-semibold text-white flex-1">
+            {t('support') || 'Support'}
+          </h1>
+          
+          {/* Online indicator */}
+          <div className="flex items-center gap-1.5 text-xs text-emerald-500">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+            Online
           </div>
         </div>
       </div>
@@ -345,10 +336,9 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       {/* Scrollable Chat Messages Area */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
+        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 bg-[#f8f9fc] dark:bg-[#0f1623]"
         style={{ 
-          paddingBottom: keyboardVisible ? '80px' : '100px',
-          minHeight: 0, // Important for flex scroll
+          paddingBottom: keyboardVisible ? '70px' : '180px',
         }}
       >
         <div className="space-y-4">
@@ -433,15 +423,18 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         )}
       </div>
 
-      {/* Fixed Input Area - Always visible above keyboard */}
+      {/* Fixed Input Area - Always visible */}
       <div 
-        className="flex-shrink-0 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3 z-50"
+        className={cn(
+          "flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2332] px-4 py-3",
+          keyboardVisible ? "fixed bottom-0 left-0 right-0 z-50" : ""
+        )}
         style={{
-          paddingBottom: keyboardVisible ? '12px' : 'calc(env(safe-area-inset-bottom) + 80px)',
+          paddingBottom: keyboardVisible ? 'env(safe-area-inset-bottom, 8px)' : 'calc(env(safe-area-inset-bottom) + 70px)',
         }}
       >
-        <div className="flex items-end gap-3 max-w-full">
-          <div className="flex-1 relative min-w-0">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 relative">
             <input
               ref={inputRef}
               type="text"
@@ -449,19 +442,18 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               onFocus={() => {
-                // Scroll input into view and scroll messages after keyboard opens
+                // Scroll to bottom when keyboard opens
                 setTimeout(() => {
-                  // Scroll to the end of messages
-                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-                }, 400)
+                  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+                }, 300)
               }}
-              placeholder={t('writeYourQuestion')}
+              placeholder={t('writeYourQuestion') || 'Schreibe deine Frage...'}
               className={cn(
-                "w-full px-4 py-3 rounded-2xl text-base",
-                "bg-gray-50 dark:bg-[#232e40]",
+                "w-full px-4 py-3 rounded-full text-base",
+                "bg-gray-100 dark:bg-[#232e40]",
                 "text-gray-900 dark:text-white placeholder-gray-400",
-                "border-2 border-transparent",
-                "focus:outline-none focus:border-blue-500"
+                "border-0",
+                "focus:outline-none focus:ring-2 focus:ring-blue-500"
               )}
               style={{ fontSize: '16px' }} // Prevents iOS zoom on focus
             />
@@ -470,11 +462,11 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isTyping}
             className={cn(
-              "w-12 h-12 min-w-[48px] rounded-full flex items-center justify-center flex-shrink-0",
-              "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
-              "hover:bg-blue-600 active:scale-95",
+              "w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0",
+              "bg-blue-500 text-white",
+              "active:scale-95",
               "disabled:opacity-50 disabled:cursor-not-allowed",
-              "transition-all"
+              "transition-transform"
             )}
           >
             <Send className="w-5 h-5" />
@@ -484,7 +476,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         {/* Contact Hint - only when keyboard hidden */}
         {!keyboardVisible && (
           <p className="text-center text-xs text-gray-400 mt-2">
-            {t('typeContactForSupport')}
+            {t('typeContactForSupport') || 'Schreibe "Kontakt" um unser Support-Team zu erreichen'}
           </p>
         )}
       </div>
