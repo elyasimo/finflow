@@ -103,15 +103,17 @@ export default function RoboAdvisorSelectionModal({
       localStorage.setItem('roboAdvisorPreference', option.id)
     }
 
-    // Navigate FIRST, then close modal
-    // This prevents the robo-advisor page from re-rendering and showing modal again
+    // Close modal first, then navigate
+    onClose()
+    
+    // Use router.push for SPA navigation (no full page reload)
     if (option.route) {
-      // Use window.location for reliable navigation in Capacitor
-      window.location.href = option.route
-    } else {
-      onClose()
+      // Small delay to let modal close animation finish
+      setTimeout(() => {
+        router.push(option.route!)
+      }, 100)
     }
-  }, [rememberChoice, onClose, trackSelection])
+  }, [rememberChoice, onClose, trackSelection, router])
 
   // Keyboard handling
   useEffect(() => {
