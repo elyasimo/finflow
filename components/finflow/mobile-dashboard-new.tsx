@@ -451,7 +451,7 @@ export default function MobileDashboard({
                 {portfolioLoading && <Loader2 className="w-4 h-4 animate-spin opacity-60" />}
               </div>
               <p className="text-3xl font-bold mb-4 truncate">
-                {formatCurrency(totalPortfolioValue, 'EUR')}
+                {formatCurrency(totalPortfolioValue, currency)}
               </p>
               
               {/* Top 3 Assets - wrap instead of overflow */}

@@ -224,10 +224,16 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
       </div>
 
       {showContactForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => !isSendingEmail && setShowContactForm(false)} />
-          <div className="relative bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto">
-            <div className="p-5 border-b border-gray-700 flex items-center justify-between">
+          <div 
+            className="relative bg-[#1a2332] rounded-t-3xl w-full max-h-[85vh] overflow-y-auto"
+            style={{
+              marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+              transition: 'margin-bottom 0.25s ease-out'
+            }}
+          >
+            <div className="p-5 border-b border-gray-700 flex items-center justify-between sticky top-0 bg-[#1a2332] z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-900/30 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-blue-400" />
@@ -238,7 +244,7 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 pb-8">
               {emailSent ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
