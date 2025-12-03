@@ -470,7 +470,7 @@ export default function MobileTransactionsPage({
           )}
         >
           <ArrowUpRight className="w-4 h-4" />
-          Ausgabe
+          {t('expense')}
         </button>
         <button
           onClick={() => setFormData(prev => ({ ...prev, type: 'income' }))}
@@ -482,14 +482,14 @@ export default function MobileTransactionsPage({
           )}
         >
           <ArrowDownLeft className="w-4 h-4" />
-          Einnahme
+          {t('income')}
         </button>
       </div>
 
       {/* Amount Input */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Betrag *
+          {t('amount')} *
         </label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">
@@ -515,11 +515,11 @@ export default function MobileTransactionsPage({
       {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Beschreibung *
+          {t('description')} *
         </label>
         <input
           type="text"
-          placeholder="z.B. Einkauf Migros"
+          placeholder={t('descriptionPlaceholder') || 'e.g. Grocery shopping'}
           value={formData.description}
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           className={cn(
@@ -535,7 +535,7 @@ export default function MobileTransactionsPage({
       {/* Account Selection */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Konto *
+          {t('account')} *
         </label>
         <div className="flex gap-2 overflow-x-auto pb-2">
           {accounts.map((account) => (
@@ -567,7 +567,7 @@ export default function MobileTransactionsPage({
       {/* Category */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Kategorie
+          {t('category')}
         </label>
         <div className="flex flex-wrap gap-2">
           {uniqueCategories.slice(0, 8).map((cat) => {
@@ -605,7 +605,7 @@ export default function MobileTransactionsPage({
       {/* Date */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Datum
+          {t('transactionDate')}
         </label>
         <input
           type="date"
@@ -624,10 +624,10 @@ export default function MobileTransactionsPage({
       {/* Note (optional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Notiz (optional)
+          {t('notes')} ({t('optional') || 'optional'})
         </label>
         <textarea
-          placeholder="Zusätzliche Infos..."
+          placeholder={t('additionalInfo') || 'Additional info...'}
           value={formData.note}
           onChange={(e) => setFormData(prev => ({ ...prev, note: e.target.value }))}
           rows={2}
@@ -991,7 +991,7 @@ export default function MobileTransactionsPage({
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Neue Transaktion
+                {t('newTransaction')}
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}

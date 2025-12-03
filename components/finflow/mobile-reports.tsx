@@ -86,18 +86,18 @@ export default function MobileReports({
   const currentYear = new Date().getFullYear()
   const years = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1]
   const months = [
-    { value: 0, label: 'Januar' },
-    { value: 1, label: 'Februar' },
-    { value: 2, label: 'März' },
-    { value: 3, label: 'April' },
-    { value: 4, label: 'Mai' },
-    { value: 5, label: 'Juni' },
-    { value: 6, label: 'Juli' },
-    { value: 7, label: 'August' },
-    { value: 8, label: 'September' },
-    { value: 9, label: 'Oktober' },
-    { value: 10, label: 'November' },
-    { value: 11, label: 'Dezember' },
+    { value: 0, labelKey: 'january' },
+    { value: 1, labelKey: 'february' },
+    { value: 2, labelKey: 'march' },
+    { value: 3, labelKey: 'april' },
+    { value: 4, labelKey: 'may' },
+    { value: 5, labelKey: 'june' },
+    { value: 6, labelKey: 'july' },
+    { value: 7, labelKey: 'august' },
+    { value: 8, labelKey: 'september' },
+    { value: 9, labelKey: 'october' },
+    { value: 10, labelKey: 'november' },
+    { value: 11, labelKey: 'december' },
   ]
 
   const [pickerYear, setPickerYear] = useState(selectedMonth.getFullYear())
@@ -178,7 +178,7 @@ export default function MobileReports({
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Monat wählen
+                  {t('selectMonth')}
                 </h3>
                 <button
                   onClick={() => setShowMonthPicker(false)}
@@ -230,7 +230,7 @@ export default function MobileReports({
                           : "bg-gray-100 dark:bg-[#232e40] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2a3a50]"
                       )}
                     >
-                      {month.label}
+                      {t(month.labelKey as any)}
                     </button>
                   )
                 })}
@@ -267,10 +267,10 @@ export default function MobileReports({
         <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-2 mb-4 shadow-sm">
           <div className="flex gap-1 overflow-x-auto scrollbar-hide">
             {[
-              { id: 'overview', label: 'Übersicht', icon: BarChart3 },
-              { id: 'income', label: 'Einnahmen', icon: TrendingUp },
-              { id: 'expenses', label: 'Ausgaben', icon: PieChart },
-              { id: 'budgets', label: 'Budgets', icon: DollarSign },
+              { id: 'overview', labelKey: 'overview', icon: BarChart3 },
+              { id: 'income', labelKey: 'income', icon: TrendingUp },
+              { id: 'expenses', labelKey: 'expenses', icon: PieChart },
+              { id: 'budgets', labelKey: 'budgets', icon: DollarSign },
             ].map((tab) => {
               const Icon = tab.icon
               return (
@@ -285,7 +285,7 @@ export default function MobileReports({
                   )}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden sm:inline">{t(tab.labelKey as any)}</span>
                 </button>
               )
             })}
@@ -298,7 +298,7 @@ export default function MobileReports({
             {/* Income vs Expenses Bar */}
             <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                Einnahmen vs. Ausgaben
+                {t('incomeVsExpenses')}
               </h3>
               <div className="space-y-4">
                 <div>
@@ -331,7 +331,7 @@ export default function MobileReports({
             {/* Transaction Distribution */}
             <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-                Transaktionsverteilung
+                {t('transactionDistribution')}
               </h3>
               <div className="flex items-center justify-center gap-8">
                 <div className="text-center">
@@ -359,12 +359,12 @@ export default function MobileReports({
         {activeTab === 'income' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              Einnahmen-Trend (6 Monate)
+              {t('incomeTrend')}
             </h3>
             {incomeTrends.length === 0 ? (
               <div className="py-8 text-center">
                 <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Keine Einnahmen-Daten verfügbar</p>
+                <p className="text-gray-500">{t('noIncomeData')}</p>
               </div>
             ) : (
               <MobileSVGChart
@@ -385,12 +385,12 @@ export default function MobileReports({
         {activeTab === 'expenses' && (
           <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
-              Ausgaben nach Kategorie
+              {t('expensesByCategory')}
             </h3>
             {categoryData.length === 0 ? (
               <div className="py-8 text-center">
                 <PieChart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Keine Ausgaben in diesem Zeitraum</p>
+                <p className="text-gray-500">{t('noExpensesInPeriod')}</p>
               </div>
             ) : (
               <MobileSVGChart
@@ -413,7 +413,7 @@ export default function MobileReports({
             {budgetPerformance.length === 0 ? (
               <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-8 text-center shadow-sm">
                 <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Keine Budgets für diesen Zeitraum</p>
+                <p className="text-gray-500">{t('noBudgetsForPeriod')}</p>
               </div>
             ) : (
               budgetPerformance.map((budget) => {
@@ -429,7 +429,7 @@ export default function MobileReports({
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">{budget.name}</p>
                         <p className="text-sm text-gray-500">
-                          {formatCurrency(budget.spent)} von {formatCurrency(budget.amount)}
+                          {formatCurrency(budget.spent)} {t('of')} {formatCurrency(budget.amount)}
                         </p>
                       </div>
                       <span className={cn(
@@ -451,12 +451,12 @@ export default function MobileReports({
                       />
                     </div>
                     <div className="flex justify-between mt-2 text-xs">
-                      <span className="text-gray-400">Ausgegeben</span>
+                      <span className="text-gray-400">{t('budgetSpent')}</span>
                       <span className={cn(
                         "font-medium",
                         budget.remaining > 0 ? "text-emerald-500" : "text-rose-500"
                       )}>
-                        {budget.remaining > 0 ? `${formatCurrency(budget.remaining)} übrig` : `${formatCurrency(Math.abs(budget.remaining))} darüber`}
+                        {budget.remaining > 0 ? `${formatCurrency(budget.remaining)} ${t('remainingBudget')}` : `${formatCurrency(Math.abs(budget.remaining))} ${t('exceededBudget')}`}
                       </span>
                     </div>
                   </div>

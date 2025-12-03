@@ -796,6 +796,20 @@ export const translations = {
     importFailed: 'Import failed',
     willBeDeleted: 'will be permanently deleted.',
     days: 'days',
+    
+    // Reports page (new keys only)
+    selectMonth: 'Select Month',
+    incomeTrend: 'Income Trend (6 months)',
+    noIncomeData: 'No income data available',
+    expensesByCategory: 'Expenses by Category',
+    
+    // Transaction form
+    newTransaction: 'New Transaction',
+    descriptionPlaceholder: 'e.g. Grocery shopping',
+    additionalInfo: 'Additional info...',
+    
+    // Budget page
+    yourBudgets: 'Your Budgets',
   },
   de: {
     // Navigation
@@ -1596,6 +1610,20 @@ export const translations = {
     importFailed: 'Import fehlgeschlagen',
     willBeDeleted: 'wird unwiderruflich gelöscht.',
     days: 'Tage',
+    
+    // Reports page
+    selectMonth: 'Monat wählen',
+    incomeTrend: 'Einnahmen-Trend (6 Monate)',
+    noIncomeData: 'Keine Einnahmen-Daten verfügbar',
+    expensesByCategory: 'Ausgaben nach Kategorie',
+    
+    // Transaction form
+    newTransaction: 'Neue Transaktion',
+    descriptionPlaceholder: 'z.B. Einkauf Migros',
+    additionalInfo: 'Zusätzliche Infos...',
+    
+    // Budget page
+    yourBudgets: 'Ihre Budgets',
   },
   fr: {
     // Navigation
@@ -2389,6 +2417,20 @@ export const translations = {
     importFailed: 'Échec de l\'importation',
     willBeDeleted: 'sera supprimé définitivement.',
     days: 'jours',
+    
+    // Reports page
+    selectMonth: 'Sélectionner le mois',
+    incomeTrend: 'Tendance des revenus (6 mois)',
+    noIncomeData: 'Aucune donnée de revenus disponible',
+    expensesByCategory: 'Dépenses par catégorie',
+    
+    // Transaction form
+    newTransaction: 'Nouvelle transaction',
+    descriptionPlaceholder: 'ex. Courses au supermarché',
+    additionalInfo: 'Infos supplémentaires...',
+    
+    // Budget page
+    yourBudgets: 'Vos budgets',
   },
   ar: {
     // Navigation
@@ -3181,6 +3223,20 @@ export const translations = {
     importFailed: 'فشل الاستيراد',
     willBeDeleted: 'سيتم حذفه نهائياً.',
     days: 'أيام',
+    
+    // Reports page
+    selectMonth: 'اختر الشهر',
+    incomeTrend: 'اتجاه الدخل (6 أشهر)',
+    noIncomeData: 'لا توجد بيانات دخل متاحة',
+    expensesByCategory: 'المصروفات حسب الفئة',
+    
+    // Transaction form
+    newTransaction: 'معاملة جديدة',
+    descriptionPlaceholder: 'مثال: التسوق في السوبرماركت',
+    additionalInfo: 'معلومات إضافية...',
+    
+    // Budget page
+    yourBudgets: 'ميزانياتك',
   }
 };
 

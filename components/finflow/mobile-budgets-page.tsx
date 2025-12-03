@@ -557,10 +557,10 @@ export default function MobileBudgetsPage({
       <div className="px-5 py-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-            Ihre Budgets
+            {t('yourBudgets')}
           </h2>
           <span className="text-sm text-gray-500">
-            {budgets.length} {budgets.length === 1 ? 'Budget' : 'Budgets'}
+            {budgets.length} {t('budgets')}
           </span>
         </div>
 
@@ -743,12 +743,12 @@ export default function MobileBudgetsPage({
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Neues Budget
+                {t('createNewBudget')}
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
-                aria-label="Schließen"
+                aria-label={t('cancel')}
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
