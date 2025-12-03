@@ -67,7 +67,7 @@ export default function MobileReports({
   selectedMonth,
   onMonthChange,
 }: MobileReportsProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { currency } = useCurrency()
   const [activeTab, setActiveTab] = useState<'overview' | 'income' | 'expenses' | 'budgets'>('overview')
   const [showMonthPicker, setShowMonthPicker] = useState(false)
@@ -80,7 +80,18 @@ export default function MobileReports({
     }).format(Number.isFinite(amount) ? amount : 0)
   }
 
-  const monthLabel = selectedMonth.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+  // Map language code to locale for date formatting
+  const getLocale = () => {
+    const localeMap: Record<string, string> = {
+      'de': 'de-DE',
+      'en': 'en-US',
+      'fr': 'fr-FR',
+      'ar': 'ar-SA'
+    }
+    return localeMap[language] || 'de-DE'
+  }
+
+  const monthLabel = selectedMonth.toLocaleDateString(getLocale(), { month: 'long', year: 'numeric' })
 
   // Generate months for picker (current year +/- 2 years)
   const currentYear = new Date().getFullYear()

@@ -981,9 +981,8 @@ export default function MobileTransactionsPage({
           <div 
             className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              maxHeight: keyboard.isVisible 
-                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
-                : '90vh'
+              height: '90vh',
+              maxHeight: '90vh'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
@@ -1021,9 +1020,8 @@ export default function MobileTransactionsPage({
           <div 
             className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              maxHeight: keyboard.isVisible 
-                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
-                : '90vh'
+              height: '90vh',
+              maxHeight: '90vh'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
