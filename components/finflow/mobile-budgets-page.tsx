@@ -731,10 +731,11 @@ export default function MobileBudgetsPage({
             onClick={() => setShowAddSheet(false)}
           />
           <div 
-            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            className="absolute left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              height: '90vh',
-              maxHeight: '90vh'
+              bottom: keyboard.isVisible ? `${keyboard.height}px` : '0px',
+              maxHeight: keyboard.isVisible ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` : '90vh',
+              transition: 'bottom 0.25s ease-out, max-height 0.25s ease-out'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
@@ -770,10 +771,11 @@ export default function MobileBudgetsPage({
             onClick={() => setShowEditSheet(false)}
           />
           <div 
-            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            className="absolute left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              height: '90vh',
-              maxHeight: '90vh'
+              bottom: keyboard.isVisible ? `${keyboard.height}px` : '0px',
+              maxHeight: keyboard.isVisible ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` : '90vh',
+              transition: 'bottom 0.25s ease-out, max-height 0.25s ease-out'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
