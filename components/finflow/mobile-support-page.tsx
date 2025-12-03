@@ -140,18 +140,19 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
   return (
     <div 
       ref={containerRef}
-      className="min-h-screen bg-[#0f1623] flex flex-col"
+      className="fixed inset-0 flex flex-col bg-[#0f1623] max-w-[100vw] overflow-x-hidden"
       style={{ 
+        height: '100%',
+        maxHeight: '100dvh',
         paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+        transition: 'padding-bottom 0.25s ease-out'
       }}>
       {/* Header - Same style as MobilePageHeader */}
-      <header className="sticky top-0 z-40 bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-800 w-full">
+      <div className="flex-shrink-0 bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-800">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <button 
-              onClick={() => window.history.back()} 
-              className="w-10 h-10 min-w-[40px] rounded-full bg-[#1a2332] flex items-center justify-center flex-shrink-0"
-            >
+            <button onClick={() => window.history.back()} className="w-10 h-10 min-w-[40px] rounded-full bg-[#1a2332] flex items-center justify-center flex-shrink-0">
               <ChevronLeft className="w-5 h-5 text-gray-300" />
             </button>
             <h1 className="text-base font-semibold text-white truncate">{t('support') || 'Support'}</h1>
@@ -161,16 +162,9 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             Online
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Chat Messages */}
-      <div 
-        className="flex-1 overflow-y-auto px-4 py-4" 
-        style={{ 
-          WebkitOverflowScrolling: 'touch',
-          paddingBottom: keyboardHeight > 0 ? `${keyboardHeight + 80}px` : '100px',
-        }}
-      >
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ WebkitOverflowScrolling: 'touch' }}>
         <div className="space-y-4">
           {messages.map(m => (
             <div key={m.id} className={cn("flex gap-3", m.type === 'user' ? "flex-row-reverse" : "flex-row")}>
@@ -212,15 +206,8 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
         </div>
       </div>
 
-      {/* Input Bar - Fixed at bottom */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 border-t border-gray-800 bg-[#1a2332] px-4 py-3 z-30"
-        style={{ 
-          paddingBottom: keyboardHeight > 0 ? '12px' : 'max(12px, env(safe-area-inset-bottom))',
-          transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
-          transition: 'transform 0.25s ease-out'
-        }}
-      >
+      <div className="flex-shrink-0 border-t border-gray-800 bg-[#1a2332] px-4 py-3"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
         <div className="flex items-center gap-3">
           <input ref={inputRef} type="text" value={inputMessage}
             onChange={e => setInputMessage(e.target.value)}
@@ -230,76 +217,47 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
             className="flex-1 px-4 py-3 rounded-full bg-[#232e40] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ fontSize: '16px' }} autoComplete="off" />
           <button onClick={() => handleSendMessage()} disabled={!inputMessage.trim() || isTyping}
-            className="w-11 h-11 rounded-full bg-blue-500 text-white flex items-center justify-center disabled:opacity-50 flex-shrink-0">
+            className="w-11 h-11 rounded-full bg-blue-500 text-white flex items-center justify-center disabled:opacity-50">
             <Send className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Contact Form Modal - Scrollable */}
       {showContactForm && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60" onClick={() => !isSendingEmail && setShowContactForm(false)} />
-          <div 
-            className="relative bg-[#1a2332] w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl max-h-[90vh] flex flex-col"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-          >
-            {/* Modal Header - Sticky */}
-            <div className="flex-shrink-0 p-5 border-b border-gray-700 flex items-center justify-between">
+          <div className="relative bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div className="p-5 border-b border-gray-700 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-900/30 flex items-center justify-center">
                   <Mail className="w-5 h-5 text-blue-400" />
                 </div>
                 <h2 className="text-lg font-bold text-white">{t('contact')}</h2>
               </div>
-              <button 
-                onClick={() => setShowContactForm(false)} 
-                className="w-10 h-10 rounded-full bg-[#232e40] flex items-center justify-center"
-              >
+              <button onClick={() => setShowContactForm(false)} className="w-10 h-10 rounded-full bg-[#232e40] flex items-center justify-center">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
-            
-            {/* Modal Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-5" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="p-5 space-y-4">
               {emailSent ? (
                 <div className="text-center py-8">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white">{t('messageSent')}</h3>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">{t('subject') || 'Betreff'}</label>
-                    <input 
-                      type="text" 
-                      value={contactSubject} 
-                      onChange={e => setContactSubject(e.target.value)}
-                      placeholder={t('subjectPlaceholder')} 
-                      style={{ fontSize: '16px' }}
-                      className="w-full px-4 py-3 rounded-2xl bg-[#232e40] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">{t('describeYourConcern') || 'Nachricht'}</label>
-                    <textarea 
-                      value={contactMessage} 
-                      onChange={e => setContactMessage(e.target.value)}
-                      placeholder={t('describeYourConcern')} 
-                      rows={5} 
-                      style={{ fontSize: '16px' }}
-                      className="w-full px-4 py-3 rounded-2xl bg-[#232e40] text-white placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    />
-                  </div>
-                  <button 
-                    onClick={handleSendContactEmail} 
-                    disabled={isSendingEmail || !contactSubject.trim() || !contactMessage.trim()}
-                    className="w-full py-4 rounded-2xl bg-blue-500 text-white font-semibold disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
-                  >
+                <>
+                  <input type="text" value={contactSubject} onChange={e => setContactSubject(e.target.value)}
+                    placeholder={t('subjectPlaceholder')} style={{ fontSize: '16px' }}
+                    className="w-full px-4 py-3 rounded-2xl bg-[#232e40] text-white placeholder-gray-500" />
+                  <textarea value={contactMessage} onChange={e => setContactMessage(e.target.value)}
+                    placeholder={t('describeYourConcern')} rows={4} style={{ fontSize: '16px' }}
+                    className="w-full px-4 py-3 rounded-2xl bg-[#232e40] text-white placeholder-gray-500 resize-none" />
+                  <button onClick={handleSendContactEmail} disabled={isSendingEmail || !contactSubject.trim() || !contactMessage.trim()}
+                    className="w-full py-4 rounded-2xl bg-blue-500 text-white font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
                     {isSendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     {isSendingEmail ? t('sending') : t('sendMessage')}
                   </button>
-                </div>
+                </>
               )}
             </div>
           </div>
