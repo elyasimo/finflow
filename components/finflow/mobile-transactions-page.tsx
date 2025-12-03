@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useRef, useCallback, useEffect } from "react"
+import { useKeyboard } from "@/hooks/use-keyboard"
 import { 
   Plus,
   Search,
@@ -182,6 +183,11 @@ export default function MobileTransactionsPage({
   const { t } = useLanguage()
   const { currency } = useCurrency()
   
+  // Debug: Log received transactions
+  useEffect(() => {
+    console.log('📊 MobileTransactionsPage received transactions:', transactions?.length || 0, transactions)
+  }, [transactions])
+  
   // UI State
   const [activeTypeTab, setActiveTypeTab] = useState('all')
   const [activeDateFilter, setActiveDateFilter] = useState('all')
@@ -195,34 +201,8 @@ export default function MobileTransactionsPage({
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [keyboardVisible, setKeyboardVisible] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
-  
-  // Handle keyboard visibility using VisualViewport API
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.visualViewport) {
-        const currentHeight = window.visualViewport.height
-        const windowHeight = window.innerHeight
-        const keyboardHeight = windowHeight - currentHeight
-        setKeyboardVisible(keyboardHeight > 100)
-        setViewportHeight(currentHeight)
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize)
-      window.visualViewport.addEventListener('scroll', handleResize)
-      handleResize()
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize)
-        window.visualViewport.removeEventListener('scroll', handleResize)
-      }
-    }
-  }, [])
+  // Use keyboard hook for better keyboard handling
+  const keyboard = useKeyboard({ autoScroll: true })
   
   // Form State
   const [formData, setFormData] = useState<TransactionFormData>({
@@ -398,11 +378,11 @@ export default function MobileTransactionsPage({
       return
     }
     if (formData.amount <= 0) {
-      setError('Bitte geben Sie einen gültigen Betrag ein')
+      setError(t('enterValidAmount') || 'Please enter a valid amount')
       return
     }
     if (!formData.accountId) {
-      setError('Bitte wählen Sie ein Konto aus')
+      setError(t('selectAccount'))
       return
     }
     
@@ -412,7 +392,7 @@ export default function MobileTransactionsPage({
       await onAddTransaction(formData)
       setShowAddSheet(false)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Erstellen der Transaktion')
+      setError(err.message || t('errorCreatingTransaction'))
     } finally {
       setIsSubmitting(false)
     }
@@ -422,7 +402,7 @@ export default function MobileTransactionsPage({
     if (!selectedTransaction) return
     
     if (!formData.description.trim()) {
-      setError('Bitte geben Sie eine Beschreibung ein')
+      setError(t('enterDescription') || 'Please enter a description')
       return
     }
     
@@ -433,7 +413,7 @@ export default function MobileTransactionsPage({
       setShowEditSheet(false)
       setSelectedTransaction(null)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Aktualisieren der Transaktion')
+      setError(err.message || t('errorCreatingTransaction'))
     } finally {
       setIsSubmitting(false)
     }
@@ -448,7 +428,7 @@ export default function MobileTransactionsPage({
       setShowDeleteConfirm(false)
       setSelectedTransaction(null)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Löschen der Transaktion')
+      setError(err.message || t('errorDeletingTransaction'))
     } finally {
       setIsSubmitting(false)
     }
@@ -466,7 +446,7 @@ export default function MobileTransactionsPage({
       setIsSubmitting(true)
       await onImport(file)
     } catch (err: any) {
-      setError(err.message || 'Import fehlgeschlagen')
+      setError(err.message || t('importFailed') || 'Import failed')
     } finally {
       setIsSubmitting(false)
       if (fileInputRef.current) {
@@ -687,7 +667,7 @@ export default function MobileTransactionsPage({
         ) : (
           <>
             <Check className="w-5 h-5" />
-            {isEdit ? 'Speichern' : 'Hinzufügen'}
+            {isEdit ? t('save') : t('add')}
           </>
         )}
       </button>
@@ -840,12 +820,12 @@ export default function MobileTransactionsPage({
               <Sparkles className="w-12 h-12 text-gray-300 dark:text-gray-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Keine Transaktionen
+              {t('noTransactionsFound')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-xs mx-auto">
               {searchQuery || selectedCategory 
-                ? "Keine Transaktionen gefunden. Versuchen Sie andere Filter."
-                : "Beginnen Sie mit dem Tracking Ihrer Ausgaben und Einnahmen"
+                ? t('noTransactionsFilterHint')
+                : t('addFirstTransactionHint')
               }
             </p>
             <button
@@ -853,7 +833,7 @@ export default function MobileTransactionsPage({
               className="inline-flex items-center gap-2 px-8 py-4 bg-blue-500 text-white rounded-2xl font-semibold shadow-xl shadow-blue-500/30 hover:bg-blue-600 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Erste Transaktion
+              {t('addTransaction')}
             </button>
           </div>
         ) : (
@@ -905,7 +885,7 @@ export default function MobileTransactionsPage({
                             {transaction.description}
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                            {transaction.category || transaction.merchant || 'Keine Kategorie'}
+                            {transaction.category || transaction.merchant || t('noCategory')}
                           </p>
                         </div>
 
@@ -934,14 +914,14 @@ export default function MobileTransactionsPage({
                                 className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332]"
                               >
                                 <Edit className="w-4 h-4" />
-                                Bearbeiten
+                                {t('edit')}
                               </button>
                               <button
                                 onClick={() => handleOpenDelete(transaction)}
                                 className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
                               >
                                 <Trash2 className="w-4 h-4" />
-                                Löschen
+                                {t('delete')}
                               </button>
                             </div>
                           )}
@@ -976,7 +956,7 @@ export default function MobileTransactionsPage({
         <button
           onClick={handleOpenAdd}
           className="w-16 h-16 bg-blue-500 rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center active:scale-95 transition-transform hover:bg-blue-600"
-          aria-label="Transaktion hinzufügen"
+          aria-label={t('addTransaction')}
         >
           <Plus className="w-7 h-7 text-white" />
         </button>
@@ -993,10 +973,7 @@ export default function MobileTransactionsPage({
 
       {/* Add Transaction Sheet */}
       {showAddSheet && (
-        <div 
-          className="fixed inset-0 z-50"
-          style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
-        >
+        <div className="fixed inset-0 z-50">
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
@@ -1004,8 +981,9 @@ export default function MobileTransactionsPage({
           <div 
             className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              maxHeight: viewportHeight ? `${viewportHeight * 0.9}px` : '90vh',
-              height: keyboardVisible ? `${viewportHeight ? viewportHeight * 0.95 : 95}vh` : 'auto'
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
+                : '90vh'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
@@ -1024,8 +1002,8 @@ export default function MobileTransactionsPage({
               </button>
             </div>
             {/* Scrollable content with keyboard safe area */}
-            <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
-              <div className="p-5" style={{ paddingBottom: keyboardVisible ? '20px' : '200px' }}>
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="p-5 pb-[200px]">
                 {renderTransactionForm(false)}
               </div>
             </div>
@@ -1035,10 +1013,7 @@ export default function MobileTransactionsPage({
 
       {/* Edit Transaction Sheet */}
       {showEditSheet && selectedTransaction && (
-        <div 
-          className="fixed inset-0 z-50"
-          style={{ height: viewportHeight ? `${viewportHeight}px` : '100dvh' }}
-        >
+        <div className="fixed inset-0 z-50">
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
@@ -1046,8 +1021,9 @@ export default function MobileTransactionsPage({
           <div 
             className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{ 
-              maxHeight: viewportHeight ? `${viewportHeight * 0.9}px` : '90vh',
-              height: keyboardVisible ? `${viewportHeight ? viewportHeight * 0.95 : 95}vh` : 'auto'
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
+                : '90vh'
             }}
           >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
@@ -1055,7 +1031,7 @@ export default function MobileTransactionsPage({
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Transaktion bearbeiten
+                {t('editTransaction')}
               </h2>
               <button
                 onClick={() => setShowEditSheet(false)}
@@ -1065,9 +1041,9 @@ export default function MobileTransactionsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            {/* A1 Fix: Scrollable content with safe area padding */}
+            {/* Scrollable content with safe area padding */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="p-5" style={{ paddingBottom: keyboardVisible ? '20px' : '120px' }}>
+              <div className="p-5 pb-[200px]">
                 {renderTransactionForm(true)}
               </div>
             </div>
@@ -1088,10 +1064,10 @@ export default function MobileTransactionsPage({
                 <Trash2 className="w-8 h-8 text-rose-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Transaktion löschen?
+                {t('deleteTransactionTitle')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                "{selectedTransaction.description}" wird unwiderruflich gelöscht.
+                "{selectedTransaction.description}" {t('willBeDeleted') || 'will be permanently deleted.'}
               </p>
             </div>
             <div className="flex gap-3">
@@ -1099,7 +1075,7 @@ export default function MobileTransactionsPage({
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 py-3 rounded-xl font-medium bg-gray-100 dark:bg-[#232e40] text-gray-700 dark:text-gray-300"
               >
-                Abbrechen
+                {t('cancel')}
               </button>
               <button
                 onClick={handleConfirmDelete}
@@ -1111,7 +1087,7 @@ export default function MobileTransactionsPage({
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4" />
-                    Löschen
+                    {t('delete')}
                   </>
                 )}
               </button>

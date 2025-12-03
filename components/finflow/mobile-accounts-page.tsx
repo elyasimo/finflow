@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useKeyboard } from "@/hooks/use-keyboard"
 import { 
   Plus,
   X,
@@ -93,6 +94,7 @@ export default function MobileAccountsPage({
 }: MobileAccountsPageProps) {
   const { t } = useLanguage()
   const { currency } = useCurrency()
+  const keyboard = useKeyboard({ autoScroll: true })
   
   // UI State
   const [showAddSheet, setShowAddSheet] = useState(false)
@@ -203,11 +205,11 @@ export default function MobileAccountsPage({
 
   const handleSubmitAdd = async () => {
     if (!formData.name.trim()) {
-      setError('Bitte geben Sie einen Kontonamen ein')
+      setError(t('enterAccountName') || 'Please enter an account name')
       return
     }
     if (!formData.type) {
-      setError('Bitte wählen Sie einen Kontotyp')
+      setError(t('selectAccountType'))
       return
     }
     
@@ -217,7 +219,7 @@ export default function MobileAccountsPage({
       await onAddAccount(formData)
       setShowAddSheet(false)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Erstellen des Kontos')
+      setError(err.message || t('errorCreatingAccount'))
     } finally {
       setIsSubmitting(false)
     }
@@ -227,7 +229,7 @@ export default function MobileAccountsPage({
     if (!selectedAccount) return
     
     if (!formData.name.trim()) {
-      setError('Bitte geben Sie einen Kontonamen ein')
+      setError(t('enterAccountName') || 'Please enter an account name')
       return
     }
     
@@ -238,7 +240,7 @@ export default function MobileAccountsPage({
       setShowEditSheet(false)
       setSelectedAccount(null)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Aktualisieren des Kontos')
+      setError(err.message || t('errorCreatingAccount'))
     } finally {
       setIsSubmitting(false)
     }
@@ -253,7 +255,7 @@ export default function MobileAccountsPage({
       setShowDeleteConfirm(false)
       setSelectedAccount(null)
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Löschen des Kontos')
+      setError(err.message || t('errorDeletingAccountMsg'))
     } finally {
       setIsSubmitting(false)
     }
@@ -272,7 +274,7 @@ export default function MobileAccountsPage({
       {/* Account Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Kontoname *
+          {t('accountName')} *
         </label>
         <input
           type="text"
@@ -292,7 +294,7 @@ export default function MobileAccountsPage({
       {/* Account Type */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Kontotyp *
+          {t('accountType')} *
         </label>
         <div className="grid grid-cols-3 gap-2">
           {ACCOUNT_TYPES.map((type) => {
@@ -394,7 +396,7 @@ export default function MobileAccountsPage({
       {/* Balance */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Kontostand
+          {t('balance')}
         </label>
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-light text-gray-400">
@@ -420,7 +422,7 @@ export default function MobileAccountsPage({
       {/* Currency */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Währung
+          {t('currency')}
         </label>
         <div className="flex gap-2">
           {CURRENCIES.map((curr) => (
@@ -465,7 +467,7 @@ export default function MobileAccountsPage({
         ) : (
           <>
             <Check className="w-5 h-5" />
-            {isEdit ? 'Speichern' : 'Konto erstellen'}
+            {isEdit ? t('save') : t('createAccount')}
           </>
         )}
       </button>
@@ -495,7 +497,7 @@ export default function MobileAccountsPage({
       {/* Total Balance Card */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-700 mx-5 mt-4 rounded-3xl p-5 text-white shadow-xl">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-blue-100 text-sm">Gesamtvermögen</p>
+          <p className="text-blue-100 text-sm">{t('totalAssets')}</p>
           <Wallet className="w-6 h-6 text-blue-100" />
         </div>
         <p className="text-4xl font-bold mb-4">
@@ -520,10 +522,10 @@ export default function MobileAccountsPage({
       <div className="px-5 py-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-            Ihre Konten
+            {t('yourAccounts')}
           </h2>
           <span className="text-sm text-gray-500">
-            {accounts.length} {accounts.length === 1 ? 'Konto' : 'Konten'}
+            {accounts.length} {t('yourAccountsCount')}
           </span>
         </div>
 
@@ -537,17 +539,17 @@ export default function MobileAccountsPage({
               <Wallet className="w-12 h-12 text-gray-300 dark:text-gray-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Keine Konten
+              {t('noAccounts')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-xs mx-auto">
-              Fügen Sie Ihr erstes Konto hinzu, um Ihre Finanzen zu verwalten.
+              {t('addAccountToStart')}
             </p>
             <button
               onClick={handleOpenAdd}
               className="inline-flex items-center gap-2 px-8 py-4 bg-blue-500 text-white rounded-2xl font-semibold shadow-xl shadow-blue-500/30 hover:bg-blue-600 transition-colors"
             >
               <Plus className="w-5 h-5" />
-              Erstes Konto
+              {t('addAccount')}
             </button>
           </div>
         ) : (
@@ -643,14 +645,14 @@ export default function MobileAccountsPage({
                             className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332] transition-colors"
                           >
                             <Edit className="w-4 h-4" />
-                            Bearbeiten
+                            {t('edit')}
                           </button>
                           <button
                             onClick={() => handleOpenDelete(account)}
                             className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
-                            Löschen
+                            {t('delete')}
                           </button>
                         </div>
                       )}
@@ -670,7 +672,7 @@ export default function MobileAccountsPage({
       <button
         onClick={handleOpenAdd}
         className="fixed bottom-28 right-6 w-16 h-16 bg-blue-500 rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center active:scale-95 transition-transform hover:bg-blue-600 z-20"
-        aria-label="Konto hinzufügen"
+        aria-label={t('addAccount')}
       >
         <Plus className="w-7 h-7 text-white" />
       </button>
@@ -682,13 +684,20 @@ export default function MobileAccountsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowAddSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            style={{ 
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
+                : '90vh'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Neues Konto
+                {t('addAccount')}
               </h2>
               <button
                 onClick={() => setShowAddSheet(false)}
@@ -698,9 +707,9 @@ export default function MobileAccountsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            {/* A1 Fix: Scrollable content with safe area padding */}
+            {/* Scrollable content with keyboard safe area */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="p-5 pb-[120px]">
+              <div className="p-5 pb-[200px]">
                 {renderAccountForm(false)}
               </div>
             </div>
@@ -715,13 +724,20 @@ export default function MobileAccountsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowEditSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
+            style={{ 
+              maxHeight: keyboard.isVisible 
+                ? `calc(100vh - ${keyboard.height}px - env(safe-area-inset-top))` 
+                : '90vh'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
             <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                Konto bearbeiten
+                {t('editAccountTitle')}
               </h2>
               <button
                 onClick={() => setShowEditSheet(false)}
@@ -731,9 +747,9 @@ export default function MobileAccountsPage({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            {/* A1 Fix: Scrollable content with safe area padding */}
+            {/* Scrollable content with keyboard safe area */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="p-5 pb-[120px]">
+              <div className="p-5 pb-[200px]">
                 {renderAccountForm(true)}
               </div>
             </div>
@@ -754,10 +770,10 @@ export default function MobileAccountsPage({
                 <Trash2 className="w-8 h-8 text-rose-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Konto löschen?
+                {t('deleteAccountTitle')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                "{selectedAccount.name}" und alle zugehörigen Daten werden unwiderruflich gelöscht.
+                {t('deleteAccountConfirmation').replace('{name}', selectedAccount.name)}
               </p>
             </div>
             <div className="flex gap-3">
@@ -765,7 +781,7 @@ export default function MobileAccountsPage({
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 py-3 rounded-xl font-medium bg-gray-100 dark:bg-[#232e40] text-gray-700 dark:text-gray-300"
               >
-                Abbrechen
+                {t('cancel')}
               </button>
               <button
                 onClick={handleConfirmDelete}
@@ -777,7 +793,7 @@ export default function MobileAccountsPage({
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4" />
-                    Löschen
+                    {t('delete')}
                   </>
                 )}
               </button>

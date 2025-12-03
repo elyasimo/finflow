@@ -68,17 +68,18 @@ export function useTransactions() {
     isLoading: transactionsQuery.isLoading,
     error: transactionsQuery.error,
     getTransaction,
+    refetch: transactionsQuery.refetch,
     
-    // Mutations
-    createTransaction: createTransactionMutation.mutate,
+    // Mutations - use mutateAsync for proper async/await handling
+    createTransaction: createTransactionMutation.mutateAsync,
     isCreating: createTransactionMutation.isPending,
     createError: createTransactionMutation.error,
     
-    updateTransaction: updateTransactionMutation.mutate,
+    updateTransaction: updateTransactionMutation.mutateAsync,
     isUpdating: updateTransactionMutation.isPending,
     updateError: updateTransactionMutation.error,
     
-    deleteTransaction: deleteTransactionMutation.mutate,
+    deleteTransaction: deleteTransactionMutation.mutateAsync,
     isDeleting: deleteTransactionMutation.isPending,
     deleteError: deleteTransactionMutation.error,
   };
