@@ -206,36 +206,35 @@ export default function MobileDashboard({
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Elegant Header with Safe Area */}
-      <div className="px-4 pb-6 bg-white dark:bg-[#1a2332] sticky top-0 z-40" style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
-        {/* Top Action Bar with all controls */}
-        <div className="flex items-center justify-between mb-4">
+      {/* Fixed Header - Separate from content */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#1a2332]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="flex items-center justify-between px-4 h-14">
           {/* Left: Greeting */}
-          <div>
-            <p className="text-xs text-gray-400 dark:text-gray-500">{getGreeting()}</p>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="min-w-0 flex-shrink">
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{getGreeting()}</p>
+            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
               {userName.split(' ')[0]}
             </h1>
           </div>
           
-          {/* Right: Action Icons */}
-          <div className="flex items-center gap-1.5">
+          {/* Right: Action Icons - Compact */}
+          <div className="flex items-center gap-1 flex-shrink-0">
             {/* Language Dropdown */}
             <div ref={langRef} className="relative">
               <button
                 onClick={() => { setShowLanguageMenu(!showLanguageMenu); setShowCurrencyMenu(false) }}
-                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
               >
-                <Globe className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                <Globe className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               {showLanguageMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[120px]">
+                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[110px]">
                   {languageOptions.map(opt => (
                     <button
                       key={opt.code}
                       onClick={() => { setLanguage(opt.code as any); setShowLanguageMenu(false) }}
                       className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2.5 text-sm",
+                        "w-full flex items-center gap-2 px-3 py-2 text-xs",
                         language === opt.code 
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
                           : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
@@ -253,18 +252,18 @@ export default function MobileDashboard({
             <div ref={currRef} className="relative">
               <button
                 onClick={() => { setShowCurrencyMenu(!showCurrencyMenu); setShowLanguageMenu(false) }}
-                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
               >
-                <Coins className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                <Coins className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
               </button>
               {showCurrencyMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[120px]">
+                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[110px]">
                   {currencyOptions.map(opt => (
                     <button
                       key={opt.code}
                       onClick={() => { updateCurrencyInBackend(opt.code); setShowCurrencyMenu(false) }}
                       className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2.5 text-sm",
+                        "w-full flex items-center gap-2 px-3 py-2 text-xs",
                         currency === opt.code 
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
                           : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
@@ -279,35 +278,41 @@ export default function MobileDashboard({
             </div>
 
             {/* Notifications */}
-            <Link href="/price-alerts" className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center relative">
-              <Bell className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+            <Link href="/price-alerts" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center relative">
+              <Bell className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
             </Link>
 
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
             >
               {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-yellow-500" />
+                <Sun className="w-3.5 h-3.5 text-yellow-500" />
               ) : (
-                <Moon className="w-4 h-4 text-gray-600" />
+                <Moon className="w-3.5 h-3.5 text-gray-600" />
               )}
             </button>
 
             {/* User Avatar */}
             <Link 
               href="/settings"
-              className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-xs shadow-lg shadow-blue-500/20"
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-[10px] shadow-md"
             >
               {userName.charAt(0).toUpperCase()}
             </Link>
           </div>
         </div>
+      </header>
 
+      {/* Spacer for fixed header */}
+      <div style={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
+
+      {/* Hero Section - Balance Display */}
+      <div className="px-5 py-6 bg-white dark:bg-[#1a2332]">
         {/* Main Balance Display */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           <p className="text-xs text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-widest font-medium">
             {t('totalBalanceLabel')}
           </p>
