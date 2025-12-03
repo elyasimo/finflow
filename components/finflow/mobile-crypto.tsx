@@ -83,7 +83,7 @@ export default function MobileCrypto({
       currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: amount < 1 ? 4 : 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const formatPercent = (value: number) => {

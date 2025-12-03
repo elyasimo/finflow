@@ -106,7 +106,7 @@ export default function MobileTradingAgent({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const handleCreate = async () => {

@@ -90,7 +90,7 @@ export default function MobileTradingPerformance({ user }: MobileTradingPerforma
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 2,
-    }).format(value)
+    }).format(Number.isFinite(value) ? value : 0)
   }
 
   const selectedRange = DATE_RANGES.find(r => r.value === timeRange)

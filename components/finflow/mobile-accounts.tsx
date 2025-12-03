@@ -80,19 +80,21 @@ export default function MobileAccounts({
   const [selectedType, setSelectedType] = useState<string>('all')
 
   const formatCurrency = (amount: number, curr?: string) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   const formatBalance = (amount: number, curr?: string) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   const filteredAccounts = useMemo(() => {

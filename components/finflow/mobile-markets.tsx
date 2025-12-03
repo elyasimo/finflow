@@ -79,7 +79,7 @@ export default function MobileMarkets({
       currency: curr || currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: amount < 1 ? 6 : 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const formatMarketCap = (value: number) => {

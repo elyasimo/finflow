@@ -79,7 +79,7 @@ export default function MobileTransactionsNew({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   // Filter transactions based on active filters

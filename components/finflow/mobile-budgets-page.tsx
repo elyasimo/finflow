@@ -141,12 +141,13 @@ export default function MobileBudgetsPage({
   })
 
   const formatCurrency = (amount: number) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   const getCategoryIcon = (categoryName?: string) => {

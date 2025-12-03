@@ -91,7 +91,7 @@ export default function MobileRiskAnalysisPage({
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 2,
-    }).format(value)
+    }).format(Number.isFinite(value) ? value : 0)
   }
 
   const handleCalculateRisk = async () => {

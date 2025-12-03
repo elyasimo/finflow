@@ -240,11 +240,12 @@ export default function MobileTransactionsPage({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const formatCurrency = (amount: number, curr?: string) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   const formatDate = (dateStr: string) => {

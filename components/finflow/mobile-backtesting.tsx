@@ -134,7 +134,7 @@ export default function MobileBacktesting({ user }: MobileBacktestingProps) {
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 2,
-    }).format(value)
+    }).format(Number.isFinite(value) ? value : 0)
   }
 
   const selectedCrypto = CRYPTOS.find(c => c.value === symbol)

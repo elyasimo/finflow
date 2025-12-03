@@ -123,11 +123,12 @@ export default function MobileDashboard({
   const [activeAccountIndex, setActiveAccountIndex] = useState(0)
 
   const formatCurrency = (amount: number, curr?: string) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   const recentTransactions = useMemo(() => 

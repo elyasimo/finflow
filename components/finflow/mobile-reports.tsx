@@ -77,7 +77,7 @@ export default function MobileReports({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const monthLabel = selectedMonth.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })

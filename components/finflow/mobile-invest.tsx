@@ -221,7 +221,7 @@ export default function MobileInvest({
       currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const formatPercent = (value: number) => {

@@ -35,7 +35,7 @@ export default function MobileCommoditiesPage({ commodities, isLoading }: Mobile
       style: 'currency',
       currency: currency,
       minimumFractionDigits: 4,
-    }).format(value)
+    }).format(Number.isFinite(value) ? value : 0)
   }
 
   // Default commodities if none provided

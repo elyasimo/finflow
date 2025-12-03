@@ -154,18 +154,22 @@ export default function MobileDashboard({
 
   // Calculate total portfolio value
   const totalPortfolioValue = useMemo(() => {
-    return binancePortfolio.reduce((sum, asset) => {
-      const value = asset.currentPrice ? parseFloat(asset.free) * asset.currentPrice : 0
-      return sum + value
+    const total = binancePortfolio.reduce((sum, asset) => {
+      const free = parseFloat(asset.free) || 0
+      const price = asset.currentPrice || 0
+      const value = free * price
+      return sum + (Number.isFinite(value) ? value : 0)
     }, 0)
+    return Number.isFinite(total) ? total : 0
   }, [binancePortfolio])
 
   const formatCurrency = (amount: number, curr?: string) => {
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   // Get recent transactions (last 5)

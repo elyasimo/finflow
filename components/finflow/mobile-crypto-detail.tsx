@@ -274,7 +274,7 @@ export default function MobileCryptoDetail({ symbol }: MobileCryptoDetailProps) 
       currency: currency,
       minimumFractionDigits: value < 1 ? 4 : 2,
       maximumFractionDigits: value < 1 ? 6 : 2,
-    }).format(value)
+    }).format(Number.isFinite(value) ? value : 0)
   }
 
   const formatLargeNumber = (value: number) => {

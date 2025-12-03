@@ -44,7 +44,7 @@ export default function MobileBudgetsNew({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 0,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   // Sort budgets by usage percentage (highest first)

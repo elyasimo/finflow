@@ -112,7 +112,7 @@ export default function MobileTransactions({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   const getCategoryConfig = (category?: string | { name?: string }) => {

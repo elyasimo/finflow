@@ -93,7 +93,7 @@ export default function MobileBudgets({
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 0,
-    }).format(amount)
+    }).format(Number.isFinite(amount) ? amount : 0)
   }
 
   // Calculate budget statistics

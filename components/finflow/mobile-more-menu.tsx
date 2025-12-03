@@ -62,8 +62,6 @@ const menuSections = [
     titleKey: "trading",
     items: [
       { href: "/robo-advisor", icon: Bot, labelKey: "roboAdvisor", color: "from-cyan-500 to-cyan-600" },
-      { href: "/stock-trading-agent", icon: LineChart, labelKey: "stockTradingAgent", color: "from-indigo-500 to-indigo-600" },
-      { href: "/price-alerts", icon: Bell, labelKey: "priceAlerts", color: "from-red-500 to-red-600" },
     ]
   },
   {

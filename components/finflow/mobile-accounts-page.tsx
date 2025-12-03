@@ -116,21 +116,28 @@ export default function MobileAccountsPage({
 
   const formatCurrency = (amount: number, curr?: string) => {
     if (hideBalance) return '••••••'
+    const safeAmount = Number.isFinite(amount) ? amount : 0
     return new Intl.NumberFormat('de-CH', {
       style: 'currency',
       currency: curr || currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(safeAmount)
   }
 
   // Calculate totals
   const summary = useMemo(() => {
-    const total = accounts.reduce((sum, acc) => sum + Number(acc.balance), 0)
+    const total = accounts.reduce((sum, acc) => {
+      const balance = Number(acc.balance) || 0
+      return sum + (Number.isFinite(balance) ? balance : 0)
+    }, 0)
     const byType = ACCOUNT_TYPES.map(type => ({
       ...type,
       total: accounts
         .filter(acc => acc.type.toLowerCase() === type.id || acc.type.toLowerCase() === type.label.toLowerCase())
-        .reduce((sum, acc) => sum + Number(acc.balance), 0),
+        .reduce((sum, acc) => {
+          const balance = Number(acc.balance) || 0
+          return sum + (Number.isFinite(balance) ? balance : 0)
+        }, 0),
       count: accounts.filter(acc => acc.type.toLowerCase() === type.id || acc.type.toLowerCase() === type.label.toLowerCase()).length
     }))
     return { total, byType }
