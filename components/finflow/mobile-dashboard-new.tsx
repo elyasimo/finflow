@@ -168,8 +168,8 @@ export default function MobileDashboard({
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Elegant Header with More Whitespace */}
-      <div className="px-6 pt-16 pb-8 bg-white dark:bg-[#1a2332]">
+      {/* Elegant Header with Safe Area */}
+      <div className="px-6 pb-8 bg-white dark:bg-[#1a2332] sticky top-0 z-40" style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}>
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-10">
           <div>
