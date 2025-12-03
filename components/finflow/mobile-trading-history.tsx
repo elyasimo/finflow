@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "@/hooks/use-currency"
 import { useExchangeRates } from "@/hooks/use-exchange-rates"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { tradingAgentApi } from "@/lib/api"
 
@@ -166,6 +166,7 @@ export default function MobileTradingHistory({ user }: MobileTradingHistoryProps
         user={user}
         title={t('tradingHistory') || 'Trading History'}
       />
+      <MobilePageHeaderSpacer />
 
       {/* Stats Summary */}
       {stats && (

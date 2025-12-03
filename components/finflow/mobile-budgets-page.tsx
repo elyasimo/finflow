@@ -29,7 +29,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { format, differenceInDays, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns'
 import { de } from 'date-fns/locale'
@@ -506,6 +506,7 @@ export default function MobileBudgetsPage({
         user={user} 
         title={t('budgets')}
       />
+      <MobilePageHeaderSpacer />
 
       {/* Summary Card */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-700 mx-5 mt-4 rounded-3xl p-5 text-white shadow-xl">

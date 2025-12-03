@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { PostFinanceIcon, UBSIcon, CreditSuisseIcon, RaiffeisenIcon, ZKBIcon } from "@/components/icons/swiss-brand-icons"
 
@@ -483,6 +483,7 @@ export default function MobileAccountsPage({
           </button>
         }
       />
+      <MobilePageHeaderSpacer />
 
       {/* Total Balance Card */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-700 mx-5 mt-4 rounded-3xl p-5 text-white shadow-xl">

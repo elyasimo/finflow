@@ -35,7 +35,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { de } from 'date-fns/locale'
@@ -696,15 +696,14 @@ export default function MobileTransactionsPage({
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1623] pb-24">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-40">
-        <MobilePageHeader 
-          user={user} 
-          title={t('transactions')}
-          showSearch
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Transaktionen suchen..."
-        />
-      </div>
+      <MobilePageHeader 
+        user={user} 
+        title={t('transactions')}
+        showSearch
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Transaktionen suchen..."
+      />
+      <MobilePageHeaderSpacer />
 
       {/* Type Tabs - Split Income/Expense */}
       <div className="bg-white dark:bg-[#1a2332] px-5 pt-3">

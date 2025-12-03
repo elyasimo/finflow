@@ -142,15 +142,14 @@ export default function MobilePageHeader({
   return (
     <header 
       className={cn(
-        "lg:hidden sticky top-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl",
+        "lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl",
         "border-b border-gray-200/50 dark:border-[#232e40]/50",
         "pt-[env(safe-area-inset-top)]",
-        "w-full max-w-[100vw] overflow-hidden",
         className
       )}
       role="banner"
     >
-      <div className="flex items-center justify-between px-4 h-14 w-full max-w-full">
+      <div className="flex items-center justify-between px-4 h-14">
         {/* Left: Back/Home + Title */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <button 
@@ -355,5 +354,21 @@ export default function MobilePageHeader({
         )}
       </div>
     </header>
+  )
+}
+
+/**
+ * Spacer component to add below MobilePageHeader when it's fixed
+ * This prevents content from being hidden behind the fixed header
+ */
+export function MobilePageHeaderSpacer() {
+  return (
+    <div 
+      className="lg:hidden w-full" 
+      style={{ 
+        height: 'calc(56px + env(safe-area-inset-top))',
+        minHeight: '56px'
+      }} 
+    />
   )
 }

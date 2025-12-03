@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "@/hooks/use-currency"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 
 interface BacktestResult {
@@ -146,6 +146,7 @@ export default function MobileBacktesting({ user }: MobileBacktestingProps) {
         user={user}
         title={t('backtesting') || 'Backtesting'}
       />
+      <MobilePageHeaderSpacer />
 
       <div className="px-5 py-4 pb-32 space-y-5">
         {/* Header Card */}

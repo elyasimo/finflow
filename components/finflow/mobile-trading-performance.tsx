@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "@/hooks/use-currency"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 
 interface PerformanceStats {
@@ -101,6 +101,7 @@ export default function MobileTradingPerformance({ user }: MobileTradingPerforma
         user={user}
         title={t('tradingPerformance') || 'Trading Performance'}
       />
+      <MobilePageHeaderSpacer />
 
       {/* Date Range Selector - Modern Pills */}
       <div className="px-5 py-4">

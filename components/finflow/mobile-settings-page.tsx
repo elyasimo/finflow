@@ -37,7 +37,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { useRouter } from "next/navigation"
 
@@ -439,6 +439,7 @@ export default function MobileSettingsPage({
         user={user as any} 
         title={t('settings')}
       />
+      <MobilePageHeaderSpacer />
 
       {/* User Card */}
       <div className="px-5 pt-4">

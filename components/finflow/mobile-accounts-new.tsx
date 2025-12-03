@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import { useKeyboard } from "@/hooks/use-keyboard"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 
 interface Account {
@@ -440,6 +440,7 @@ export default function MobileAccountsNew({
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
       <MobilePageHeader user={user} title={t('accounts')} />
+      <MobilePageHeaderSpacer />
 
       {/* Total Balance Header */}
       <div className="bg-white dark:bg-[#1a2332] px-5 pt-4 pb-6">

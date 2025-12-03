@@ -19,7 +19,7 @@ import {
   Zap
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import MobilePageHeader from "./mobile-page-header"
+import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 
 interface RiskMetrics {
@@ -197,6 +197,7 @@ export default function MobileRiskAnalysisPage({
         user={user as any} 
         title="Risikoanalyse"
       />
+      <MobilePageHeaderSpacer />
 
       <div className="px-5 py-6 space-y-6">
         {/* Calculate Button - Always Visible */}
