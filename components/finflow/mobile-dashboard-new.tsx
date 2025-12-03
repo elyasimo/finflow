@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import Link from "next/link"
-import MobileBottomNav from "./mobile-bottom-nav"
 import TransactionCard from "./ui/transaction-card"
 import BudgetWalletCard from "./ui/budget-wallet-card"
 import useBinancePortfolio from "@/hooks/use-binance-portfolio"
@@ -556,12 +555,9 @@ export default function MobileDashboard({
           </div>
         )}
 
-        {/* Bottom Spacing for Nav */}
-        <div className="h-28" />
+        {/* Bottom Spacing for Nav - handled by parent layout */}
+        <div className="h-4" />
       </div>
-
-      {/* Bottom Navigation */}
-      <MobileBottomNav />
     </div>
   )
 }
