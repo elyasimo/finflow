@@ -688,7 +688,7 @@ function RoboAdvisorPageContent() {
           </div>
         )}
 
-        <MobileBottomNav />
+        <MobileBottomNav fixed />
       </div>
     );
   }

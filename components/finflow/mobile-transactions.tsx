@@ -380,7 +380,7 @@ export default function MobileTransactions({
       </button>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

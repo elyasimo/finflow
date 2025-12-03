@@ -831,7 +831,7 @@ export default function MobileBudgetsPage({
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

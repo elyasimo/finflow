@@ -1262,7 +1262,7 @@ export default function MobileSettingsPage({
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

@@ -411,7 +411,7 @@ export default function MobileTradingHistory({ user }: MobileTradingHistoryProps
         <Download className="w-7 h-7 text-white" />
       </button>
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

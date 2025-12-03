@@ -426,7 +426,7 @@ export default function MobileMarkets({
       </div>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

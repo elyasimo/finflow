@@ -738,7 +738,7 @@ export default function MobileInvest({
       </main>
 
       {/* Fixed Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

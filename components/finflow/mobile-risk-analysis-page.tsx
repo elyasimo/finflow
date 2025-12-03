@@ -466,7 +466,7 @@ export default function MobileRiskAnalysisPage({
         <div className="h-24" />
       </div>
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

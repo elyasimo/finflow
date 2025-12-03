@@ -277,7 +277,7 @@ export default function MobileAccounts({
       </div>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

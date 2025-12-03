@@ -1119,7 +1119,7 @@ export default function MobileTransactionsPage({
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

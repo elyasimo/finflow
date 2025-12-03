@@ -137,7 +137,7 @@ export default function MobileReports({
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
           <p className="text-gray-500 dark:text-gray-400">{t('loadingReports') || 'Loading reports...'}</p>
         </div>
-        <MobileBottomNav />
+        <MobileBottomNav fixed />
       </div>
     )
   }
@@ -469,7 +469,7 @@ export default function MobileReports({
       </div>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
 
       {/* CSS Animation for Month Picker */}
       <style jsx>{`

@@ -313,7 +313,7 @@ export default function MobileCategoriesNew({
       )}
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

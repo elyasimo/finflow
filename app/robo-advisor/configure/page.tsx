@@ -377,7 +377,7 @@ export default function ConfigureRoboAdvisorPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

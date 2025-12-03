@@ -733,7 +733,7 @@ export default function MobileAccountsNew({
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

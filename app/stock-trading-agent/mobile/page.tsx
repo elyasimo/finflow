@@ -575,7 +575,7 @@ export default function MobileStockTradingPage() {
         </>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   );
 }

@@ -352,7 +352,7 @@ export default function MobilePriceAlerts({
       </button>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

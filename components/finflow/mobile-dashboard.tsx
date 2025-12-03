@@ -477,7 +477,7 @@ export default function MobileDashboard({
       </div>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

@@ -349,7 +349,7 @@ export default function MobileTradingPerformance({ user }: MobileTradingPerforma
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

@@ -57,9 +57,11 @@ const navItems: NavItem[] = [
 
 interface MobileBottomNavProps {
   onMenuClick?: () => void
+  /** Use fixed positioning (for pages not using the main layout) */
+  fixed?: boolean
 }
 
-export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
+export default function MobileBottomNav({ onMenuClick, fixed = false }: MobileBottomNavProps) {
   const pathname = usePathname()
   const { t, language, isLoaded } = useLanguage()
   const { user } = useAuth()
@@ -81,7 +83,10 @@ export default function MobileBottomNav({ onMenuClick }: MobileBottomNavProps) {
   }
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+    <nav className={cn(
+      "lg:hidden w-full z-50",
+      fixed && "fixed bottom-0 left-0 right-0"
+    )}>
       {/* Navigation bar - Dark Style */}
       <div className="bg-[#121212] border-t border-[#2a2a2a] safe-area-pb">
         <div className="flex items-stretch justify-around h-16 px-1 max-w-lg mx-auto">

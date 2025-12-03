@@ -231,7 +231,7 @@ export default function MobileCategories({
       )}
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   );
 }

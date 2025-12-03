@@ -649,7 +649,7 @@ export default function MobileTradingAgentPage() {
         </div>
       )}
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   );
 }

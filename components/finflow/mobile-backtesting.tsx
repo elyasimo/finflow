@@ -443,7 +443,7 @@ export default function MobileBacktesting({ user }: MobileBacktestingProps) {
         )}
       </button>
 
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

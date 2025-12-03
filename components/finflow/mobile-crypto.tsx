@@ -555,7 +555,7 @@ export default function MobileCrypto({
       </main>
 
       {/* Fixed Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }

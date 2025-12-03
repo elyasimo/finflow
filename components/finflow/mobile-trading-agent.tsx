@@ -167,7 +167,7 @@ export default function MobileTradingAgent({
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Lade Trading Agents...</p>
         </div>
-        <MobileBottomNav />
+        <MobileBottomNav fixed />
       </div>
     )
   }
@@ -628,7 +628,7 @@ export default function MobileTradingAgent({
       </button>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav fixed />
     </div>
   )
 }
