@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef, useEffect } from "react"
 import { 
   ArrowUpRight, 
   Plus,
@@ -16,11 +16,16 @@ import {
   Sparkles,
   Bitcoin,
   AlertCircle,
-  Loader2
+  Loader2,
+  Globe,
+  Coins,
+  Sun,
+  Moon
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 import TransactionCard from "./ui/transaction-card"
 import BudgetWalletCard from "./ui/budget-wallet-card"
@@ -102,9 +107,42 @@ export default function MobileDashboard({
   totalExpenses,
   userName = 'User',
 }: MobileDashboardProps) {
-  const { t } = useLanguage()
-  const { currency } = useCurrency()
+  const { t, language, setLanguage } = useLanguage()
+  const { currency, updateCurrencyInBackend } = useCurrency()
+  const { theme, setTheme } = useTheme()
   const [activeAccountIndex, setActiveAccountIndex] = useState(0)
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+  const [showCurrencyMenu, setShowCurrencyMenu] = useState(false)
+  const langRef = useRef<HTMLDivElement>(null)
+  const currRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setShowLanguageMenu(false)
+      }
+      if (currRef.current && !currRef.current.contains(e.target as Node)) {
+        setShowCurrencyMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const languageOptions = [
+    { code: 'en', label: 'EN', flag: '🇬🇧' },
+    { code: 'de', label: 'DE', flag: '🇩🇪' },
+    { code: 'fr', label: 'FR', flag: '🇫🇷' },
+    { code: 'ar', label: 'AR', flag: '🇲🇦' },
+  ]
+
+  const currencyOptions = [
+    { code: 'USD', label: '$', flag: '🇺🇸' },
+    { code: 'EUR', label: '€', flag: '🇪🇺' },
+    { code: 'CHF', label: 'Fr', flag: '🇨🇭' },
+    { code: 'MAD', label: 'د.م', flag: '🇲🇦' },
+  ]
 
   // Binance Portfolio Hook
   const { 
@@ -169,89 +207,165 @@ export default function MobileDashboard({
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
       {/* Elegant Header with Safe Area */}
-      <div className="px-6 pb-8 bg-white dark:bg-[#1a2332] sticky top-0 z-40" style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}>
-        {/* Top Bar */}
-        <div className="flex items-center justify-between mb-10">
+      <div className="px-4 pb-6 bg-white dark:bg-[#1a2332] sticky top-0 z-40" style={{ paddingTop: 'max(env(safe-area-inset-top), 12px)' }}>
+        {/* Top Action Bar with all controls */}
+        <div className="flex items-center justify-between mb-4">
+          {/* Left: Greeting */}
           <div>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mb-1">{getGreeting()}</p>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-xs text-gray-400 dark:text-gray-500">{getGreeting()}</p>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
               {userName.split(' ')[0]}
             </h1>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="w-11 h-11 rounded-full bg-gray-50 dark:bg-[#232e40] flex items-center justify-center relative">
-              <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500"></span>
+          
+          {/* Right: Action Icons */}
+          <div className="flex items-center gap-1.5">
+            {/* Language Dropdown */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => { setShowLanguageMenu(!showLanguageMenu); setShowCurrencyMenu(false) }}
+                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+              >
+                <Globe className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              </button>
+              {showLanguageMenu && (
+                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[120px]">
+                  {languageOptions.map(opt => (
+                    <button
+                      key={opt.code}
+                      onClick={() => { setLanguage(opt.code as any); setShowLanguageMenu(false) }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2.5 text-sm",
+                        language === opt.code 
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
+                          : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
+                      )}
+                    >
+                      <span>{opt.flag}</span>
+                      <span className="font-medium">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Currency Dropdown */}
+            <div ref={currRef} className="relative">
+              <button
+                onClick={() => { setShowCurrencyMenu(!showCurrencyMenu); setShowLanguageMenu(false) }}
+                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+              >
+                <Coins className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              </button>
+              {showCurrencyMenu && (
+                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[120px]">
+                  {currencyOptions.map(opt => (
+                    <button
+                      key={opt.code}
+                      onClick={() => { updateCurrencyInBackend(opt.code); setShowCurrencyMenu(false) }}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-3 py-2.5 text-sm",
+                        currency === opt.code 
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
+                          : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
+                      )}
+                    >
+                      <span>{opt.flag}</span>
+                      <span className="font-medium">{opt.code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Notifications */}
+            <Link href="/price-alerts" className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center relative">
+              <Bell className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+            </Link>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-yellow-500" />
+              ) : (
+                <Moon className="w-4 h-4 text-gray-600" />
+              )}
             </button>
+
+            {/* User Avatar */}
             <Link 
               href="/settings"
-              className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-blue-500/20"
+              className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-xs shadow-lg shadow-blue-500/20"
             >
               {userName.charAt(0).toUpperCase()}
             </Link>
           </div>
         </div>
 
-        {/* Main Balance Display - Large, Elegant Typography */}
-        <div className="text-center mb-10">
-          <p className="text-sm text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-widest font-medium">
+        {/* Main Balance Display */}
+        <div className="text-center mb-6">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-widest font-medium">
             {t('totalBalanceLabel')}
           </p>
-          <h2 className="text-5xl font-extralight text-gray-900 dark:text-white tracking-tight mb-6">
+          <h2 className="text-4xl font-extralight text-gray-900 dark:text-white tracking-tight mb-4">
             {formatCurrency(totalBalance)}
           </h2>
           
           {/* Income/Expense Pills */}
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-950/30">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
                 +{formatCurrency(totalIncome)}
               </span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 dark:bg-rose-950/30">
-              <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-              <span className="text-sm font-medium text-rose-600 dark:text-rose-400">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 dark:bg-rose-950/30">
+              <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+              <span className="text-xs font-medium text-rose-600 dark:text-rose-400">
                 −{formatCurrency(totalExpenses)}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Savings Rate Ring - Subtle */}
+        {/* Savings Rate Ring - Compact */}
         <div className="flex justify-center">
-          <div className="relative w-24 h-24">
+          <div className="relative w-20 h-20">
             <svg className="w-full h-full transform -rotate-90">
               <circle
-                cx="48"
-                cy="48"
-                r="42"
+                cx="40"
+                cy="40"
+                r="34"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="6"
+                strokeWidth="5"
                 className="text-gray-100 dark:text-gray-800"
               />
               <circle
-                cx="48"
-                cy="48"
-                r="42"
+                cx="40"
+                cy="40"
+                r="34"
                 fill="none"
                 stroke="url(#dashboardGradient)"
-                strokeWidth="6"
+                strokeWidth="5"
                 strokeLinecap="round"
-                strokeDasharray={`${Math.max(savingsRate, 0) * 2.64} 264`}
+                strokeDasharray={`${Math.max(savingsRate, 0) * 2.14} 214`}
                 className="transition-all duration-1000"
               />
               <defs>
                 <linearGradient id="dashboardGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10B981" />
-                  <stop offset="100%" stopColor="#3B82F6" />
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#06b6d4" />
                 </linearGradient>
               </defs>
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xl font-bold text-gray-900 dark:text-white">{Math.max(savingsRate, 0)}%</span>
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider">{t('savingsRateLabel')}</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">{savingsRate}%</span>
+              <span className="text-[8px] text-gray-400 uppercase tracking-wide">Savings</span>
             </div>
           </div>
         </div>
