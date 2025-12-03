@@ -43,7 +43,20 @@ export default function Layout({ children, user }: LayoutProps) {
 
   return (
     <CurrencyProvider>
-      <div className={`flex h-screen overflow-hidden ${theme === "dark" ? "dark" : ""}`}>
+      {/* Mobile Bottom Navigation - OUTSIDE all containers for true fixed positioning */}
+      {isMobile && (
+        <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
+      )}
+
+      {/* Mobile More Menu - OUTSIDE all containers */}
+      {isMobile && (
+        <MobileMoreMenu 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
         {/* Desktop Sidebar - Hidden on Mobile */}
         {!isMobile && (
           <div className="hidden lg:block flex-shrink-0">
@@ -52,7 +65,7 @@ export default function Layout({ children, user }: LayoutProps) {
         )}
         
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Desktop Header - Hidden on Mobile */}
+          {/* Desktop Header - Hidden on Desktop */}
           {!isMobile && (
             <header className="hidden lg:block h-16 flex-shrink-0 border-b border-gray-200 dark:border-[#232e40]">
               <TopNav user={user} />
@@ -68,19 +81,6 @@ export default function Layout({ children, user }: LayoutProps) {
               {children}
             </div>
           </main>
-
-          {/* Mobile Bottom Navigation - Hidden on Desktop */}
-          {isMobile && (
-            <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
-          )}
-
-          {/* Mobile More Menu - Using new menu component */}
-          {isMobile && (
-            <MobileMoreMenu 
-              isOpen={isMobileMenuOpen} 
-              onClose={() => setIsMobileMenuOpen(false)}
-            />
-          )}
         </div>
       </div>
     </CurrencyProvider>
