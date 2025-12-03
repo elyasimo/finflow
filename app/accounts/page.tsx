@@ -30,6 +30,16 @@ export default function AccountsPage() {
   const { currency: userCurrency } = useCurrency();
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
+  // Swiss Banks constant - defined early so it's available for both mobile and desktop
+  const SWISS_BANKS = [
+    { id: 'postfinance', label: 'PostFinance' },
+    { id: 'ubs', label: 'UBS' },
+    { id: 'credit-suisse', label: 'Credit Suisse' },
+    { id: 'raiffeisen', label: 'Raiffeisen' },
+    { id: 'zkb', label: 'ZKB' },
+    { id: 'other', label: 'Other' },
+  ];
+
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -239,16 +249,6 @@ export default function AccountsPage() {
       />
     );
   }
-
-  // Swiss Banks constant for name building
-  const SWISS_BANKS = [
-    { id: 'postfinance', label: 'PostFinance' },
-    { id: 'ubs', label: 'UBS' },
-    { id: 'credit-suisse', label: 'Credit Suisse' },
-    { id: 'raiffeisen', label: 'Raiffeisen' },
-    { id: 'zkb', label: 'ZKB' },
-    { id: 'other', label: 'Other' },
-  ];
 
   // Extract bank info from account name
   const extractBankInfo = (accountName: string) => {
