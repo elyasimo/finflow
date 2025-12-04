@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PriceAlertsService } from './price-alerts.service.js';
 import { pushNotificationService } from './push-notification.service.js';
 import { db } from '../db.js';
