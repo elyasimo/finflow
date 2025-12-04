@@ -75,40 +75,54 @@ class PushNotificationService {
   }
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {
+      console.log('[Push] Already initialized');
+      return;
+    }
+    
+    console.log('[Push] Initializing...');
     
     // Try to load Capacitor
     this.capacitorLoaded = await loadCapacitor();
     
     if (!this.capacitorLoaded || !Capacitor?.isNativePlatform?.()) {
+      console.log('[Push] Not on native platform, skipping');
       return;
     }
 
     try {
       // Request permission
+      console.log('[Push] Requesting permissions...');
       const permStatus = await PushNotifications.requestPermissions();
+      console.log('[Push] Permission status:', permStatus.receive);
       
       if (permStatus.receive !== 'granted') {
+        console.log('[Push] Permission not granted');
         return;
       }
 
       // Register for push notifications
+      console.log('[Push] Registering for push notifications...');
       await PushNotifications.register();
 
       // Setup listeners
       this.setupListeners();
       
       this.initialized = true;
+      console.log('[Push] Initialization complete');
     } catch (error) {
-      // Error initializing push notifications
+      console.error('[Push] Error initializing:', error);
     }
   }
 
   private setupListeners(): void {
     if (!PushNotifications) return;
     
+    console.log('[Push] Setting up listeners...');
+    
     // On successful registration
     PushNotifications.addListener('registration', async (token: any) => {
+      console.log('[Push] Registration successful, token:', token.value?.substring(0, 20) + '...');
       this.token = token.value;
       
       // Send token to backend
@@ -116,7 +130,16 @@ class PushNotificationService {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
         const accessToken = typeof localStorage !== 'undefined' ? localStorage.getItem('accessToken') : '';
         
-        await fetch(`${apiUrl}/notifications/push-token`, {
+        console.log('[Push] Sending token to backend...');
+        console.log('[Push] API URL:', apiUrl);
+        console.log('[Push] Has accessToken:', !!accessToken);
+        
+        if (!accessToken) {
+          console.log('[Push] No access token, cannot register push token');
+          return;
+        }
+        
+        const response = await fetch(`${apiUrl}/notifications/push-token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -128,14 +151,17 @@ class PushNotificationService {
             deviceName: await this.getDeviceName(),
           }),
         });
+        
+        const result = await response.json();
+        console.log('[Push] Backend response:', result);
       } catch (error) {
-        // Error registering push token with backend
+        console.error('[Push] Error registering token with backend:', error);
       }
     });
 
     // On registration error
     PushNotifications.addListener('registrationError', (error: any) => {
-      // Push registration error
+      console.error('[Push] Registration error:', error);
     });
 
     // When a push notification is received

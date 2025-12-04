@@ -3,6 +3,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+// Initialize push notifications after login
+const initPushNotifications = async () => {
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (Capacitor.isNativePlatform()) {
+      const { pushNotificationService } = await import('@/lib/push-notification-service');
+      await pushNotificationService.initialize();
+      console.log('Push notifications initialized after auth');
+    }
+  } catch (error) {
+    // Not on native platform or push not available
+  }
+};
 
 // Types
 interface LoginCredentials {
@@ -30,7 +45,9 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: (credentials: LoginCredentials) => 
       authApi.login(credentials.email, credentials.password),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Initialize push notifications now that user is logged in
+      await initPushNotifications();
       // Invalidate queries that depend on authentication
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       // Redirect to dashboard
@@ -42,7 +59,9 @@ export function useAuth() {
   const registerMutation = useMutation({
     mutationFn: (credentials: RegisterCredentials) => 
       authApi.register(credentials.email, credentials.password, credentials.fullName),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Initialize push notifications now that user is registered
+      await initPushNotifications();
       // Invalidate queries that depend on authentication
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       // Redirect to dashboard
@@ -80,6 +99,13 @@ export function useAuth() {
   const isAuthenticated = profileQuery.isSuccess;
   const isLoading = profileQuery.isLoading;
   const user = profileQuery.data;
+
+  // Initialize push notifications when user is authenticated (e.g., on app restart with saved token)
+  useEffect(() => {
+    if (isAuthenticated) {
+      initPushNotifications();
+    }
+  }, [isAuthenticated]);
 
   return {
     isAuthenticated,
