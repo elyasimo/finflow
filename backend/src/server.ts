@@ -291,6 +291,7 @@ app.get('/notifications/preferences', authMiddleware, (req, res) => notification
 app.put('/notifications/preferences', authMiddleware, (req, res) => notificationsController.updateNotificationPreferences(req, res));
 app.post('/notifications/push-token', authMiddleware, (req, res) => notificationsController.registerPushToken(req, res));
 app.delete('/notifications/push-token', authMiddleware, (req, res) => notificationsController.unregisterPushToken(req, res));
+app.post('/notifications/test', authMiddleware, (req, res) => notificationsController.testPushNotification(req, res));
 app.post('/notifications/cleanup', authMiddleware, adminMiddleware, (req, res) => notificationsController.cleanupOldNotifications(req, res));
 
 // Banking routes (PSD2/Open Banking)

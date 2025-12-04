@@ -297,3 +297,61 @@ export const cleanupOldNotifications = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to cleanup notifications' });
   }
 };
+
+// Test push notification endpoint
+export const testPushNotification = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { title, body } = req.body;
+
+    // Get user's push tokens
+    const tokens = await db
+      .select()
+      .from(pushTokens)
+      .where(and(eq(pushTokens.userId, userId), eq(pushTokens.isActive, true)));
+
+    if (tokens.length === 0) {
+      return res.status(400).json({ 
+        error: 'No push tokens registered',
+        hint: 'Make sure you have allowed notifications in the app'
+      });
+    }
+
+    const results = [];
+    for (const tokenRecord of tokens) {
+      const result = await pushNotificationService.send(
+        tokenRecord.token,
+        {
+          title: title || '🔔 Test Notification',
+          body: body || 'Push notifications are working! 🎉',
+          data: { type: 'test', timestamp: new Date().toISOString() },
+          sound: 'default',
+        },
+        tokenRecord.platform === 'android' ? 'android' : tokenRecord.platform === 'ios' ? 'ios' : 'auto'
+      );
+      results.push({
+        platform: tokenRecord.platform,
+        deviceName: tokenRecord.deviceName,
+        success: result.success,
+        messageId: result.messageId,
+        error: result.error,
+      });
+    }
+
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    res.json({
+      success: successful > 0,
+      message: `Sent to ${successful} device(s), ${failed} failed`,
+      results,
+    });
+  } catch (error) {
+    console.error('Error testing push notification:', error);
+    res.status(500).json({ error: 'Failed to send test notification' });
+  }
+};
