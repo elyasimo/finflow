@@ -127,13 +127,17 @@ class PushNotificationService {
   }
 
   private setupListeners(): void {
-    if (!PushNotifications) return;
+    if (!PushNotifications) {
+      console.log('[Push] PushNotifications not available');
+      return;
+    }
     
     console.log('[Push] Setting up listeners...');
     
     // On successful registration
     PushNotifications.addListener('registration', async (token: any) => {
-      console.log('[Push] Registration successful, token:', token.value?.substring(0, 20) + '...');
+      console.log('[Push] *** REGISTRATION EVENT RECEIVED ***');
+      console.log('[Push] Token value:', token?.value ? token.value.substring(0, 30) + '...' : 'NO TOKEN');
       this.token = token.value;
       
       // Send token to backend
@@ -143,12 +147,16 @@ class PushNotificationService {
         
         console.log('[Push] Sending token to backend...');
         console.log('[Push] API URL:', apiUrl);
-        console.log('[Push] Has accessToken:', !!accessToken);
+        console.log('[Push] Has accessToken:', !!accessToken, 'length:', accessToken?.length);
         
         if (!accessToken) {
           console.log('[Push] No access token, cannot register push token');
           return;
         }
+        
+        const deviceName = await this.getDeviceName();
+        const platform = Capacitor?.getPlatform?.() || 'unknown';
+        console.log('[Push] Device:', deviceName, 'Platform:', platform);
         
         const response = await fetch(`${apiUrl}/notifications/push-token`, {
           method: 'POST',
@@ -158,13 +166,14 @@ class PushNotificationService {
           },
           body: JSON.stringify({
             token: token.value,
-            platform: Capacitor?.getPlatform?.() || 'unknown',
-            deviceName: await this.getDeviceName(),
+            platform: platform,
+            deviceName: deviceName,
           }),
         });
         
+        console.log('[Push] Response status:', response.status);
         const result = await response.json();
-        console.log('[Push] Backend response:', result);
+        console.log('[Push] Backend response:', JSON.stringify(result));
       } catch (error) {
         console.error('[Push] Error registering token with backend:', error);
       }
@@ -172,7 +181,7 @@ class PushNotificationService {
 
     // On registration error
     PushNotifications.addListener('registrationError', (error: any) => {
-      console.error('[Push] Registration error:', error);
+      console.error('[Push] *** REGISTRATION ERROR ***:', JSON.stringify(error));
     });
 
     // When a push notification is received

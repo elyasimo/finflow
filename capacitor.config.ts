@@ -1,15 +1,10 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-/**
- * Capacitor Configuration
- * Currently set to PRODUCTION mode
- */
 const config: CapacitorConfig = {
-  appId: 'ch.finflowapp',
+  appId: 'ch.finflowapp.app',
   appName: 'FinFlow',
   webDir: 'out',
   server: {
-    // Production URL
     url: 'https://finflowapp.ch',
     cleartext: false,
   },
