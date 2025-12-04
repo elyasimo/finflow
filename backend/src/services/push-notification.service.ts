@@ -52,6 +52,30 @@ class PushNotificationService {
   }
 
   /**
+   * Parse private key handling multiple escape levels from environment variables
+   * Handles: "\\n" -> "\n" -> actual newlines
+   */
+  private parsePrivateKey(key: string): string {
+    if (!key) return '';
+    
+    // First, replace literal \n (as \\n in string) with actual newlines
+    let parsed = key.replace(/\\n/g, '\n');
+    
+    // If the key still doesn't look right (no actual newlines), try again
+    // This handles cases where the env var was double-escaped
+    if (!parsed.includes('\n') && parsed.includes('\\n')) {
+      parsed = parsed.replace(/\\n/g, '\n');
+    }
+    
+    // Log key format for debugging (only first/last few chars)
+    const hasNewlines = parsed.includes('\n');
+    const startsCorrectly = parsed.startsWith('-----BEGIN');
+    console.log(`   Private key parsing: hasNewlines=${hasNewlines}, startsCorrectly=${startsCorrectly}, length=${parsed.length}`);
+    
+    return parsed;
+  }
+
+  /**
    * Initialize the push notification service
    */
   private init(): void {
@@ -61,12 +85,14 @@ class PushNotificationService {
     // FCM Configuration (Firebase Service Account)
     this.fcmProjectId = process.env.FCM_PROJECT_ID || '';
     this.fcmClientEmail = process.env.FCM_CLIENT_EMAIL || '';
-    this.fcmPrivateKey = (process.env.FCM_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+    // Handle multiple escaping levels: \\n -> \n -> actual newline
+    this.fcmPrivateKey = this.parsePrivateKey(process.env.FCM_PRIVATE_KEY || '');
 
     // APNs Configuration
     this.apnsKeyId = process.env.APNS_KEY_ID || '';
     this.apnsTeamId = process.env.APNS_TEAM_ID || '';
-    this.apnsPrivateKey = (process.env.APNS_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+    // Handle multiple escaping levels: \\n -> \n -> actual newline
+    this.apnsPrivateKey = this.parsePrivateKey(process.env.APNS_PRIVATE_KEY || '');
     this.apnsBundleId = process.env.APNS_BUNDLE_ID || 'ch.finflowapp.app';
     this.apnsProduction = process.env.APNS_PRODUCTION !== 'false';
 
