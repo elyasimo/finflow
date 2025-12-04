@@ -12,6 +12,8 @@ const initPushNotifications = async () => {
     if (Capacitor.isNativePlatform()) {
       const { pushNotificationService } = await import('@/lib/push-notification-service');
       await pushNotificationService.initialize();
+      // Also retry sending token in case it was received before login
+      await pushNotificationService.retrySendToken();
       console.log('Push notifications initialized after auth');
     }
   } catch (error) {

@@ -74,6 +74,7 @@ class PushNotificationService {
   private initialized = false;
   private token: string | null = null;
   private capacitorLoaded = false;
+  private tokenSentToBackend = false;
 
   private constructor() {}
 
@@ -140,43 +141,8 @@ class PushNotificationService {
       console.log('[Push] Token value:', token?.value ? token.value.substring(0, 30) + '...' : 'NO TOKEN');
       this.token = token.value;
       
-      // Send token to backend
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
-        const accessToken = typeof localStorage !== 'undefined' ? localStorage.getItem('accessToken') : '';
-        
-        console.log('[Push] Sending token to backend...');
-        console.log('[Push] API URL:', apiUrl);
-        console.log('[Push] Has accessToken:', !!accessToken, 'length:', accessToken?.length);
-        
-        if (!accessToken) {
-          console.log('[Push] No access token, cannot register push token');
-          return;
-        }
-        
-        const deviceName = await this.getDeviceName();
-        const platform = Capacitor?.getPlatform?.() || 'unknown';
-        console.log('[Push] Device:', deviceName, 'Platform:', platform);
-        
-        const response = await fetch(`${apiUrl}/notifications/push-token`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            token: token.value,
-            platform: platform,
-            deviceName: deviceName,
-          }),
-        });
-        
-        console.log('[Push] Response status:', response.status);
-        const result = await response.json();
-        console.log('[Push] Backend response:', JSON.stringify(result));
-      } catch (error) {
-        console.error('[Push] Error registering token with backend:', error);
-      }
+      // Try to send token to backend (may fail if not logged in yet)
+      await this.sendTokenToBackend();
     });
 
     // On registration error
@@ -222,6 +188,70 @@ class PushNotificationService {
     } catch {
       return 'Unknown Device';
     }
+  }
+
+  // Send token to backend - can be called multiple times safely
+  private async sendTokenToBackend(): Promise<boolean> {
+    if (!this.token) {
+      console.log('[Push] No token to send');
+      return false;
+    }
+    
+    if (this.tokenSentToBackend) {
+      console.log('[Push] Token already sent to backend');
+      return true;
+    }
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+      const accessToken = typeof localStorage !== 'undefined' ? localStorage.getItem('accessToken') : '';
+      
+      console.log('[Push] Sending token to backend...');
+      console.log('[Push] API URL:', apiUrl);
+      console.log('[Push] Has accessToken:', !!accessToken, 'length:', accessToken?.length);
+      
+      if (!accessToken) {
+        console.log('[Push] No access token yet, will retry after login');
+        return false;
+      }
+      
+      const deviceName = await this.getDeviceName();
+      const platform = Capacitor?.getPlatform?.() || 'unknown';
+      console.log('[Push] Device:', deviceName, 'Platform:', platform);
+      
+      const response = await fetch(`${apiUrl}/notifications/push-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          token: this.token,
+          platform: platform,
+          deviceName: deviceName,
+        }),
+      });
+      
+      console.log('[Push] Response status:', response.status);
+      const result = await response.json();
+      console.log('[Push] Backend response:', JSON.stringify(result));
+      
+      if (response.ok) {
+        this.tokenSentToBackend = true;
+        console.log('[Push] ✅ Token successfully registered with backend!');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('[Push] Error registering token with backend:', error);
+      return false;
+    }
+  }
+
+  // Public method to retry sending token after login
+  async retrySendToken(): Promise<boolean> {
+    console.log('[Push] Retrying to send token after login...');
+    return this.sendTokenToBackend();
   }
 
   private async isAppInForeground(): Promise<boolean> {
