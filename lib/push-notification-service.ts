@@ -5,21 +5,51 @@
 let Capacitor: any = null;
 let PushNotifications: any = null;
 let LocalNotifications: any = null;
+let Device: any = null;
+let App: any = null;
 
 // Dynamic import to prevent build errors when Capacitor is not available
 const loadCapacitor = async (): Promise<boolean> => {
+  // Skip in SSR/Node environment
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  
   try {
-    const core = await import('@capacitor/core');
+    // Use eval to prevent webpack from analyzing these imports
+    const importModule = (name: string) => eval(`import('${name}')`);
+    
+    const core = await importModule('@capacitor/core');
     Capacitor = core.Capacitor;
     
-    const push = await import('@capacitor/push-notifications');
+    // Only load push notifications if we're on a native platform
+    if (!Capacitor?.isNativePlatform?.()) {
+      return false;
+    }
+    
+    const push = await importModule('@capacitor/push-notifications');
     PushNotifications = push.PushNotifications;
     
+    // Try to load optional packages - don't fail if they're not available
     try {
-      const local = await import('@capacitor/local-notifications');
+      const local = await importModule('@capacitor/local-notifications');
       LocalNotifications = local.LocalNotifications;
     } catch {
-      // Local notifications not available
+      LocalNotifications = null;
+    }
+    
+    try {
+      const device = await importModule('@capacitor/device');
+      Device = device.Device;
+    } catch {
+      Device = null;
+    }
+    
+    try {
+      const app = await importModule('@capacitor/app');
+      App = app.App;
+    } catch {
+      App = null;
     }
     
     return true;
@@ -138,9 +168,11 @@ class PushNotificationService {
 
   private async getDeviceName(): Promise<string> {
     try {
-      const { Device } = await import('@capacitor/device');
-      const info = await Device.getInfo();
-      return `${info.manufacturer || ''} ${info.model || 'Unknown Device'}`.trim();
+      if (Device) {
+        const info = await Device.getInfo();
+        return `${info.manufacturer || ''} ${info.model || 'Unknown Device'}`.trim();
+      }
+      return 'Unknown Device';
     } catch {
       return 'Unknown Device';
     }
@@ -148,9 +180,11 @@ class PushNotificationService {
 
   private async isAppInForeground(): Promise<boolean> {
     try {
-      const { App } = await import('@capacitor/app');
-      const state = await App.getState();
-      return state.isActive;
+      if (App) {
+        const state = await App.getState();
+        return state.isActive;
+      }
+      return false;
     } catch {
       return false;
     }
