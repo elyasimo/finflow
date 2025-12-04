@@ -16,44 +16,54 @@ const loadCapacitor = async (): Promise<boolean> => {
   }
   
   try {
-    // Use eval to prevent webpack from analyzing these imports
-    const importModule = (name: string) => eval(`import('${name}')`);
-    
-    const core = await importModule('@capacitor/core');
+    // Direct import for @capacitor/core - this is always available in native apps
+    const core = await import('@capacitor/core');
     Capacitor = core.Capacitor;
     
+    const isNative = Capacitor?.isNativePlatform?.();
+    console.log('[Push] Platform check - isNativePlatform:', isNative, 'platform:', Capacitor?.getPlatform?.());
+    
     // Only load push notifications if we're on a native platform
-    if (!Capacitor?.isNativePlatform?.()) {
+    if (!isNative) {
       return false;
     }
     
-    const push = await importModule('@capacitor/push-notifications');
+    // Direct import for push notifications
+    const push = await import('@capacitor/push-notifications');
     PushNotifications = push.PushNotifications;
     
     // Try to load optional packages - don't fail if they're not available
     try {
-      const local = await importModule('@capacitor/local-notifications');
-      LocalNotifications = local.LocalNotifications;
+      // Use eval to prevent webpack from analyzing these optional imports
+      const importModule = (name: string) => eval(`import('${name}')`);
+      
+      try {
+        const local = await importModule('@capacitor/local-notifications');
+        LocalNotifications = local.LocalNotifications;
+      } catch {
+        LocalNotifications = null;
+      }
+      
+      try {
+        const device = await importModule('@capacitor/device');
+        Device = device.Device;
+      } catch {
+        Device = null;
+      }
+      
+      try {
+        const app = await importModule('@capacitor/app');
+        App = app.App;
+      } catch {
+        App = null;
+      }
     } catch {
-      LocalNotifications = null;
-    }
-    
-    try {
-      const device = await importModule('@capacitor/device');
-      Device = device.Device;
-    } catch {
-      Device = null;
-    }
-    
-    try {
-      const app = await importModule('@capacitor/app');
-      App = app.App;
-    } catch {
-      App = null;
+      // Optional packages not available
     }
     
     return true;
-  } catch {
+  } catch (error) {
+    console.error('[Push] Error loading Capacitor:', error);
     // Capacitor not available - push notifications disabled
     return false;
   }
