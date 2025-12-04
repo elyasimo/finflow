@@ -111,12 +111,13 @@ class PushNotificationService {
         return;
       }
 
+      // Setup listeners BEFORE registering (important!)
+      console.log('[Push] Setting up listeners...');
+      this.setupListeners();
+
       // Register for push notifications
       console.log('[Push] Registering for push notifications...');
       await PushNotifications.register();
-
-      // Setup listeners
-      this.setupListeners();
       
       this.initialized = true;
       console.log('[Push] Initialization complete');
