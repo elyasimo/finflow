@@ -263,6 +263,21 @@ export default function MobileSupportPage({ user, onSendEmail }: MobileSupportPa
                     {isSendingEmail ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     {isSendingEmail ? t('sending') : t('sendMessage')}
                   </button>
+                  
+                  {/* Legal Links */}
+                  <div className="flex justify-center gap-4 pt-4 border-t border-gray-700 mt-4">
+                    <a href="/privacy" className="text-xs text-gray-500 hover:text-gray-400">
+                      {t('privacyPolicy')}
+                    </a>
+                    <span className="text-gray-600">•</span>
+                    <a href="/terms" className="text-xs text-gray-500 hover:text-gray-400">
+                      {t('termsOfService')}
+                    </a>
+                    <span className="text-gray-600">•</span>
+                    <a href="/impressum" className="text-xs text-gray-500 hover:text-gray-400">
+                      {t('legalNotice')}
+                    </a>
+                  </div>
                 </>
               )}
             </div>

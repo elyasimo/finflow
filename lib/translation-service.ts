@@ -70,7 +70,6 @@ export async function translateToAllLanguages(
       });
 
       if (!response.ok) {
-        console.error(`Translation failed for ${targetLang}: ${response.statusText}`);
         translations[targetLang] = text; // Fallback to original text
         continue;
       }
@@ -81,7 +80,6 @@ export async function translateToAllLanguages(
       // Add a small delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
-      console.error(`Error translating to ${targetLang}:`, error);
       translations[targetLang] = text; // Fallback to original text
     }
   }
@@ -120,14 +118,12 @@ export async function translateText(
     });
 
     if (!response.ok) {
-      console.error(`Translation failed: ${response.statusText}`);
       return text; // Fallback to original text
     }
 
     const data = await response.json();
     return data.translatedText || text;
   } catch (error) {
-    console.error('Error translating text:', error);
     return text; // Fallback to original text
   }
 }

@@ -108,8 +108,8 @@ export default function MobileTradingAgentPage() {
       setAgents(agentsRes.agents || []);
       setPortfolio(portfolioRes.portfolio || []);
       setTotalValueEur(portfolioRes.totalValueEur || 0);
-    } catch (error) {
-      console.error('Error loading trading agent data:', error);
+    } catch {
+      // Trading agent data loading failed silently
     } finally {
       setIsLoading(false);
     }
@@ -159,8 +159,7 @@ export default function MobileTradingAgentPage() {
       setTakeProfit(15);
       setShowCreateSheet(false);
       loadData();
-    } catch (error) {
-      console.error('Error creating agent:', error);
+    } catch {
       alert(t('errorCreatingAgent') || 'Fehler beim Erstellen des Agents');
     } finally {
       setIsCreating(false);
@@ -171,8 +170,8 @@ export default function MobileTradingAgentPage() {
     try {
       await tradingAgentApi.toggleAgent(agentId, enabled);
       loadData();
-    } catch (error) {
-      console.error('Error toggling agent:', error);
+    } catch {
+      // Toggle failed silently
     }
   };
 
@@ -181,8 +180,8 @@ export default function MobileTradingAgentPage() {
     try {
       await tradingAgentApi.deleteAgent(agentId);
       loadData();
-    } catch (error) {
-      console.error('Error deleting agent:', error);
+    } catch {
+      // Delete failed silently
     }
   };
 

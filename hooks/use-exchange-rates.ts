@@ -20,9 +20,7 @@ export function useExchangeRates() {
   const { data, isLoading, error } = useQuery<ExchangeRates>({
     queryKey: ['exchangeRates', baseCurrency],
     queryFn: async () => {
-      console.log(`Fetching exchange rates for base currency: ${baseCurrency}`);
       const result = await currencyApi.getExchangeRates(baseCurrency);
-      console.log(`Exchange rates loaded:`, result);
       return result;
     },
     staleTime: 3600000, // 1 hour
@@ -43,7 +41,6 @@ export function useExchangeRates() {
 
     // No rates available yet
     if (!data?.rates) {
-      console.warn('Exchange rates not loaded yet');
       return amount;
     }
 
@@ -56,24 +53,18 @@ export function useExchangeRates() {
       if (fromCurrency === baseCurrency) {
         const rate = data.rates[targetCurrency];
         if (!rate) {
-          console.warn(`No rate found for ${baseCurrency} -> ${targetCurrency}`);
           return amount;
         }
-        const result = amount * rate;
-        console.log(`Convert ${amount} ${fromCurrency} -> ${result.toFixed(2)} ${targetCurrency} (rate: ${rate})`);
-        return result;
+        return amount * rate;
       }
 
       // If converting to base currency
       if (targetCurrency === baseCurrency) {
         const rate = data.rates[fromCurrency];
         if (!rate) {
-          console.warn(`No rate found for ${fromCurrency} -> ${baseCurrency}`);
           return amount;
         }
-        const result = amount / rate;
-        console.log(`Convert ${amount} ${fromCurrency} -> ${result.toFixed(2)} ${targetCurrency} (rate: 1/${rate})`);
-        return result;
+        return amount / rate;
       }
 
       // Converting between two non-base currencies
@@ -83,17 +74,13 @@ export function useExchangeRates() {
       const rateTo = data.rates[targetCurrency];
       
       if (!rateFrom || !rateTo) {
-        console.warn(`Missing rates for conversion ${fromCurrency} -> ${targetCurrency}`);
         return amount;
       }
       
       // First to base, then to target
       const inBase = amount / rateFrom;
-      const result = inBase * rateTo;
-      console.log(`Convert ${amount} ${fromCurrency} -> ${result.toFixed(2)} ${targetCurrency} (via ${baseCurrency})`);
-      return result;
+      return inBase * rateTo;
     } catch (error) {
-      console.error('Currency conversion error:', error);
       return amount;
     }
   };

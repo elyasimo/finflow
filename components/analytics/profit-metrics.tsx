@@ -10,7 +10,6 @@ interface ProfitMetricsProps {
 
 export function ProfitMetrics({ metrics }: ProfitMetricsProps) {
   const { currency } = useCurrency();
-  console.log('ProfitMetrics metrics:', metrics);
   if (!metrics) return null;
 
   const formatCurrency = (value: number) => {

@@ -125,8 +125,7 @@ export default function MobileStockTradingPage() {
         
         setPortfolio(portfolioRes);
         setOrders(ordersRes);
-      } catch (error) {
-        console.error('Portfolio error:', error);
+      } catch {
         setPortfolio({
           totalValue: 0,
           cash: 0,
@@ -142,11 +141,11 @@ export default function MobileStockTradingPage() {
         const allSymbols = stocksRes.map((stock: any) => stock.symbol);
         const quotesRes = await stockTradingApi.getStockQuotes(allSymbols);
         setQuotes(quotesRes);
-      } catch (error) {
-        console.log('Quotes not available:', error);
+      } catch {
+        // Quotes not available
       }
-    } catch (error) {
-      console.error('Error loading stock trading data:', error);
+    } catch {
+      // Stock trading data loading failed silently
     } finally {
       setIsLoading(false);
     }
@@ -180,7 +179,6 @@ export default function MobileStockTradingPage() {
       setShowOrderModal(false);
       await loadData();
     } catch (error: any) {
-      console.error('Error placing order:', error);
       alert(error.message || 'Failed to place order');
     } finally {
       setIsPlacingOrder(false);

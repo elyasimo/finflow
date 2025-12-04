@@ -119,7 +119,6 @@ const fetchCryptoData = async (): Promise<CryptoData[]> => {
       };
     });
   } catch (error) {
-    console.error('Fehler beim Abrufen der Kryptodaten:', error);
     // Fallback zu den Beispieldaten im Fehlerfall
     return getFallbackCryptoData();
   }

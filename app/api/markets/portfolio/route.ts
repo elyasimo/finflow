@@ -16,8 +16,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/json',
       }
     });
-  } catch (error) {
-    console.error('Error fetching portfolio:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch portfolio' },
       { status: 500 }

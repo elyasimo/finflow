@@ -238,8 +238,7 @@ export default function MobileCryptoDetail({ symbol }: MobileCryptoDetailProps) 
         })
       }
     } catch (error) {
-      console.error('Failed to fetch crypto data:', error)
-      // Fallback
+      // Fallback on error
       setCryptoData({
         symbol: cleanSymbol,
         price: cleanSymbol === 'BTC' ? 67500 : cleanSymbol === 'ETH' ? 3200 : 100,

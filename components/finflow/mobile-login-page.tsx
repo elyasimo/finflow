@@ -71,27 +71,16 @@ export default function MobileLoginPage({
   // Check for saved biometric credentials on mount - retry until native is ready
   useEffect(() => {
     const checkBiometricCredentials = async () => {
-      // Debug log
-      console.log('🔐 Biometric check:', { 
-        biometricAvailable, 
-        isNative, 
-        biometricInitialized,
-        hasSavedCredentials 
-      })
-      
       // Wait until biometric is initialized
       if (!biometricInitialized) {
-        console.log('🔐 Waiting for biometric initialization...')
         return
       }
       
       if (biometricAvailable && isNative) {
         try {
           const credentials = await getCredentials()
-          console.log('🔐 Credentials found:', !!credentials)
           setHasSavedCredentials(!!credentials)
         } catch (err) {
-          console.error('🔐 Credentials check error:', err)
           setHasSavedCredentials(false)
         }
         setBiometricChecked(true)
@@ -168,23 +157,11 @@ export default function MobileLoginPage({
       { email, password },
       {
         onSuccess: async () => {
-          // Debug: Log biometric state
-          console.log('🔐 Login success - Biometric state:', {
-            biometricAvailable,
-            isNative,
-            biometricInitialized,
-            hasSavedCredentials,
-            biometricsEnabledSetting,
-            shouldShowSetup: biometricInitialized && biometricAvailable && isNative && !hasSavedCredentials
-          })
-          
           // Auto-save credentials if biometrics is enabled in settings but credentials not saved yet
           if (biometricInitialized && biometricAvailable && isNative && biometricsEnabledSetting && !hasSavedCredentials) {
-            console.log('🔐 Auto-saving credentials because biometrics is enabled in settings')
             const saved = await saveCredentials(email, password)
             if (saved) {
               await hapticFeedback('success')
-              console.log('🔐 Credentials saved successfully')
             }
             router.push('/dashboard')
             return
@@ -479,10 +456,15 @@ export default function MobileLoginPage({
       <div className="px-6 pb-8 pt-4">
         <p className="text-center text-xs text-gray-500">
           {t('termsAgreement')}{' '}
-          <span className="text-blue-400">{t('termsOfService')}</span>{' '}
+          <a href="/terms" className="text-blue-400 hover:underline">{t('termsOfService')}</a>{' '}
           {t('and')}{' '}
-          <span className="text-blue-400">{t('privacyPolicy')}</span>
+          <a href="/privacy" className="text-blue-400 hover:underline">{t('privacyPolicy')}</a>
         </p>
+        <div className="flex justify-center gap-4 mt-3">
+          <a href="/impressum" className="text-xs text-gray-500 hover:text-gray-400">
+            {t('legalNotice')}
+          </a>
+        </div>
       </div>
 
       {/* Biometric Setup Modal */}

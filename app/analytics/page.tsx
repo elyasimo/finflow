@@ -207,12 +207,12 @@ export default function AnalyticsPage() {
 
         const cryptoTotal = portfolio.reduce((sum: number, asset: CryptoHolding) => sum + (asset.valueEur || asset.value || 0), 0);
         setTotalCryptoValue(cryptoTotal);
-      } catch (error) {
-        console.error('Error loading crypto portfolio:', error);
+      } catch {
+        // Crypto portfolio loading failed silently
       }
 
-    } catch (error) {
-      console.error('Error loading analytics data:', error);
+    } catch {
+      // Analytics data loading failed silently
     } finally {
       setIsLoading(false);
     }
@@ -289,8 +289,7 @@ export default function AnalyticsPage() {
 
       // Show success message (you can add a toast here)
       alert(t('budgetCreated'));
-    } catch (error) {
-      console.error('Error creating budget:', error);
+    } catch {
       alert(t('errorCreatingBudget'));
     } finally {
       setIsCreatingBudget(false);

@@ -46,9 +46,7 @@ export default function TopNav({ user }: TopNavProps) {
     try {
       await updateCurrencyInBackend(newCurrency);
       // Currency wurde erfolgreich aktualisiert und React Query Cache invalidiert
-      console.log('Currency updated successfully to:', newCurrency);
     } catch (error) {
-      console.error('Failed to update currency:', error);
       alert('Failed to update currency. Please try again.');
     }
   };

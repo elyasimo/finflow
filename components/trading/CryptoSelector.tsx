@@ -89,7 +89,7 @@ export default function CryptoSelector({
       setAllCryptos(data.cryptocurrencies);
       setGroupedCryptos(data.grouped);
     } catch (error) {
-      console.error('Error loading cryptocurrencies:', error);
+      // Error loading cryptocurrencies - silently fail
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +104,6 @@ export default function CryptoSelector({
       });
       
       if (!response.ok) {
-        console.warn('Failed to load crypto prices:', response.status);
         return; // Keep existing prices on error
       }
       
@@ -121,7 +120,6 @@ export default function CryptoSelector({
         setPrices(priceMap);
       }
     } catch (error) {
-      console.warn('Error loading prices, keeping existing prices:', error);
       // Don't clear prices on error - keep the old ones
     }
   };

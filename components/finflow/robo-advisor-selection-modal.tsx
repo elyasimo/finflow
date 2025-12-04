@@ -91,7 +91,6 @@ export default function RoboAdvisorSelectionModal({
         event_label: choice
       })
     }
-    console.log('[Analytics] Robo-Advisor selection:', choice)
   }, [])
 
   // Handle selection

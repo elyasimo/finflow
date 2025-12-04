@@ -79,7 +79,7 @@ export default function MobileTradingPerformance({ user }: MobileTradingPerforma
         setStats(data.stats)
       }
     } catch (error) {
-      console.error('Error loading performance:', error)
+      // Error loading performance - silently fail
     } finally {
       setIsLoading(false)
     }

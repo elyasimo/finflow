@@ -209,8 +209,6 @@ const fetchMarketData = async (): Promise<MarketsResponse> => {
       forex: mapForex(forexData),
     };
   } catch (error) {
-    console.error('Fehler beim Abrufen der Marktdaten:', error);
-    
     // Fallback zu unseren Beispieldaten im Fehlerfall
     return getFallbackMarketData();
   }

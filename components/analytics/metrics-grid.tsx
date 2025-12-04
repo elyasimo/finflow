@@ -11,7 +11,6 @@ interface MetricsGridProps {
 
 export function MetricsGrid({ metrics }: MetricsGridProps) {
   const { currency } = useCurrency();
-  console.log('MetricsGrid metrics:', metrics);
   if (!metrics) return null;
 
   const formatCurrency = (value: number) => {

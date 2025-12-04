@@ -28,7 +28,6 @@ export default function RegisterMobilePage() {
       // Just redirect to dashboard on success
       router.push('/dashboard');
     } catch (error) {
-      console.error('Registration error:', error);
       setError(error instanceof Error ? error.message : 'Registrierung fehlgeschlagen');
     }
   };

@@ -96,8 +96,8 @@ export default function TradingHistoryPage() {
       setLogs(data.logs || []);
       setTotal(data.total || 0);
       setStats(data.stats || null);
-    } catch (error) {
-      console.error('Error loading trading history:', error);
+    } catch {
+      // Trading history loading failed silently
     } finally {
       setIsLoading(false);
     }

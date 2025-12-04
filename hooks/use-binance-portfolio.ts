@@ -42,7 +42,6 @@ export default function useBinancePortfolio(pollInterval = 10000) {
       } catch (err: unknown) {
         if (!mounted) return;
         
-        console.error('Portfolio fetch error:', err);
         const error = err as { response?: { data?: { message?: string; needsConfiguration?: boolean } }; message?: string };
         
         if (error.response?.data?.needsConfiguration) {

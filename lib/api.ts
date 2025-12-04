@@ -4,7 +4,6 @@ import axios from 'axios';
 function getApiUrl(): string {
   // Check environment variable first
   if (process.env.NEXT_PUBLIC_API_URL) {
-    console.log('[API] Using env NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
@@ -13,26 +12,20 @@ function getApiUrl(): string {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
     
-    console.log('[API] Detecting environment - hostname:', hostname, 'protocol:', protocol);
-    
     // Production domain (web or Capacitor WebView loading finflowapp.ch)
     if (hostname === 'finflowapp.ch' || hostname.endsWith('.finflowapp.ch')) {
-      console.log('[API] Detected production domain, using https://api.finflowapp.ch');
       return 'https://api.finflowapp.ch';
     }
     
     // Capacitor native app with capacitor:// protocol
     if (protocol === 'capacitor:' || protocol === 'ionic:') {
-      console.log('[API] Detected Capacitor app, using https://api.finflowapp.ch');
       return 'https://api.finflowapp.ch';
     }
     
     // Check if we're in a WebView loading a remote URL
-    // Capacitor sets some specific user agent or we can check the URL being loaded
     try {
       // @ts-ignore - Capacitor may be available
       if (window.Capacitor?.isNativePlatform?.()) {
-        console.log('[API] Detected Capacitor native platform, using https://api.finflowapp.ch');
         return 'https://api.finflowapp.ch';
       }
     } catch {
@@ -41,7 +34,6 @@ function getApiUrl(): string {
   }
   
   // Default to local development
-  console.log('[API] Defaulting to local development: http://localhost:8081');
   return 'http://localhost:8081';
 }
 
@@ -110,7 +102,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -167,7 +158,6 @@ export const authApi = {
    */
   sendPhoneOtp: async (phone: string) => {
     // Mock for phone OTP until we integrate SMS provider
-    console.log('📱 Mock: Sending phone OTP to', phone);
     return {
       otp_id: `phone_${Date.now()}`,
       expires_at: new Date(Date.now() + 5 * 60000).toISOString()
@@ -182,7 +172,6 @@ export const authApi = {
    */
   verifyPhoneOtp: async (phone: string, code: string) => {
     // Mock for phone OTP - accept any 6-digit code
-    console.log('📱 Mock: Verifying phone OTP for', phone);
     if (code.length === 6) {
       return { verified: true };
     }
@@ -207,7 +196,6 @@ export const authApi = {
       createdAt: userData.createdAt || userData.created_at,
     };
     
-    console.log('📡 API - getProfile response:', user);
     return user;
   },
   updateProfile: async (data: { fullName?: string; email?: string; phone?: string; defaultCurrency?: string }) => {
@@ -508,33 +496,18 @@ export const marketsApi = {
   getPortfolio,
   
   getFinancialMarkets: async () => {
-    try {
-      const response = await api.get('/markets/financial');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching financial markets:', error);
-      throw error;
-    }
+    const response = await api.get('/markets/financial');
+    return response.data;
   },
 
   getCryptoMarkets: async () => {
-    try {
-      const response = await api.get('/markets/crypto');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching crypto markets:', error);
-      throw error;
-    }
+    const response = await api.get('/markets/crypto');
+    return response.data;
   },
 
   getMarketHistory: async (id: string, period: 'day' | 'week' | 'month' | 'year') => {
-    try {
-      const response = await api.get(`/markets/${id}/history/${period}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching market history:', error);
-      throw error;
-    }
+    const response = await api.get(`/markets/${id}/history/${period}`);
+    return response.data;
   }
 };
 

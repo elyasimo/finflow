@@ -17,7 +17,6 @@ export function useCryptoMarkets() {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An error occurred'));
-        console.error('Error fetching crypto markets:', err);
       } finally {
         setIsLoading(false);
       }

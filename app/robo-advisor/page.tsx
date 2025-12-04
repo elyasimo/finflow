@@ -134,8 +134,6 @@ function RoboAdvisorPageContent() {
     const typeParam = searchParams.get('type');
     const actionParam = searchParams.get('action');
     
-    console.log('[RoboAdvisor] Checking preferences...', { typeParam, actionParam });
-    
     // If action=create, open the create sheet
     if (actionParam === 'create') {
       setShowCreateSheet(true);
@@ -145,7 +143,6 @@ function RoboAdvisorPageContent() {
     
     // If type is specified in URL, use it
     if (typeParam === 'crypto' || typeParam === 'trading') {
-      console.log('[RoboAdvisor] Using URL type param:', typeParam);
       setAgentType(typeParam);
       setHasCheckedPreference(true);
       return;
@@ -154,19 +151,16 @@ function RoboAdvisorPageContent() {
     // Check for saved preference - but ONLY if not coming from navigation
     // Skip preference check on direct navigation to /robo-advisor
     const savedPreference = localStorage.getItem('roboAdvisorPreference');
-    console.log('[RoboAdvisor] Saved preference:', savedPreference);
     
     // Always show modal on first visit - let user choose
     // Only use saved preference if "Remember my choice" was checked
     if (savedPreference === 'crypto' || savedPreference === 'trading') {
-      console.log('[RoboAdvisor] Using saved preference:', savedPreference);
       setAgentType(savedPreference);
       setHasCheckedPreference(true);
       return;
     }
     
     // No preference saved and no URL param - show selection modal
-    console.log('[RoboAdvisor] No preference found, showing modal');
     setShowSelectionModal(true);
     setHasCheckedPreference(true);
   }, [searchParams, hasCheckedPreference]);
@@ -186,7 +180,7 @@ function RoboAdvisorPageContent() {
       setPortfolio(portfolioRes.portfolio || []);
       setTotalValueEur(portfolioRes.totalValueEur || 0);
     } catch (error) {
-      console.error('Error loading robo-advisor data:', error);
+      // Error loading robo-advisor data - silently fail
     } finally {
       setIsLoading(false);
     }
@@ -237,7 +231,6 @@ function RoboAdvisorPageContent() {
       setShowCreateSheet(false);
       loadData();
     } catch (error) {
-      console.error('Error creating agent:', error);
       alert(t('errorCreatingAgent') || 'Fehler beim Erstellen des Agents');
     } finally {
       setIsCreating(false);
@@ -249,7 +242,7 @@ function RoboAdvisorPageContent() {
       await tradingAgentApi.toggleAgent(agentId, enabled);
       loadData();
     } catch (error) {
-      console.error('Error toggling agent:', error);
+      // Error toggling agent - silently fail
     }
   };
 
@@ -259,7 +252,7 @@ function RoboAdvisorPageContent() {
       await tradingAgentApi.deleteAgent(agentId);
       loadData();
     } catch (error) {
-      console.error('Error deleting agent:', error);
+      // Error deleting agent - silently fail
     }
   };
 

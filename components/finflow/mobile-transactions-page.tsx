@@ -183,11 +183,6 @@ export default function MobileTransactionsPage({
   const { t } = useLanguage()
   const { currency } = useCurrency()
   
-  // Debug: Log received transactions
-  useEffect(() => {
-    console.log('📊 MobileTransactionsPage received transactions:', transactions?.length || 0, transactions)
-  }, [transactions])
-  
   // UI State
   const [activeTypeTab, setActiveTypeTab] = useState('all')
   const [activeDateFilter, setActiveDateFilter] = useState('all')

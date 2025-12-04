@@ -132,8 +132,7 @@ export default function ConfigureRoboAdvisorPage() {
 
       // Navigate back to robo-advisor
       router.push('/robo-advisor')
-    } catch (err) {
-      console.error('Error creating agent:', err)
+    } catch {
       setError('Fehler beim Erstellen des Agents. Bitte versuche es erneut.')
     } finally {
       setIsCreating(false)

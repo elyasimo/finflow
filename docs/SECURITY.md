@@ -228,7 +228,9 @@ Before production deployment:
 
 ### Privacy Policy
 
-⚠️ **TODO:** Draft privacy policy before public release
+✅ **Privacy Policy available at:** `/privacy` (multi-language: EN, DE, FR, AR)
+✅ **Terms of Service available at:** `/terms`
+✅ **Legal Notice (Impressum) available at:** `/impressum`
 
 ---
 

@@ -15,7 +15,6 @@ interface EquityCurveChartProps {
 
 export function EquityCurveChart({ data }: EquityCurveChartProps) {
   const { currency } = useCurrency();
-  console.log('EquityCurveChart data:', data);
   const formattedData = data.map(point => ({
     ...point,
     time: format(new Date(point.time), 'MMM dd, yyyy'),

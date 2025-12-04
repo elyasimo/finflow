@@ -89,15 +89,12 @@ export default function TransactionsPage() {
 
       setMonthToDelete(null);
     } catch (error) {
-      console.error('Error deleting month transactions:', error);
       alert(`Failed to delete transactions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   // Group transactions by month - use useMemo to recalculate when userCurrency changes
   const monthlyGroups = useMemo(() => {
-    console.log('🔄 Recalculating monthlyGroups with userCurrency:', userCurrency);
-    
     if (!transactions) {
       return [];
     }
@@ -131,7 +128,6 @@ export default function TransactionsPage() {
           .filter(t => t.type === 'income')
           .reduce((sum, t) => {
             const converted = convert(Number(t.amount), t.currency || userCurrency, userCurrency);
-            console.log(`💰 Income: Convert ${t.amount} ${t.currency} -> ${converted} ${userCurrency}`);
             return sum + converted;
           }, 0);
         
@@ -139,7 +135,6 @@ export default function TransactionsPage() {
           .filter(t => t.type === 'expense')
           .reduce((sum, t) => {
             const converted = convert(Number(t.amount), t.currency || userCurrency, userCurrency);
-            console.log(`💸 Expense: Convert ${t.amount} ${t.currency} -> ${converted} ${userCurrency}`);
             return sum + converted;
           }, 0);
         
@@ -213,8 +208,6 @@ export default function TransactionsPage() {
         accountId: selectedAccountForImport
       });
 
-      console.log('Import result:', result);
-
       setIsImportOpen(false);
       setCsvFile(null);
       setSelectedAccountForImport("");
@@ -222,7 +215,6 @@ export default function TransactionsPage() {
       // Reload the page to refresh all data
       window.location.reload();
     } catch (error) {
-      console.error('Fehler beim Importieren:', error);
       setImportError(error instanceof Error ? error.message : 'Unbekannter Fehler beim Import');
     } finally {
       setIsImporting(false);
@@ -267,7 +259,6 @@ export default function TransactionsPage() {
       transactionDate: new Date(),
     });
     } catch (error) {
-      console.error('Fehler beim Erstellen:', error);
       alert(`Erstellen fehlgeschlagen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   };
@@ -293,7 +284,6 @@ export default function TransactionsPage() {
     setIsEditOpen(false);
     setSelectedTransaction(null);
     } catch (error) {
-      console.error('Fehler beim Aktualisieren:', error);
       alert(`Aktualisieren fehlgeschlagen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   };

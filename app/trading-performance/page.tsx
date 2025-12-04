@@ -80,7 +80,6 @@ export default function TradingPerformancePage() {
       setPerformanceData(data);
     } catch (err: unknown) {
       setError(err.message || 'Failed to load performance data');
-      console.error('Error loading performance:', err);
     } finally {
       setLoading(false);
     }

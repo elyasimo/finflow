@@ -86,8 +86,8 @@ export default function SettingsPage() {
             setEncryptionError(data.reason || 'Encryption is disabled');
           }
         }
-      } catch (error) {
-        console.error('Failed to check encryption status:', error);
+      } catch {
+        // Encryption status check failed silently
       }
     };
     
@@ -138,8 +138,8 @@ export default function SettingsPage() {
           setAlpacaIsPaper(data.keys.is_paper === 'true');
         }
       }
-    } catch (error) {
-      console.error('Failed to load API keys:', error);
+    } catch {
+      // API keys loading failed silently
     }
   };
 
@@ -155,8 +155,8 @@ export default function SettingsPage() {
         const data = await response.json();
         setBinanceKeysConfigured(data.configured || false);
       }
-    } catch (error) {
-      console.error('Failed to check Binance API keys status:', error);
+    } catch {
+      // Binance status check failed silently
     } finally {
       setBinanceStatusLoaded(true);
     }
@@ -170,8 +170,7 @@ export default function SettingsPage() {
         email,
       });
       toast.success(t('profileUpdatedSuccessfully') || 'Profile updated successfully!');
-    } catch (error) {
-      console.error('Profile update error:', error);
+    } catch {
       toast.error(t('failedToUpdateProfile') || 'Failed to update profile');
     }
   };
@@ -196,8 +195,7 @@ export default function SettingsPage() {
         const error = await response.json();
         toast.error(error.message || t('failedToUpdateCurrency') || 'Failed to update currency');
       }
-    } catch (error) {
-      console.error('Currency update error:', error);
+    } catch {
       toast.error(t('failedToUpdateCurrency') || 'Failed to update currency');
     }
   };
@@ -238,8 +236,7 @@ export default function SettingsPage() {
         const error = await response.json();
         toast.error(error.message || t('failedToUpdatePassword') || 'Failed to update password');
       }
-    } catch (error) {
-      console.error('Password update error:', error);
+    } catch {
       toast.error(t('failedToUpdatePassword') || 'Failed to update password');
     }
   };
@@ -277,8 +274,7 @@ export default function SettingsPage() {
       }
 
       toast.success(t('apiKeysSavedSuccessfully') || 'API keys saved successfully!');
-    } catch (error) {
-      console.error('Failed to save API keys:', error);
+    } catch {
       toast.error(t('failedToSaveApiKeys') || 'Failed to save API keys');
     } finally {
       setApiKeysLoading(false);
@@ -315,8 +311,7 @@ export default function SettingsPage() {
       // Clear the fields after saving for security
       setBinanceApiKey('');
       setBinanceApiSecret('');
-    } catch (error) {
-      console.error('Failed to save Binance API keys:', error);
+    } catch {
       toast.error('Failed to save Binance API keys');
     } finally {
       setBinanceApiKeysLoading(false);
@@ -340,8 +335,7 @@ export default function SettingsPage() {
 
       toast.success('Binance API keys deleted successfully!');
       setBinanceKeysConfigured(false);
-    } catch (error) {
-      console.error('Failed to delete Binance API keys:', error);
+    } catch {
       toast.error('Failed to delete Binance API keys');
     } finally {
       setBinanceApiKeysLoading(false);
@@ -431,8 +425,8 @@ export default function SettingsPage() {
             if (response.ok) {
               toast.success('Währung aktualisiert');
             }
-          } catch (error) {
-            console.error('Currency update error:', error);
+          } catch {
+            // Currency update failed silently
           }
         }}
         onEmailNotificationsChange={async (enabled) => {
@@ -480,8 +474,7 @@ export default function SettingsPage() {
               
               setBinanceKeysConfigured(true);
               toast.success('Binance API-Schlüssel gespeichert!');
-            } catch (error) {
-              console.error('Failed to save Binance API keys:', error);
+            } catch {
               throw new Error('Binance API-Schlüssel konnten nicht gespeichert werden');
             } finally {
               setBinanceApiKeysLoading(false);
@@ -513,8 +506,7 @@ export default function SettingsPage() {
               setAlpacaApiKey(keys.alpacaApiKey);
               setAlpacaApiSecret(keys.alpacaSecretKey);
               toast.success('Alpaca API-Schlüssel gespeichert!');
-            } catch (error) {
-              console.error('Failed to save Alpaca API keys:', error);
+            } catch {
               throw new Error('Alpaca API-Schlüssel konnten nicht gespeichert werden');
             } finally {
               setApiKeysLoading(false);

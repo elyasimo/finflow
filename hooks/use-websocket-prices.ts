@@ -27,7 +27,6 @@ export function useWebSocketPrices(enabled: boolean = true) {
         wsRef.current = ws;
 
         ws.onopen = () => {
-          console.log('✅ WebSocket connected');
           setIsConnected(true);
           setError(null);
           
@@ -58,27 +57,23 @@ export function useWebSocketPrices(enabled: boolean = true) {
               setPrices(priceMap);
             }
           } catch (err) {
-            console.error('Error parsing WebSocket message:', err);
+            // Error parsing WebSocket message
           }
         };
 
-        ws.onerror = (event) => {
-          console.error('WebSocket error:', event);
+        ws.onerror = () => {
           setError('WebSocket connection error');
         };
 
         ws.onclose = () => {
-          console.log('WebSocket disconnected');
           setIsConnected(false);
           
           // Attempt to reconnect after 5 seconds
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log('Attempting to reconnect...');
             connect();
           }, 5000);
         };
       } catch (err) {
-        console.error('Error creating WebSocket:', err);
         setError('Failed to create WebSocket connection');
       }
     };

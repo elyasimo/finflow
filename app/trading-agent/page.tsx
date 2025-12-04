@@ -142,8 +142,8 @@ export default function TradingAgentPage() {
       setAgents(agentsRes.agents || []);
       setPortfolio(portfolioRes.portfolio || []);
       setTotalValueEur(portfolioRes.totalValueEur || 0);
-    } catch (error) {
-      console.error('Error loading trading agent data:', error);
+    } catch {
+      // Trading agent data loading failed silently
     } finally {
       setIsLoading(false);
     }
@@ -182,8 +182,7 @@ export default function TradingAgentPage() {
 
       setShowCreateDialog(false);
       loadData();
-    } catch (error) {
-      console.error('Error creating agent:', error);
+    } catch {
       alert(t('errorCreatingAgent') || 'Error creating agent');
     } finally {
       setIsCreating(false);
@@ -194,8 +193,8 @@ export default function TradingAgentPage() {
     try {
       await tradingAgentApi.toggleAgent(agentId, enabled);
       loadData();
-    } catch (error) {
-      console.error('Error toggling agent:', error);
+    } catch {
+      // Toggle failed silently
     }
   };
 
@@ -204,8 +203,8 @@ export default function TradingAgentPage() {
     try {
       await tradingAgentApi.deleteAgent(agentId);
       loadData();
-    } catch (error) {
-      console.error('Error deleting agent:', error);
+    } catch {
+      // Delete failed silently
     }
   };
 
@@ -214,8 +213,8 @@ export default function TradingAgentPage() {
       const res = await tradingAgentApi.getAgentLogs(agentId);
       setSelectedAgentLogs(res.logs || []);
       setShowLogsDialog(true);
-    } catch (error) {
-      console.error('Error loading agent logs:', error);
+    } catch {
+      // Agent logs loading failed silently
     }
   };
 

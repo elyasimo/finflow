@@ -16,7 +16,6 @@ export function useFinancialMarkets() {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch market data'));
-        console.error('Error fetching markets:', err);
       } finally {
         setIsLoading(false);
       }

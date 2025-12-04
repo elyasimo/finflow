@@ -201,8 +201,8 @@ export default function BankingPage() {
       if (accountsRes.length > 0) {
         setSelectedAccount(accountsRes[0].id);
       }
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch {
+      // Data loading failed silently
     } finally {
       setLoading(false);
     }

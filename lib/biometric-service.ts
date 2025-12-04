@@ -60,10 +60,8 @@ class BiometricService {
     try {
       // First check if we're in a native Capacitor environment via window
       const isNative = isCapacitorNative();
-      console.log('[BiometricService] isCapacitorNative check:', isNative);
       
       if (!isNative) {
-        console.log('[BiometricService] Not running in native Capacitor app');
         this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
         return false;
       }
@@ -73,12 +71,9 @@ class BiometricService {
       const Capacitor = win.Capacitor;
       
       if (!Capacitor) {
-        console.log('[BiometricService] Capacitor not found on window');
         this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
         return false;
       }
-
-      console.log('[BiometricService] Loading native plugins...');
       
       // Import modules using standard dynamic import
       const [capacitorCore, biometric, haptics] = await Promise.all([
@@ -95,15 +90,8 @@ class BiometricService {
         ImpactStyle: haptics?.ImpactStyle || null,
       };
 
-      console.log('[BiometricService] Modules loaded:', {
-        hasCapacitor: !!this.modules.Capacitor,
-        hasNativeBiometric: !!this.modules.NativeBiometric,
-        hasHaptics: !!this.modules.Haptics,
-      });
-
       return true;
     } catch (error) {
-      console.warn('[BiometricService] Failed to load modules:', error);
       this.modules = { Capacitor: null, NativeBiometric: null, BiometryType: null, Haptics: null, ImpactStyle: null };
       return false;
     }
@@ -126,10 +114,8 @@ class BiometricService {
    */
   async isAvailable(): Promise<BiometricAvailability> {
     const initSuccess = await this.init();
-    console.log('[BiometricService] isAvailable - init result:', initSuccess);
 
     if (!this.modules?.NativeBiometric) {
-      console.log('[BiometricService] NativeBiometric module not available');
       return {
         available: false,
         biometryType: 'none',
@@ -138,9 +124,7 @@ class BiometricService {
     }
 
     try {
-      console.log('[BiometricService] Calling NativeBiometric.isAvailable()...');
       const result = await this.modules.NativeBiometric.isAvailable();
-      console.log('[BiometricService] NativeBiometric.isAvailable() result:', result);
       
       const BiometryType = this.modules.BiometryType;
 
@@ -153,8 +137,6 @@ class BiometricService {
                  result.biometryType === BiometryType.FINGERPRINT)) {
         biometryType = 'fingerprint';
       }
-
-      console.log('[BiometricService] Detected biometry type:', biometryType, 'available:', result.isAvailable);
       
       return {
         available: result.isAvailable,
@@ -162,7 +144,6 @@ class BiometricService {
         errorMessage: result.errorCode ? `Error: ${result.errorCode}` : undefined,
       };
     } catch (error: any) {
-      console.error('[BiometricService] Error checking availability:', error);
       return {
         available: false,
         biometryType: 'none',
@@ -223,7 +204,6 @@ class BiometricService {
       });
       return true;
     } catch (error) {
-      console.error('Failed to save credentials:', error);
       return false;
     }
   }
@@ -244,7 +224,6 @@ class BiometricService {
         password: credentials.password,
       };
     } catch (error) {
-      console.error('Failed to get credentials:', error);
       return null;
     }
   }
@@ -262,7 +241,6 @@ class BiometricService {
       });
       return true;
     } catch (error) {
-      console.error('Failed to delete credentials:', error);
       return false;
     }
   }

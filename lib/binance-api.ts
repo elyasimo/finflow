@@ -105,9 +105,6 @@ export async function getCombinedCryptoData() {
         const coinGeckoInfo = coinGeckoData.find(
           (coin: CoinGeckoData) => coin.symbol.toLowerCase() === symbol
         );
-        if (!coinGeckoInfo) {
-          console.warn('No CoinGecko match for', symbol, 'Binance:', ticker.symbol);
-        }
         return {
           id: symbol,
           symbol: symbol.toUpperCase(),
@@ -124,7 +121,6 @@ export async function getCombinedCryptoData() {
       .filter(coin => coin.market_cap > 0 && coin.current_price > 0) // Only include coins with market cap and price data
       .sort((a, b) => b.market_cap - a.market_cap); // Sort by market cap
   } catch (error) {
-    console.error('Error in getCombinedCryptoData:', error);
     throw error;
   }
 } 

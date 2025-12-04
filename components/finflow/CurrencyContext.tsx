@@ -74,7 +74,6 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey: ['exchangeRates'] });
       
     } catch (error) {
-      console.error('Currency update error:', error);
       throw error;
     }
   }, [queryClient]);

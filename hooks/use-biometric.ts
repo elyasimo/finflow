@@ -17,19 +17,15 @@ export function useBiometric() {
     let mounted = true;
     
     const checkAvailability = async () => {
-      console.log('🔐 [useBiometric] Starting availability check...');
-      
       // isAvailable() triggers module loading and returns availability
       const result = await biometricService.isAvailable();
       
       if (!mounted) return;
       
-      console.log('🔐 [useBiometric] Availability result:', result);
       setAvailability(result);
       
       // After isAvailable, modules are loaded, so isNativeApp should work
       const nativeStatus = biometricService.isNativeApp();
-      console.log('🔐 [useBiometric] isNative:', nativeStatus);
       setIsNative(nativeStatus);
       setIsInitialized(true);
     };

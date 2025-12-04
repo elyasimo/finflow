@@ -113,8 +113,8 @@ export default function MobilePageHeader({
     try {
       await updateCurrencyInBackend(newCurrency)
       setShowCurrencyMenu(false)
-    } catch (error) {
-      console.error('Failed to update currency:', error)
+    } catch {
+      // Currency update failed silently
     }
   }
 

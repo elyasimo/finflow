@@ -16,7 +16,6 @@ interface RiskMetricsProps {
 }
 
 export function RiskMetrics({ metrics }: RiskMetricsProps) {
-  console.log('RiskMetrics metrics:', metrics);
   if (!metrics) return null;
 
   const formatPercentage = (value: number) => {

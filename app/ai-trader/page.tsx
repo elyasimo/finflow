@@ -146,8 +146,8 @@ export default function AITraderPage() {
             setPerformance(data.performance);
           }
         }
-      } catch (error) {
-        console.error('Error fetching status:', error);
+      } catch {
+        // Status fetch failed silently
       }
     };
 
@@ -161,8 +161,8 @@ export default function AITraderPage() {
       const res = await fetch(`${apiUrl}/ai-trader/trades`);
       const data = await res.json();
       setTrades(data);
-    } catch (error) {
-      console.error('Error fetching trades:', error);
+    } catch {
+      // Trades fetch failed silently
     }
   };
 

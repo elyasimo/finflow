@@ -55,7 +55,6 @@ export default function CategoriesPage() {
       setNewCategoryName('');
       setIsCreateDialogOpen(false);
     } catch (error) {
-      console.error('Error creating category:', error);
       alert(`Failed to create category: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
@@ -71,7 +70,6 @@ export default function CategoriesPage() {
       setEditCategoryName('');
       setIsEditDialogOpen(false);
     } catch (error) {
-      console.error('Error updating category:', error);
       alert(`Failed to update category: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
@@ -80,7 +78,6 @@ export default function CategoriesPage() {
     try {
       await deleteCategory.mutateAsync(id);
     } catch (error) {
-      console.error('Error deleting category:', error);
       alert(`Failed to delete category: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };

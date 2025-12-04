@@ -14,7 +14,6 @@ interface ReturnsChartProps {
 
 export function ReturnsChart({ data }: ReturnsChartProps) {
   const { currency } = useCurrency();
-  console.log('ReturnsChart data:', data);
   return (
     <div className="h-[400px] w-full">
       <ResponsiveContainer width="100%" height="100%">

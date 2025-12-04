@@ -85,8 +85,8 @@ export default function NotificationsPage() {
       setNotifications(notificationsRes.notifications || []);
       setUnreadCount(notificationsRes.unreadCount || 0);
       setPreferences(preferencesRes);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
+    } catch {
+      // Notifications loading failed silently
     } finally {
       setLoading(false);
     }
@@ -99,8 +99,8 @@ export default function NotificationsPage() {
         prev.map(n => (n.id === id ? { ...n, read: true, readAt: new Date().toISOString() } : n))
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+    } catch {
+      // Mark as read failed silently
     }
   };
 
@@ -111,8 +111,8 @@ export default function NotificationsPage() {
         prev.map(n => ({ ...n, read: true, readAt: new Date().toISOString() }))
       );
       setUnreadCount(0);
-    } catch (error) {
-      console.error('Error marking all as read:', error);
+    } catch {
+      // Mark all as read failed silently
     }
   };
 
@@ -122,8 +122,7 @@ export default function NotificationsPage() {
 
     try {
       await notificationsApi.updatePreferences(newPreferences);
-    } catch (error) {
-      console.error('Error updating preferences:', error);
+    } catch {
       setPreferences(preferences);
     }
   };

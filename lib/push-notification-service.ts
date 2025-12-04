@@ -19,12 +19,12 @@ const loadCapacitor = async (): Promise<boolean> => {
       const local = await import('@capacitor/local-notifications');
       LocalNotifications = local.LocalNotifications;
     } catch {
-      console.log('Local notifications not available');
+      // Local notifications not available
     }
     
     return true;
   } catch {
-    console.log('Capacitor not available - push notifications disabled');
+    // Capacitor not available - push notifications disabled
     return false;
   }
 };
@@ -51,7 +51,6 @@ class PushNotificationService {
     this.capacitorLoaded = await loadCapacitor();
     
     if (!this.capacitorLoaded || !Capacitor?.isNativePlatform?.()) {
-      console.log('Not a native platform - push notifications disabled');
       return;
     }
 
@@ -60,7 +59,6 @@ class PushNotificationService {
       const permStatus = await PushNotifications.requestPermissions();
       
       if (permStatus.receive !== 'granted') {
-        console.log('Push notification permission not granted');
         return;
       }
 
@@ -71,9 +69,8 @@ class PushNotificationService {
       this.setupListeners();
       
       this.initialized = true;
-      console.log('Push notifications initialized');
     } catch (error) {
-      console.error('Error initializing push notifications:', error);
+      // Error initializing push notifications
     }
   }
 
@@ -82,7 +79,6 @@ class PushNotificationService {
     
     // On successful registration
     PushNotifications.addListener('registration', async (token: any) => {
-      console.log('Push registration success, token:', token.value);
       this.token = token.value;
       
       // Send token to backend
@@ -103,19 +99,17 @@ class PushNotificationService {
           }),
         });
       } catch (error) {
-        console.error('Error registering push token with backend:', error);
+        // Error registering push token with backend
       }
     });
 
     // On registration error
     PushNotifications.addListener('registrationError', (error: any) => {
-      console.error('Push registration error:', error);
+      // Push registration error
     });
 
     // When a push notification is received
     PushNotifications.addListener('pushNotificationReceived', async (notification: any) => {
-      console.log('Push notification received:', notification);
-      
       // Show local notification if app is in foreground
       if (LocalNotifications && await this.isAppInForeground()) {
         await LocalNotifications.schedule({
@@ -133,8 +127,6 @@ class PushNotificationService {
 
     // When user taps on a push notification
     PushNotifications.addListener('pushNotificationActionPerformed', (action: any) => {
-      console.log('Push notification action performed:', action);
-      
       const data = action.notification?.data;
       
       // Handle navigation based on notification type
@@ -205,16 +197,14 @@ class PushNotificationService {
       }
       
       this.token = null;
-      console.log('Push notifications unregistered');
     } catch (error) {
-      console.error('Error unregistering push notifications:', error);
+      // Error unregistering push notifications
     }
   }
 
   // For web - show browser notification
   async showWebNotification(title: string, body: string, data?: any): Promise<void> {
     if (typeof window === 'undefined' || !('Notification' in window)) {
-      console.log('This browser does not support notifications');
       return;
     }
 

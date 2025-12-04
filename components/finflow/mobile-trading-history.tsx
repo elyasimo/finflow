@@ -93,7 +93,7 @@ export default function MobileTradingHistory({ user }: MobileTradingHistoryProps
       setTotal(data.total || 0)
       setStats(data.stats || null)
     } catch (error) {
-      console.error('Error loading trading history:', error)
+      // Error loading trading history - silently fail
     } finally {
       setIsLoading(false)
     }

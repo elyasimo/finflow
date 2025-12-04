@@ -113,8 +113,7 @@ export default function BudgetsPage() {
             remainingAmount: usage.remainingAmount,
             percentage: usage.percentage,
           };
-        } catch (error) {
-          console.error(`Error loading usage for budget ${budget.id}:`, error);
+        } catch {
           usages[budget.id] = {
             budgetId: budget.id,
             spentAmount: 0,
@@ -149,7 +148,6 @@ export default function BudgetsPage() {
         });
         setIsCreateDialogOpen(false);
       } catch (error) {
-        console.error('Error creating budget:', error);
         alert(`Failed to create budget: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
@@ -175,7 +173,6 @@ export default function BudgetsPage() {
         });
         setIsEditDialogOpen(false);
       } catch (error) {
-        console.error('Error updating budget:', error);
         alert(`Failed to update budget: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
@@ -198,8 +195,8 @@ export default function BudgetsPage() {
       if (response.suggestions && response.suggestions.length > 0) {
         setIsSuggestionsDialogOpen(true);
       }
-    } catch (error) {
-      console.error('Error loading budget suggestions:', error);
+    } catch {
+      // Budget suggestions failed silently
     } finally {
       setLoadingSuggestions(false);
     }

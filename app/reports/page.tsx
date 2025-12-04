@@ -73,8 +73,7 @@ export default function ReportsPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error('Download error:', error);
+    } catch {
       alert('Download fehlgeschlagen');
     } finally {
       setIsDownloading(false);
