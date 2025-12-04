@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { 
   Bell,
   BellOff,
@@ -86,7 +86,7 @@ export default function MobilePriceAlerts({
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
       {/* Header */}
-      <MobileHeader title="Preisalarme" />
+      <MobileHeader title={t('priceAlertsTitle')} />
 
       {/* Content */}
       <div className="px-4 pt-4 pb-28">
@@ -98,7 +98,7 @@ export default function MobilePriceAlerts({
                 <Bell className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-blue-100 text-sm">Aktive Alarme</p>
+                <p className="text-blue-100 text-sm">{t('alertActive')} {t('priceAlertsTitle')}</p>
                 <p className="text-3xl font-bold">{activeAlerts.length}</p>
               </div>
             </div>
@@ -110,17 +110,29 @@ export default function MobilePriceAlerts({
             </button>
           </div>
           <p className="text-blue-100 text-sm">
-            Erhalten Sie Benachrichtigungen, wenn Ihre Zielpreise erreicht werden.
+            {t('createFirstAlert')}
           </p>
         </div>
 
         {/* Create Form Modal */}
         {showCreateForm && (
-          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-[#1a2332] rounded-3xl w-full max-w-md max-h-[85vh] overflow-y-auto p-6 animate-scale-in">
-              <div className="flex items-center justify-between mb-6">
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-40 bg-black/50"
+              onClick={() => setShowCreateForm(false)}
+            />
+            {/* Bottom Sheet */}
+            <div className="fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up safe-area-bottom">
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+              </div>
+              
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pb-4 border-b border-gray-100 dark:border-gray-800">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Neuer Preisalarm
+                  {t('createAlert')}
                 </h2>
                 <button
                   onClick={() => setShowCreateForm(false)}
@@ -130,70 +142,76 @@ export default function MobilePriceAlerts({
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {/* Asset Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                    Asset / Symbol
-                  </label>
-                  <input
-                    type="text"
-                    value={newAlert.asset}
-                    onChange={(e) => setNewAlert({ ...newAlert, asset: e.target.value.toUpperCase() })}
-                    placeholder="z.B. BTCUSDT, AAPL"
-                    className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                </div>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="space-y-4">
+                  {/* Asset Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      {t('selectAsset')}
+                    </label>
+                    <input
+                      type="text"
+                      value={newAlert.asset}
+                      onChange={(e) => setNewAlert({ ...newAlert, asset: e.target.value.toUpperCase() })}
+                      placeholder="z.B. BTCUSDT, AAPL"
+                      className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                  </div>
 
-                {/* Alert Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                    Alarmtyp
-                  </label>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setNewAlert({ ...newAlert, alertType: 'above' })}
-                      className={cn(
-                        "flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium transition-all",
-                        newAlert.alertType === 'above'
-                          ? "bg-emerald-500 text-white"
-                          : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
-                      )}
-                    >
-                      <TrendingUp className="w-5 h-5" />
-                      Über
-                    </button>
-                    <button
-                      onClick={() => setNewAlert({ ...newAlert, alertType: 'below' })}
-                      className={cn(
-                        "flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium transition-all",
-                        newAlert.alertType === 'below'
-                          ? "bg-rose-500 text-white"
-                          : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
-                      )}
-                    >
-                      <TrendingDown className="w-5 h-5" />
-                      Unter
-                    </button>
+                  {/* Alert Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      {t('alertCondition')}
+                    </label>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setNewAlert({ ...newAlert, alertType: 'above' })}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium transition-all",
+                          newAlert.alertType === 'above'
+                            ? "bg-emerald-500 text-white"
+                            : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
+                        )}
+                      >
+                        <TrendingUp className="w-5 h-5" />
+                        {t('abovePrice')}
+                      </button>
+                      <button
+                        onClick={() => setNewAlert({ ...newAlert, alertType: 'below' })}
+                        className={cn(
+                          "flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-medium transition-all",
+                          newAlert.alertType === 'below'
+                            ? "bg-rose-500 text-white"
+                            : "bg-gray-100 dark:bg-[#232e40] text-gray-600 dark:text-gray-400"
+                        )}
+                      >
+                        <TrendingDown className="w-5 h-5" />
+                        {t('belowPrice')}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Target Price */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      {t('targetPrice')}
+                    </label>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      step="any"
+                      value={newAlert.targetPrice}
+                      onChange={(e) => setNewAlert({ ...newAlert, targetPrice: e.target.value })}
+                      placeholder="0.00"
+                      className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
                   </div>
                 </div>
+              </div>
 
-                {/* Target Price */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                    Zielpreis
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={newAlert.targetPrice}
-                    onChange={(e) => setNewAlert({ ...newAlert, targetPrice: e.target.value })}
-                    placeholder="0.00"
-                    className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                </div>
-
-                {/* Create Button */}
+              {/* Fixed Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2332]">
                 <button
                   onClick={handleCreate}
                   disabled={isCreating || !newAlert.asset || !newAlert.targetPrice}
@@ -202,39 +220,39 @@ export default function MobilePriceAlerts({
                   {isCreating ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Erstelle...
+                      {t('loading')}
                     </>
                   ) : (
                     <>
                       <Bell className="w-5 h-5" />
-                      Alarm erstellen
+                      {t('createAlert')}
                     </>
                   )}
                 </button>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Loading State */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">Lade Alarme...</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('loading')}</p>
           </div>
         ) : (
           <>
             {/* Active Alerts */}
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                Aktive Alarme ({activeAlerts.length})
+                {t('alertActive')} {t('priceAlertsTitle')} ({activeAlerts.length})
               </h3>
               
               {activeAlerts.length === 0 ? (
                 <div className="bg-white dark:bg-[#1a2332] rounded-2xl p-8 text-center">
                   <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    Noch keine Alarme. Erstellen Sie einen, um benachrichtigt zu werden!
+                    {t('noAlertsYet')}. {t('createFirstAlert')}!
                   </p>
                 </div>
               ) : (
@@ -263,11 +281,11 @@ export default function MobilePriceAlerts({
                               {alert.asset}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {alert.alertType === 'above' ? 'Über' : 'Unter'} {formatPrice(alert.targetPrice)}
+                              {alert.alertType === 'above' ? t('abovePrice') : t('belowPrice')} {formatPrice(alert.targetPrice)}
                             </p>
                             {alert.currentPrice && (
                               <p className="text-xs text-gray-400">
-                                Aktuell: {formatPrice(alert.currentPrice)}
+                                {t('currentPriceLabel')}: {formatPrice(alert.currentPrice)}
                               </p>
                             )}
                           </div>
@@ -302,7 +320,7 @@ export default function MobilePriceAlerts({
             {triggeredAlerts.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                  Ausgelöste Alarme ({triggeredAlerts.length})
+                  {t('alertTriggered')} ({triggeredAlerts.length})
                 </h3>
                 <div className="space-y-3">
                   {triggeredAlerts.map((alert) => (
@@ -320,7 +338,7 @@ export default function MobilePriceAlerts({
                               {alert.asset}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Ziel: {formatPrice(alert.targetPrice)} • Ausgelöst: {formatPrice(alert.currentPrice)}
+                              {t('targetPrice')}: {formatPrice(alert.targetPrice)} • {t('alertTriggered')}: {formatPrice(alert.currentPrice)}
                             </p>
                             <p className="text-xs text-gray-400">
                               {alert.triggeredAt && formatDate(alert.triggeredAt)}

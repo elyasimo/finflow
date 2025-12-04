@@ -18,7 +18,14 @@ export function Providers({ children }: { children: ReactNode }) {
     const checkNative = async () => {
       try {
         const { Capacitor } = await import('@capacitor/core');
-        setIsNative(Capacitor.isNativePlatform());
+        const native = Capacitor.isNativePlatform();
+        setIsNative(native);
+        
+        // Initialize push notifications for native apps
+        if (native) {
+          const { pushNotificationService } = await import('@/lib/push-notification-service');
+          await pushNotificationService.initialize();
+        }
       } catch {
         setIsNative(false);
       }
