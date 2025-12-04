@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { db } from '../db.js';
 import { pushTokens, notifications, users } from '../db/schema.js';
 import { eq, and, desc, isNull, sql } from 'drizzle-orm';
+import { pushNotificationService } from '../services/push-notification.service.js';
 
 // Register push token
 export const registerPushToken = async (req: Request, res: Response) => {
@@ -229,12 +230,42 @@ export const sendNotification = async (
       .from(pushTokens)
       .where(and(eq(pushTokens.userId, userId), eq(pushTokens.isActive, true)));
 
-    // Here you would integrate with Firebase Cloud Messaging or Apple Push Notification service
-    // For now, we just save the notification to the database
+    // Send push notifications to all user's devices
     if (tokens.length > 0) {
-      console.log(`Would send push notification to ${tokens.length} devices for user ${userId}`);
-      // TODO: Integrate with FCM/APNs
-      // await sendPushNotification(tokens, { title, body, data });
+      console.log(`📱 Sending push notification to ${tokens.length} devices for user ${userId}`);
+      
+      for (const tokenRecord of tokens) {
+        const result = await pushNotificationService.send(
+          tokenRecord.token,
+          {
+            title,
+            body,
+            data: data ? Object.fromEntries(
+              Object.entries(data).map(([k, v]) => [k, String(v)])
+            ) : undefined,
+            sound: 'default',
+          },
+          tokenRecord.platform === 'android' ? 'android' : tokenRecord.platform === 'ios' ? 'ios' : 'auto'
+        );
+
+        if (!result.success) {
+          console.error(`❌ Failed to send push to device: ${result.error}`);
+          
+          // If token is invalid, mark as inactive
+          if (result.error?.includes('NotRegistered') || 
+              result.error?.includes('InvalidRegistration') ||
+              result.error?.includes('Unregistered') ||
+              result.error?.includes('BadDeviceToken')) {
+            await db
+              .update(pushTokens)
+              .set({ isActive: false, updatedAt: new Date() })
+              .where(eq(pushTokens.id, tokenRecord.id));
+            console.log(`📱 Deactivated invalid push token: ${tokenRecord.id}`);
+          }
+        } else {
+          console.log(`✅ Push notification sent: ${result.messageId}`);
+        }
+      }
     }
   } catch (error) {
     console.error('Error sending notification:', error);
