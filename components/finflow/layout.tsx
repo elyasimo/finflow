@@ -44,14 +44,14 @@ export default function Layout({ children, user }: LayoutProps) {
   if (isMobile) {
     return (
       <CurrencyProvider>
-        <div className="h-[100dvh] flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
+        <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
           {/* Scrollable Content Area */}
-          <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain -webkit-overflow-scrolling-touch">
             {children}
           </main>
 
           {/* Fixed Bottom Navigation */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 z-50">
             <MobileBottomNav onMenuClick={() => setIsMobileMenuOpen(true)} />
           </div>
 

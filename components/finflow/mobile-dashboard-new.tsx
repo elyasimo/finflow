@@ -209,9 +209,9 @@ export default function MobileDashboard({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Fixed Header - Separate from content */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#1a2332]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="min-h-full bg-[#f8f9fc] dark:bg-[#0f1419]">
+      {/* Sticky Header - Inside scroll container */}
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#1a2332]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex items-center justify-between px-4 h-14">
           {/* Left: Greeting */}
           <div className="min-w-0 flex-shrink">
@@ -309,9 +309,6 @@ export default function MobileDashboard({
           </div>
         </div>
       </header>
-
-      {/* Spacer for fixed header */}
-      <div style={{ height: 'calc(56px + env(safe-area-inset-top))' }} />
 
       {/* Hero Section - Balance Display */}
       <div className="px-5 py-6 bg-white dark:bg-[#1a2332]">
