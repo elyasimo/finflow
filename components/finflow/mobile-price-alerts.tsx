@@ -87,12 +87,13 @@ export default function MobilePriceAlerts({
   const triggeredAlerts = alerts.filter(a => a.triggeredAt)
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Header */}
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419]">
+      {/* Fixed Header */}
       <MobileHeader title={t('priceAlertsTitle')} />
 
-      {/* Content */}
-      <div className="px-4 pt-4 pb-28">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+        <div className="px-4 pt-4 pb-28">
         {/* Summary Card */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-5 mb-6 text-white shadow-xl shadow-blue-500/25">
           <div className="flex items-center justify-between mb-4">
@@ -379,6 +380,7 @@ export default function MobilePriceAlerts({
             )}
           </>
         )}
+        </div>
       </div>
 
       {/* Floating Action Button */}
@@ -389,7 +391,7 @@ export default function MobilePriceAlerts({
         <Plus className="w-6 h-6 text-white" />
       </button>
 
-      {/* Bottom Navigation */}
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav fixed />
     </div>
   )
