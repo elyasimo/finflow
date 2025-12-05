@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { db } from '../db.js';
-import { recurringTransactions, transactions, budgets, priceAlerts, notifications, pushTokens } from '../db/schema.js';
+import { recurringTransactions, transactions, budgets, priceAlerts, notifications, pushTokens, users, categories } from '../db/schema.js';
 import { eq, and, lte, gte, sql, isNull } from 'drizzle-orm';
 import { sendNotification } from '../controllers/notifications.controller.js';
 
@@ -56,6 +56,19 @@ export const processRecurringTransactions = async (): Promise<{ processed: numbe
           categoryId: recurring.categoryId,
           toAccountId: recurring.toAccountId,
         });
+
+        // Send push notification for auto-posted transaction
+        const amount = (recurring.amountCents / 100).toFixed(2);
+        const typeEmoji = recurring.type === 'income' ? '💰' : '💸';
+        const typeText = recurring.type === 'income' ? 'Einnahme' : 'Ausgabe';
+        
+        await sendNotification(
+          recurring.userId,
+          'recurring_posted',
+          `${typeEmoji} Wiederkehrende ${typeText} gebucht`,
+          `"${recurring.description}" - ${recurring.currency} ${amount} wurde automatisch gebucht.`,
+          { recurringId: recurring.id, amount, type: recurring.type }
+        );
 
         // Calculate next occurrence
         const nextOccurrence = calculateNextOccurrence(
@@ -306,6 +319,158 @@ function calculateNextOccurrence(
 }
 
 /**
+ * Send weekly financial summary report
+ * Should be called on Sundays/Mondays
+ */
+export const sendWeeklyReports = async (): Promise<number> => {
+  console.log('[CRON] Sending weekly reports...');
+
+  let sent = 0;
+
+  try {
+    // Get all users
+    const allUsers = await db.select({ id: users.id }).from(users);
+
+    const today = new Date();
+    const oneWeekAgo = new Date(today);
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    for (const user of allUsers) {
+      try {
+        // Calculate weekly spending
+        const spendingResult = await db.execute(sql`
+          SELECT 
+            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount_cents ELSE 0 END), 0) as expenses,
+            COALESCE(SUM(CASE WHEN type = 'income' THEN amount_cents ELSE 0 END), 0) as income,
+            COUNT(*) as transaction_count
+          FROM transactions
+          WHERE user_id = ${user.id}
+            AND date >= ${oneWeekAgo.toISOString()}
+            AND date <= ${today.toISOString()}
+            AND deleted_at IS NULL
+        `);
+
+        const row = spendingResult.rows?.[0] as any;
+        if (!row) continue;
+
+        const expenses = Number(row.expenses || 0) / 100;
+        const income = Number(row.income || 0) / 100;
+        const transactionCount = Number(row.transaction_count || 0);
+
+        // Only send if there was activity
+        if (transactionCount > 0) {
+          const balance = income - expenses;
+          const balanceEmoji = balance >= 0 ? '📈' : '📉';
+          const balanceText = balance >= 0 ? `+${balance.toFixed(2)}` : balance.toFixed(2);
+
+          await sendNotification(
+            user.id,
+            'weekly_report',
+            '📊 Wochenbericht',
+            `Diese Woche: ${transactionCount} Transaktionen\nEinnahmen: +${income.toFixed(2)} CHF\nAusgaben: -${expenses.toFixed(2)} CHF\n${balanceEmoji} Bilanz: ${balanceText} CHF`,
+            { 
+              income: income.toString(), 
+              expenses: expenses.toString(), 
+              transactionCount: transactionCount.toString(),
+              balance: balance.toString()
+            }
+          );
+          sent++;
+        }
+      } catch (error) {
+        console.error(`[CRON] Error sending weekly report for user ${user.id}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('[CRON] Error in sendWeeklyReports:', error);
+  }
+
+  console.log(`[CRON] Weekly reports sent: ${sent}`);
+  return sent;
+};
+
+/**
+ * Check budget after a new transaction
+ * Called after transaction creation to send real-time warnings
+ */
+export const checkBudgetAfterTransaction = async (
+  userId: string,
+  categoryId: string | null,
+  amountCents: number
+): Promise<void> => {
+  if (!categoryId) return;
+
+  try {
+    // Find budget for this category
+    const [budget] = await db
+      .select()
+      .from(budgets)
+      .where(and(eq(budgets.userId, userId), eq(budgets.categoryId, categoryId)));
+
+    if (!budget) return;
+
+    // Calculate current month spending
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const endOfMonth = new Date(startOfMonth);
+    endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+    const spendingResult = await db.execute(sql`
+      SELECT COALESCE(SUM(amount_cents), 0) as total
+      FROM transactions
+      WHERE user_id = ${userId}
+        AND type = 'expense'
+        AND date >= ${startOfMonth.toISOString()}
+        AND date < ${endOfMonth.toISOString()}
+        AND category_id = ${categoryId}
+        AND deleted_at IS NULL
+    `);
+
+    const spending = Number(spendingResult.rows?.[0]?.total || 0);
+    const percentage = (spending / budget.amountCents) * 100;
+
+    // Get category name
+    const [category] = await db
+      .select({ name: categories.name })
+      .from(categories)
+      .where(eq(categories.id, categoryId));
+    
+    const categoryName = category?.name || budget.name || 'Budget';
+
+    // Send warning at key thresholds (80%, 90%, 100%)
+    if (percentage >= 100) {
+      await sendNotification(
+        userId,
+        'budget_exceeded',
+        '🚨 Budget überschritten!',
+        `Dein Budget für "${categoryName}" wurde überschritten! ${percentage.toFixed(0)}% erreicht.`,
+        { budgetId: budget.id, categoryId, percentage: percentage.toString() }
+      );
+    } else if (percentage >= 90) {
+      await sendNotification(
+        userId,
+        'budget_warning_90',
+        '⚠️ Budget fast aufgebraucht!',
+        `Du hast bereits ${percentage.toFixed(0)}% deines Budgets für "${categoryName}" ausgegeben.`,
+        { budgetId: budget.id, categoryId, percentage: percentage.toString() }
+      );
+    } else if (percentage >= 80) {
+      await sendNotification(
+        userId,
+        'budget_warning_80',
+        '📊 Budget-Warnung',
+        `Du hast ${percentage.toFixed(0)}% deines Budgets für "${categoryName}" erreicht.`,
+        { budgetId: budget.id, categoryId, percentage: percentage.toString() }
+      );
+    }
+  } catch (error) {
+    console.error('[BUDGET] Error checking budget after transaction:', error);
+  }
+};
+
+/**
  * Run all scheduled tasks
  * This should be called by an external cron job
  */
@@ -321,6 +486,12 @@ export const runScheduledTasks = async (): Promise<void> => {
 
     // Check budgets (once per day)
     await checkBudgetWarnings();
+
+    // Send weekly reports on Sunday
+    const today = new Date();
+    if (today.getDay() === 0) { // Sunday
+      await sendWeeklyReports();
+    }
 
     console.log('[CRON] All scheduled tasks completed');
   } catch (error) {

@@ -6,6 +6,7 @@ import { transactions, accounts, categories, users, budgets } from '../db/schema
 import { eq, and, gte, lte, desc } from 'drizzle-orm';
 import type { AuthRequest } from '../middleware/auth.js';
 import { detectCategory, getCategoryIdByName } from '../utils/auto-category-detector.js';
+import { checkBudgetAfterTransaction } from '../services/cron.service.js';
 
 const createTransactionSchema = z.object({
   accountId: z.string().uuid(),
@@ -86,6 +87,14 @@ export class TransactionsController {
           fxRate: data.fxRate.toString(),
         })
         .returning();
+
+      // Check budget and send push notification if threshold exceeded
+      if (data.type === 'expense' && data.categoryId) {
+        // Run async, don't block response
+        checkBudgetAfterTransaction(req.userId!, data.categoryId, data.amountCents).catch(err => {
+          console.error('Error checking budget after transaction:', err);
+        });
+      }
 
       res.status(201).json(transaction);
     } catch (error) {
