@@ -1,4 +1,5 @@
 import https from 'https';
+import http2 from 'http2';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
@@ -345,6 +346,7 @@ class PushNotificationService {
 
   /**
    * Send push notification via APNs (iOS only)
+   * Uses HTTP/2 as required by Apple Push Notification service
    */
   async sendApnsNotification(deviceToken: string, payload: PushNotificationPayload): Promise<SendResult> {
     if (!this.isApnsConfigured()) {
@@ -357,6 +359,10 @@ class PushNotificationService {
       const hostname = this.apnsProduction 
         ? 'api.push.apple.com' 
         : 'api.sandbox.push.apple.com';
+
+      console.log(`📱 APNs: Sending to ${hostname} (production: ${this.apnsProduction})`);
+      console.log(`   Bundle ID: ${this.apnsBundleId}`);
+      console.log(`   Token: ${deviceToken.substring(0, 20)}...`);
 
       const apnsPayload = {
         aps: {
@@ -371,47 +377,63 @@ class PushNotificationService {
         ...payload.data,
       };
 
-      return new Promise((resolve) => {
-        const postData = JSON.stringify(apnsPayload);
+      const postData = JSON.stringify(apnsPayload);
 
-        const req = https.request(
-          {
-            hostname,
-            path: `/3/device/${deviceToken}`,
-            method: 'POST',
-            headers: {
-              'authorization': `bearer ${apnsJwt}`,
-              'apns-topic': this.apnsBundleId,
-              'apns-push-type': 'alert',
-              'apns-priority': '10',
-              'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(postData),
-            },
-          },
-          (res) => {
-            let data = '';
-            res.on('data', (chunk) => (data += chunk));
-            res.on('end', () => {
-              const messageId = res.headers['apns-id'] as string;
-              if (res.statusCode === 200) {
-                console.log(`✅ APNs notification sent: ${messageId}`);
-                resolve({ success: true, messageId });
-              } else {
-                try {
-                  const response = JSON.parse(data);
-                  const errorMsg = response.reason || 'Unknown APNs error';
-                  console.error(`❌ APNs error: ${errorMsg}`);
-                  resolve({ success: false, error: errorMsg });
-                } catch {
-                  resolve({ success: false, error: `APNs error: ${res.statusCode}` });
-                }
-              }
-            });
+      return new Promise((resolve) => {
+        // APNs requires HTTP/2
+        const client = http2.connect(`https://${hostname}`);
+        
+        client.on('error', (err) => {
+          console.error('❌ APNs HTTP/2 connection error:', err.message);
+          resolve({ success: false, error: err.message });
+        });
+
+        const req = client.request({
+          ':method': 'POST',
+          ':path': `/3/device/${deviceToken}`,
+          'authorization': `bearer ${apnsJwt}`,
+          'apns-topic': this.apnsBundleId,
+          'apns-push-type': 'alert',
+          'apns-priority': '10',
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(postData),
+        });
+
+        let data = '';
+        let statusCode = 0;
+        let apnsId = '';
+
+        req.on('response', (headers) => {
+          statusCode = headers[':status'] as number;
+          apnsId = headers['apns-id'] as string || '';
+        });
+
+        req.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        req.on('end', () => {
+          client.close();
+          
+          if (statusCode === 200) {
+            console.log(`✅ APNs notification sent successfully! ID: ${apnsId}`);
+            resolve({ success: true, messageId: apnsId });
+          } else {
+            try {
+              const response = data ? JSON.parse(data) : {};
+              const errorMsg = response.reason || `APNs error: ${statusCode}`;
+              console.error(`❌ APNs error (${statusCode}): ${errorMsg}`);
+              resolve({ success: false, error: errorMsg });
+            } catch {
+              console.error(`❌ APNs error: ${statusCode}`);
+              resolve({ success: false, error: `APNs error: ${statusCode}` });
+            }
           }
-        );
+        });
 
         req.on('error', (e) => {
           console.error('❌ APNs request error:', e.message);
+          client.close();
           resolve({ success: false, error: e.message });
         });
 
