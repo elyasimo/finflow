@@ -25,6 +25,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import { tradingAgentApi } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useKeyboard } from '@/hooks/use-keyboard';
 import MobileHeader from '@/components/finflow/mobile-header';
 import MobileBottomNav from '@/components/finflow/mobile-bottom-nav';
 
@@ -74,6 +75,7 @@ export default function MobileTradingAgentPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const keyboard = useKeyboard();
   const { currency } = useCurrency();
   const { convertAndFormat } = useExchangeRates();
   const [agents, setAgents] = useState<TradingAgent[]>([]);
@@ -457,7 +459,14 @@ export default function MobileTradingAgentPage() {
           />
           
           {/* Sheet */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up"
+            style={{
+              marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+              paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
+              transition: 'margin-bottom 0.25s ease-out'
+            }}
+          >
             {/* Handle */}
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />

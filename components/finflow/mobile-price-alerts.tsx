@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { 
   Bell,
   BellOff,
@@ -18,6 +18,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
 import MobileHeader from "./mobile-header"
 import MobileBottomNav from "./mobile-bottom-nav"
+import { useKeyboard } from "@/hooks/use-keyboard"
 
 interface PriceAlert {
   id: string
@@ -49,6 +50,8 @@ export default function MobilePriceAlerts({
 }: MobilePriceAlertsProps) {
   const { t } = useLanguage()
   const { currency } = useCurrency()
+  const keyboard = useKeyboard()
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newAlert, setNewAlert] = useState({
     asset: '',
@@ -123,7 +126,14 @@ export default function MobilePriceAlerts({
               onClick={() => setShowCreateForm(false)}
             />
             {/* Bottom Sheet */}
-            <div className="fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up safe-area-bottom">
+            <div 
+              className="fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] flex flex-col animate-slide-up"
+              style={{
+                marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+                paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
+                transition: 'margin-bottom 0.25s ease-out'
+              }}
+            >
               {/* Handle */}
               <div className="flex justify-center pt-3 pb-2">
                 <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
@@ -143,7 +153,11 @@ export default function MobilePriceAlerts({
               </div>
 
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div 
+                ref={scrollContainerRef}
+                className="flex-1 overflow-y-auto px-6 py-4"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
                 <div className="space-y-4">
                   {/* Asset Input */}
                   <div>
@@ -154,8 +168,10 @@ export default function MobilePriceAlerts({
                       type="text"
                       value={newAlert.asset}
                       onChange={(e) => setNewAlert({ ...newAlert, asset: e.target.value.toUpperCase() })}
+                      onFocus={() => setTimeout(() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' }), 300)}
                       placeholder="z.B. BTCUSDT, AAPL"
                       className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      style={{ fontSize: '16px' }}
                     />
                   </div>
 
@@ -203,10 +219,14 @@ export default function MobilePriceAlerts({
                       step="any"
                       value={newAlert.targetPrice}
                       onChange={(e) => setNewAlert({ ...newAlert, targetPrice: e.target.value })}
+                      onFocus={() => setTimeout(() => scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' }), 300)}
                       placeholder="0.00"
                       className="w-full px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-[#232e40] text-gray-900 dark:text-white placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                      style={{ fontSize: '16px' }}
                     />
                   </div>
+                  {/* Extra space for keyboard */}
+                  <div className="h-4" />
                 </div>
               </div>
 

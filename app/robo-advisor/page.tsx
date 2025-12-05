@@ -47,6 +47,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import { tradingAgentApi } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useKeyboard } from '@/hooks/use-keyboard';
 import CryptoSelector from '@/components/trading/CryptoSelector';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import MobileHeader from '@/components/finflow/mobile-header';
@@ -98,6 +99,7 @@ interface PortfolioItem {
 function RoboAdvisorPageContent() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const keyboard = useKeyboard();
   const { currency } = useCurrency();
   const { convertAndFormat } = useExchangeRates();
   const router = useRouter();
@@ -549,7 +551,14 @@ function RoboAdvisorPageContent() {
         {showCreateSheet && (
           <div className="fixed inset-0 z-50">
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowCreateSheet(false)} />
-            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto pb-safe">
+            <div 
+              className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto"
+              style={{
+                marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+                paddingBottom: keyboard.height > 0 ? '20px' : 'env(safe-area-inset-bottom)',
+                transition: 'margin-bottom 0.25s ease-out'
+              }}
+            >
               <div className="sticky top-0 bg-white dark:bg-[#1a2332] pt-3 pb-4 px-5 border-b border-gray-100 dark:border-gray-700 z-10">
                 <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4" />
                 <div className="flex items-center justify-between">

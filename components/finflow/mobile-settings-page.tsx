@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { useCurrency } from "./CurrencyContext"
+import { useKeyboard } from "@/hooks/use-keyboard"
 import MobilePageHeader, { MobilePageHeaderSpacer } from "./mobile-page-header"
 import MobileBottomNav from "./mobile-bottom-nav"
 import { useRouter } from "next/navigation"
@@ -233,6 +234,7 @@ export default function MobileSettingsPage({
 }: MobileSettingsPageProps) {
   const { t } = useLanguage()
   const { setCurrency: setAppCurrency } = useCurrency()
+  const keyboard = useKeyboard()
   const router = useRouter()
   
   // UI State
@@ -593,7 +595,14 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowProfileSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up safe-area-inset-bottom flex flex-col">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up flex flex-col"
+            style={{
+              marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+              paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
+              transition: 'margin-bottom 0.25s ease-out'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -716,7 +725,14 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowPasswordSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up safe-area-inset-bottom">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up"
+            style={{
+              marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+              paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
+              transition: 'margin-bottom 0.25s ease-out'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
@@ -1010,7 +1026,14 @@ export default function MobileSettingsPage({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => !isSubmitting && setShowApiKeysSheet(false)}
           />
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up safe-area-inset-bottom flex flex-col">
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] animate-slide-up flex flex-col"
+            style={{
+              marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
+              paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
+              transition: 'margin-bottom 0.25s ease-out'
+            }}
+          >
             <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </div>
