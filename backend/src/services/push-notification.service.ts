@@ -444,34 +444,32 @@ class PushNotificationService {
     // FCM tokens are longer and contain colons/underscores
     // APNs tokens are 64 hex characters
     const isApnsToken = /^[a-f0-9]{64}$/i.test(deviceToken);
+    
+    console.log(`📱 Sending push notification - Token type: ${isApnsToken ? 'APNs' : 'FCM'}, Platform: ${platform}`);
+    console.log(`   APNs configured: ${this.isApnsConfigured()}, FCM configured: ${this.isFcmConfigured()}`);
 
     if (platform === 'android') {
       return this.sendFcmNotification(deviceToken, payload);
     }
 
-    if (platform === 'ios') {
-      // Prefer FCM for iOS as it's easier to manage
-      if (this.isFcmConfigured()) {
-        return this.sendFcmNotification(deviceToken, payload);
-      }
-      // Fall back to APNs if FCM is not configured
-      if (this.isApnsConfigured() && isApnsToken) {
-        return this.sendApnsNotification(deviceToken, payload);
-      }
-    }
-
-    // Auto-detect platform
-    if (isApnsToken && this.isApnsConfigured() && !this.isFcmConfigured()) {
+    // If it's an APNs token and APNs is configured, use APNs directly
+    if (isApnsToken && this.isApnsConfigured()) {
+      console.log(`📱 Using APNs for iOS device token`);
       return this.sendApnsNotification(deviceToken, payload);
     }
 
-    // Default to FCM (works for both platforms when app uses FCM SDK)
-    if (this.isFcmConfigured()) {
+    // If platform is iOS and we have FCM configured, try FCM (for apps using FCM SDK)
+    if (platform === 'ios' && this.isFcmConfigured() && !isApnsToken) {
       return this.sendFcmNotification(deviceToken, payload);
     }
 
-    console.warn('⚠️ No push notification service configured');
-    return { success: false, error: 'No push notification service configured' };
+    // Default to FCM for non-APNs tokens
+    if (this.isFcmConfigured() && !isApnsToken) {
+      return this.sendFcmNotification(deviceToken, payload);
+    }
+
+    console.warn('⚠️ No suitable push notification service for this token');
+    return { success: false, error: 'No suitable push notification service configured for this token type' };
   }
 
   /**
