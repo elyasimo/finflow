@@ -62,14 +62,13 @@ class PushNotificationService {
     // Trim whitespace
     let parsed = key.trim();
     
-    // First, replace literal \n (as \\n in string) with actual newlines
-    parsed = parsed.replace(/\\n/g, '\n');
+    // Debug: show raw input
+    console.log(`   Raw key length: ${parsed.length}, first 100 chars: ${parsed.substring(0, 100)}`);
     
-    // If the key still doesn't look right (no actual newlines), try again
-    // This handles cases where the env var was double-escaped
-    if (!parsed.includes('\n') && parsed.includes('\\n')) {
-      parsed = parsed.replace(/\\n/g, '\n');
-    }
+    // Replace literal backslash-n sequences with actual newlines
+    // This handles both \\n (from JSON) and \n (literal in env var)
+    // Use a regex that matches a backslash followed by 'n'
+    parsed = parsed.split('\\n').join('\n');
     
     // Remove any carriage returns
     parsed = parsed.replace(/\r/g, '');
@@ -96,6 +95,7 @@ class PushNotificationService {
     // Debug: show first and last line
     if (lines.length > 0) {
       console.log(`   First line: ${lines[0]}`);
+      console.log(`   Second line: ${lines[1] ? lines[1].substring(0, 40) + '...' : 'N/A'}`);
       console.log(`   Last line: ${lines[lines.length - 1]}`);
     }
     
