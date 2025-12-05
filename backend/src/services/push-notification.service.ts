@@ -67,11 +67,14 @@ class PushNotificationService {
     
     // Replace literal backslash-n sequences with actual newlines
     // This handles both \\n (from JSON) and \n (literal in env var)
-    // Use a regex that matches a backslash followed by 'n'
     parsed = parsed.split('\\n').join('\n');
     
     // Remove any carriage returns
     parsed = parsed.replace(/\r/g, '');
+    
+    // Remove trailing backslashes from lines (sometimes added by copy/paste)
+    parsed = parsed.replace(/\\\n/g, '\n');
+    parsed = parsed.replace(/\\$/gm, '');
     
     // Fix malformed PEM: add newline after BEGIN marker if missing
     // e.g., "-----BEGIN PRIVATE KEY-----MII..." -> "-----BEGIN PRIVATE KEY-----\nMII..."
@@ -81,8 +84,8 @@ class PushNotificationService {
     // e.g., "...abc=-----END PRIVATE KEY-----" -> "...abc=\n-----END PRIVATE KEY-----"
     parsed = parsed.replace(/([A-Za-z0-9+/=])(-----END [A-Z ]+-----)/g, '$1\n$2');
     
-    // Ensure proper PEM format - trim each line
-    const lines = parsed.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    // Ensure proper PEM format - trim each line and remove trailing backslashes
+    const lines = parsed.split('\n').map(line => line.trim().replace(/\\$/, '')).filter(line => line.length > 0);
     parsed = lines.join('\n');
     
     // Log key format for debugging
