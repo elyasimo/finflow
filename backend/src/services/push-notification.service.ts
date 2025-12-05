@@ -145,6 +145,14 @@ class PushNotificationService {
       return this.fcmAccessToken;
     }
 
+    // Debug: Check private key format
+    console.log('🔑 FCM Private Key Debug:');
+    console.log('   Length:', this.fcmPrivateKey.length);
+    console.log('   Starts with BEGIN:', this.fcmPrivateKey.startsWith('-----BEGIN'));
+    console.log('   Contains PRIVATE KEY:', this.fcmPrivateKey.includes('PRIVATE KEY'));
+    console.log('   First 50 chars:', this.fcmPrivateKey.substring(0, 50));
+    console.log('   Last 50 chars:', this.fcmPrivateKey.substring(this.fcmPrivateKey.length - 50));
+
     const now = Math.floor(Date.now() / 1000);
     const payload = {
       iss: this.fcmClientEmail,
@@ -157,7 +165,8 @@ class PushNotificationService {
     const signedJwt = jwt.sign(payload, this.fcmPrivateKey, {
       algorithm: 'RS256',
     });
-
+    console.log('✅ JWT signed successfully');
+    
     // Exchange JWT for access token
     return new Promise((resolve, reject) => {
       const postData = `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${signedJwt}`;
