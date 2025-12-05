@@ -54,6 +54,7 @@ class PushNotificationService {
   /**
    * Parse private key handling multiple escape levels from environment variables
    * Handles: "\\n" -> "\n" -> actual newlines
+   * Also handles keys without newlines after BEGIN/before END markers
    */
   private parsePrivateKey(key: string): string {
     if (!key) return '';
@@ -72,6 +73,14 @@ class PushNotificationService {
     
     // Remove any carriage returns
     parsed = parsed.replace(/\r/g, '');
+    
+    // Fix malformed PEM: add newline after BEGIN marker if missing
+    // e.g., "-----BEGIN PRIVATE KEY-----MII..." -> "-----BEGIN PRIVATE KEY-----\nMII..."
+    parsed = parsed.replace(/(-----BEGIN [A-Z ]+-----)([A-Za-z0-9+/=])/g, '$1\n$2');
+    
+    // Fix malformed PEM: add newline before END marker if missing
+    // e.g., "...abc=-----END PRIVATE KEY-----" -> "...abc=\n-----END PRIVATE KEY-----"
+    parsed = parsed.replace(/([A-Za-z0-9+/=])(-----END [A-Z ]+-----)/g, '$1\n$2');
     
     // Ensure proper PEM format - trim each line
     const lines = parsed.split('\n').map(line => line.trim()).filter(line => line.length > 0);
