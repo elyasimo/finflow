@@ -58,8 +58,11 @@ class PushNotificationService {
   private parsePrivateKey(key: string): string {
     if (!key) return '';
     
+    // Trim whitespace
+    let parsed = key.trim();
+    
     // First, replace literal \n (as \\n in string) with actual newlines
-    let parsed = key.replace(/\\n/g, '\n');
+    parsed = parsed.replace(/\\n/g, '\n');
     
     // If the key still doesn't look right (no actual newlines), try again
     // This handles cases where the env var was double-escaped
@@ -67,10 +70,25 @@ class PushNotificationService {
       parsed = parsed.replace(/\\n/g, '\n');
     }
     
-    // Log key format for debugging (only first/last few chars)
+    // Remove any carriage returns
+    parsed = parsed.replace(/\r/g, '');
+    
+    // Ensure proper PEM format - trim each line
+    const lines = parsed.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    parsed = lines.join('\n');
+    
+    // Log key format for debugging
     const hasNewlines = parsed.includes('\n');
     const startsCorrectly = parsed.startsWith('-----BEGIN');
-    console.log(`   Private key parsing: hasNewlines=${hasNewlines}, startsCorrectly=${startsCorrectly}, length=${parsed.length}`);
+    const endsCorrectly = parsed.endsWith('-----');
+    const lineCount = lines.length;
+    console.log(`   Private key parsing: hasNewlines=${hasNewlines}, startsCorrectly=${startsCorrectly}, endsCorrectly=${endsCorrectly}, lines=${lineCount}, length=${parsed.length}`);
+    
+    // Debug: show first and last line
+    if (lines.length > 0) {
+      console.log(`   First line: ${lines[0]}`);
+      console.log(`   Last line: ${lines[lines.length - 1]}`);
+    }
     
     return parsed;
   }
