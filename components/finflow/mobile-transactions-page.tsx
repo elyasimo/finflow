@@ -670,7 +670,7 @@ export default function MobileTransactionsPage({
   )
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1623] pb-24">
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1623]">
       {/* Fixed Header */}
       <MobilePageHeader 
         user={user} 
@@ -681,8 +681,10 @@ export default function MobileTransactionsPage({
       />
       <MobilePageHeaderSpacer />
 
-      {/* Type Tabs - Split Income/Expense */}
-      <div className="bg-white dark:bg-[#1a2332] px-5 pt-3">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-20">
+        {/* Type Tabs - Split Income/Expense */}
+        <div className="bg-white dark:bg-[#1a2332] px-5 pt-3">
         <div className="flex gap-1 p-1 bg-gray-100 dark:bg-[#232e40] rounded-2xl">
           {TYPE_TABS.map((tab) => (
             <button
@@ -1090,7 +1092,9 @@ export default function MobileTransactionsPage({
           </div>
         </div>
       )}
+      </div>
 
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav fixed />
     </div>
   )

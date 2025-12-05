@@ -504,15 +504,17 @@ export default function MobileBudgetsPage({
   )
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419]">
       <MobilePageHeader 
         user={user} 
         title={t('budgets')}
       />
       <MobilePageHeaderSpacer />
 
-      {/* Summary Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 mx-5 mt-4 rounded-3xl p-5 text-white shadow-xl">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-20">
+        {/* Summary Card */}
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 mx-5 mt-4 rounded-3xl p-5 text-white shadow-xl">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-blue-100 text-sm mb-1">{t('totalBudget')}</p>
@@ -847,7 +849,9 @@ export default function MobileBudgetsPage({
           </div>
         </div>
       )}
+      </div>
 
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav fixed />
     </div>
   )

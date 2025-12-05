@@ -157,9 +157,11 @@ export default function MobileDashboard({
     : 0
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
-      {/* Elegant Header */}
-      <div className="px-5 pt-14 pb-6 bg-white dark:bg-[#1a2332]">
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419]">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-20">
+        {/* Elegant Header */}
+        <div className="px-5 pt-14 pb-6 bg-white dark:bg-[#1a2332]">
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-0.5">Guten Tag</p>
@@ -476,8 +478,9 @@ export default function MobileDashboard({
         {/* Bottom Spacing for Nav */}
         <div className="h-24" />
       </div>
+      </div>
 
-      {/* Bottom Navigation */}
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav fixed />
     </div>
   )

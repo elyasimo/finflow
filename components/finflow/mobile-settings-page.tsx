@@ -436,15 +436,18 @@ export default function MobileSettingsPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419]">
+      {/* Fixed Header */}
       <MobilePageHeader 
         user={user as any} 
         title={t('settings')}
       />
       <MobilePageHeaderSpacer />
 
-      {/* User Card */}
-      <div className="px-5 pt-4">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pb-20">
+        {/* User Card */}
+        <div className="px-5 pt-4">
         <div 
           className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-5 text-white shadow-xl cursor-pointer"
           onClick={() => setShowProfileSheet(true)}
@@ -1284,7 +1287,9 @@ export default function MobileSettingsPage({
           </div>
         </div>
       )}
+      </div>
 
+      {/* Fixed Bottom Navigation */}
       <MobileBottomNav fixed />
     </div>
   )
