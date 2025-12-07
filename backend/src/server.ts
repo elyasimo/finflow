@@ -6,6 +6,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { AuthController } from './controllers/auth.controller.js';
 import { AccountsController } from './controllers/accounts.controller.js';
 import { TransactionsController } from './controllers/transactions.controller.js';
@@ -77,6 +78,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(cookieParser()); // Parse cookies for refresh tokens
 
 // Rate limiting - general
 const limiter = rateLimit({
@@ -137,6 +139,8 @@ app.get('/health', async (req, res) => {
 // Auth routes (public)
 app.post('/auth/register', (req, res) => authController.register(req, res));
 app.post('/auth/login', (req, res) => authController.login(req, res));
+app.post('/auth/refresh', (req, res) => authController.refreshToken(req, res));
+app.post('/auth/logout', (req, res) => authController.logout(req, res));
 
 // OTP routes (public - for registration verification)
 app.post('/auth/otp/send', (req, res) => otpController.sendOtp(req, res));
@@ -148,6 +152,7 @@ app.get('/auth/me', authMiddleware, (req, res) => authController.getMe(req, res)
 app.put('/auth/preferences', authMiddleware, (req, res) => authController.updatePreferences(req, res));
 app.put('/auth/change-password', authMiddleware, (req, res) => authController.changePassword(req, res));
 app.post('/auth/seed-categories', authMiddleware, (req, res) => authController.seedDefaultCategories(req, res));
+app.post('/auth/logout-all', authMiddleware, (req, res) => authController.logoutAll(req, res));
 
 // Accounts routes
 app.get('/accounts', authMiddleware, (req, res) => accountsController.list(req, res));

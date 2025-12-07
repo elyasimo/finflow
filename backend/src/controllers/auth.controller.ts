@@ -2,10 +2,11 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { db } from '../db.js';
-import { users, categories } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { users, categories, refreshTokens } from '../db/schema.js';
+import { eq, and, gt } from 'drizzle-orm';
 import type { AuthRequest } from '../middleware/auth.js';
 
 // Default categories to create for new users
@@ -96,22 +97,43 @@ export class AuthController {
         // Don't fail registration if categories fail
       }
 
-      // Generate JWT
+      // Generate JWT (short-lived access token)
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         console.error('CRITICAL: JWT_SECRET environment variable is not set!');
         res.status(500).json({ error: 'Server configuration error' });
         return;
       }
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: newUser.id },
         jwtSecret,
-        { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
+        { expiresIn: '15m' }, // Short-lived access token
       );
+
+      // Generate refresh token
+      const refreshToken = crypto.randomBytes(64).toString('hex');
+      const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      
+      await db.insert(refreshTokens).values({
+        userId: newUser.id,
+        token: refreshToken,
+        expiresAt: refreshTokenExpiry,
+        userAgent: req.headers['user-agent'] || null,
+        ipAddress: req.ip || null,
+      });
+
+      // Set refresh token as HttpOnly cookie
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/auth',
+      });
 
       res.status(201).json({
         user: newUser,
-        accessToken: token,
+        accessToken,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -156,18 +178,39 @@ export class AuthController {
         .set({ lastLoginAt: new Date() })
         .where(eq(users.id, user.id));
 
-      // Generate JWT with role
+      // Generate JWT with role (short-lived access token)
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         console.error('CRITICAL: JWT_SECRET environment variable is not set!');
         res.status(500).json({ error: 'Server configuration error' });
         return;
       }
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: user.id, role: user.role || 'user' },
         jwtSecret,
-        { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
+        { expiresIn: '15m' }, // Short-lived access token
       );
+
+      // Generate refresh token
+      const refreshToken = crypto.randomBytes(64).toString('hex');
+      const refreshTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      
+      await db.insert(refreshTokens).values({
+        userId: user.id,
+        token: refreshToken,
+        expiresAt: refreshTokenExpiry,
+        userAgent: req.headers['user-agent'] || null,
+        ipAddress: req.ip || null,
+      });
+
+      // Set refresh token as HttpOnly cookie
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/auth',
+      });
 
       res.json({
         user: {
@@ -177,7 +220,7 @@ export class AuthController {
           role: user.role || 'user',
           createdAt: user.createdAt,
         },
-        accessToken: token,
+        accessToken,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -185,6 +228,115 @@ export class AuthController {
         return;
       }
       console.error('Login error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  /**
+   * Refresh access token using refresh token from HttpOnly cookie
+   */
+  async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      
+      if (!refreshToken) {
+        res.status(401).json({ error: 'No refresh token provided' });
+        return;
+      }
+
+      // Find valid refresh token
+      const tokenRecord = await db.query.refreshTokens.findFirst({
+        where: and(
+          eq(refreshTokens.token, refreshToken),
+          eq(refreshTokens.isRevoked, false),
+          gt(refreshTokens.expiresAt, new Date())
+        ),
+      });
+
+      if (!tokenRecord) {
+        res.status(401).json({ error: 'Invalid or expired refresh token' });
+        return;
+      }
+
+      // Get user
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, tokenRecord.userId),
+      });
+
+      if (!user || !user.isActive) {
+        res.status(401).json({ error: 'User not found or inactive' });
+        return;
+      }
+
+      // Generate new access token
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        res.status(500).json({ error: 'Server configuration error' });
+        return;
+      }
+
+      const accessToken = jwt.sign(
+        { userId: user.id, role: user.role || 'user' },
+        jwtSecret,
+        { expiresIn: '15m' },
+      );
+
+      res.json({ accessToken });
+    } catch (error) {
+      console.error('Refresh token error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  /**
+   * Logout - revoke refresh token
+   */
+  async logout(req: Request, res: Response): Promise<void> {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      
+      if (refreshToken) {
+        // Revoke the refresh token
+        await db.update(refreshTokens)
+          .set({ isRevoked: true })
+          .where(eq(refreshTokens.token, refreshToken));
+      }
+
+      // Clear the cookie
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/auth',
+      });
+
+      res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
+  /**
+   * Logout from all devices - revoke all refresh tokens
+   */
+  async logoutAll(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      await db.update(refreshTokens)
+        .set({ isRevoked: true })
+        .where(eq(refreshTokens.userId, req.userId!));
+
+      // Clear the cookie
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/auth',
+      });
+
+      res.json({ message: 'Logged out from all devices' });
+    } catch (error) {
+      console.error('Logout all error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   }
