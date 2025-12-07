@@ -194,18 +194,25 @@ export default function MobileStockTradingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17]">
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] pb-24">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
       <MobileHeader user={user} showLogo={false} title={t('stockTradingAgent')} />
 
-      {/* Portfolio Summary Card */}
-      <div className="px-4 py-4">
+      {/* Scrollable Content */}
+      <main 
+        className="flex-1 overflow-y-auto overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {/* Portfolio Summary Card */}
+        <div className="px-4 py-4">
         <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-4 text-white">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -572,6 +579,10 @@ export default function MobileStockTradingPage() {
           </div>
         </>
       )}
+
+      {/* Bottom padding for nav */}
+      <div className="h-24" />
+      </main>
 
       <MobileBottomNav fixed />
     </div>

@@ -82,10 +82,10 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const currentLanguage = languageOptions.find(l => l.code === language)
 
   return (
-    <header className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] w-full max-w-full overflow-x-hidden">
-      <div className="flex items-center justify-between px-3 h-14 max-w-full">
+    <header className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] w-full" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
+      <div className="flex items-center justify-between px-3 h-14 w-full" style={{ maxWidth: '100%' }}>
         {/* Left: Back/Home Icon + Title */}
-        <div className="flex items-center gap-2 flex-shrink min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1 max-w-[40%]">
           {canGoBack ? (
             <button 
               onClick={() => router.back()}
@@ -105,7 +105,7 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
             <FinflowLogo size="sm" variant="icon" />
           )}
           {(title || canGoBack) && (
-            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[100px]">
+            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
               {title || t('dashboard')}
             </h1>
           )}
