@@ -57,6 +57,13 @@
       "when": 1764376720187,
       "tag": "0007_green_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1765148548203,
+      "tag": "0008_early_paibok",
+      "breakpoints": true
     }
   ]
 }
