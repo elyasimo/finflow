@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, bigint, boolean, jsonb, integer, numeric } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, bigint, boolean, jsonb, integer, numeric, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Users table
@@ -40,7 +40,9 @@ export const categories = pgTable('categories', {
   icon: text('icon'),
   color: text('color'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index('categories_user_id_idx').on(table.userId),
+}));
 
 // Transactions table
 export const transactions = pgTable('transactions', {
@@ -64,7 +66,13 @@ export const transactions = pgTable('transactions', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
-});
+}, (table) => ({
+  userIdIdx: index('transactions_user_id_idx').on(table.userId),
+  accountIdIdx: index('transactions_account_id_idx').on(table.accountId),
+  dateIdx: index('transactions_date_idx').on(table.date),
+  categoryIdIdx: index('transactions_category_id_idx').on(table.categoryId),
+  typeIdx: index('transactions_type_idx').on(table.type),
+}));
 
 // Budgets table
 export const budgets = pgTable('budgets', {
@@ -81,7 +89,10 @@ export const budgets = pgTable('budgets', {
   rollover: boolean('rollover').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index('budgets_user_id_idx').on(table.userId),
+  categoryIdIdx: index('budgets_category_id_idx').on(table.categoryId),
+}));
 
 // Holdings table (investments)
 export const holdings = pgTable('holdings', {
@@ -94,7 +105,10 @@ export const holdings = pgTable('holdings', {
   currency: text('currency').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index('holdings_user_id_idx').on(table.userId),
+  symbolIdx: index('holdings_symbol_idx').on(table.symbol),
+}));
 
 // Prices table (cached price data)
 export const prices = pgTable('prices', {
@@ -105,7 +119,9 @@ export const prices = pgTable('prices', {
   source: text('source').notNull(), // yahoo, alphavantage
   asOf: timestamp('as_of', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  symbolCurrencyIdx: index('prices_symbol_currency_idx').on(table.symbol, table.currency),
+}));
 
 // Rules table (auto-categorization)
 export const rules = pgTable('rules', {
