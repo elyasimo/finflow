@@ -161,24 +161,26 @@ export default function MobileTradingAgent({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+      <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419] overflow-hidden">
         <MobileHeader title="Trading Agent" />
-        <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="flex-1 flex flex-col items-center justify-center">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
           <p className="text-gray-500 dark:text-gray-400">Lade Trading Agents...</p>
         </div>
-        <MobileBottomNav fixed />
+        <div className="flex-shrink-0">
+          <MobileBottomNav />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#0f1419]">
+    <div className="fixed inset-0 flex flex-col bg-[#f8f9fc] dark:bg-[#0f1419] overflow-hidden">
       {/* Header */}
       <MobileHeader title="Trading Agent" />
 
-      {/* Content */}
-      <div className="px-4 pt-4 pb-28">
+      {/* Scrollable Content */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain -webkit-overflow-scrolling-touch px-4 pt-4 pb-4">
         {/* Warning Banner */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 mb-4">
           <div className="flex items-start gap-3">
@@ -617,18 +619,22 @@ export default function MobileTradingAgent({
             </div>
           </div>
         )}
-      </div>
 
-      {/* Floating Action Button */}
-      <button
-        onClick={() => setShowCreateForm(true)}
-        className="fixed bottom-28 right-6 w-14 h-14 bg-purple-500 rounded-full shadow-2xl shadow-purple-500/40 flex items-center justify-center z-20 active:scale-95 transition-transform"
-      >
-        <Plus className="w-6 h-6 text-white" />
-      </button>
+        {/* Floating Action Button - inside scrollable area */}
+        <div className="fixed bottom-28 right-6 z-20">
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="w-14 h-14 bg-purple-500 rounded-full shadow-2xl shadow-purple-500/40 flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <Plus className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      </main>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav fixed />
+      <div className="flex-shrink-0">
+        <MobileBottomNav />
+      </div>
     </div>
   )
 }

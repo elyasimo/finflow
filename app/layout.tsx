@@ -18,6 +18,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://finflowapp.ch'),
   title: "FinFlow - Smart Finance Manager",
   description: "Manage your finances, track investments, and monitor crypto portfolios with AI-powered insights",
   manifest: '/manifest.json',

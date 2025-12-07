@@ -14,13 +14,9 @@ export function useAccounts() {
     queryFn: accountsApi.getAll,
   });
 
-  // Get account by ID
-  const getAccount = (id: string) => {
-    return useQuery({
-      queryKey: ['accounts', id],
-      queryFn: () => accountsApi.getById(id),
-      enabled: !!id, // Only run if id is provided
-    });
+  // Helper to find account by ID from cached data
+  const getAccountById = (id: string): Account | undefined => {
+    return (accountsQuery.data as Account[] | undefined)?.find(acc => acc.id === id);
   };
 
   // Create account mutation
@@ -58,7 +54,7 @@ export function useAccounts() {
     accounts: accountsQuery.data as Account[] | undefined,
     isLoading: accountsQuery.isLoading,
     error: accountsQuery.error,
-    getAccount,
+    getAccountById,
     
     // Mutations
     createAccount: createAccountMutation.mutate,

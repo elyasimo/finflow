@@ -123,7 +123,7 @@ export default function MobileRoboAdvisor() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="fixed inset-0 flex flex-col bg-black overflow-hidden">
       {/* Intro Screen */}
       <AnimatePresence mode="wait">
         {step === 'intro' && (
@@ -131,10 +131,10 @@ export default function MobileRoboAdvisor() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="min-h-screen flex flex-col"
+            className="fixed inset-0 flex flex-col overflow-y-auto overflow-x-hidden overscroll-contain"
           >
             {/* Close Button */}
-            <header className="pt-[env(safe-area-inset-top)]">
+            <header className="flex-shrink-0 pt-[env(safe-area-inset-top)]">
               <button 
                 onClick={() => router.back()}
                 className="p-4"
@@ -241,9 +241,9 @@ export default function MobileRoboAdvisor() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            className="min-h-screen flex flex-col"
+            className="fixed inset-0 flex flex-col overflow-y-auto overflow-x-hidden overscroll-contain"
           >
-            <header className="pt-[env(safe-area-inset-top)]">
+            <header className="flex-shrink-0 pt-[env(safe-area-inset-top)]">
               <button 
                 onClick={() => setStep('intro')}
                 className="p-4"
@@ -321,9 +321,9 @@ export default function MobileRoboAdvisor() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            className="min-h-screen flex flex-col"
+            className="fixed inset-0 flex flex-col overflow-y-auto overflow-x-hidden overscroll-contain"
           >
-            <header className="pt-[env(safe-area-inset-top)]">
+            <header className="flex-shrink-0 pt-[env(safe-area-inset-top)]">
               <button 
                 onClick={() => setStep('profile')}
                 className="p-4"
@@ -432,7 +432,7 @@ export default function MobileRoboAdvisor() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="min-h-screen flex flex-col items-center justify-center p-6"
+            className="fixed inset-0 flex flex-col items-center justify-center p-6 overflow-hidden"
           >
             <motion.div
               initial={{ scale: 0 }}

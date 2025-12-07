@@ -227,9 +227,9 @@ export default function MobileCrypto({
   }
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]">
+    <div className="fixed inset-0 flex flex-col bg-background dark:bg-[#0f1623] overflow-hidden">
       {/* Fixed Header */}
-      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]">
+      <header className="flex-shrink-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-4 h-14">
           {/* Portfolio Button */}
           <Link 
@@ -297,7 +297,7 @@ export default function MobileCrypto({
       </header>
 
       {/* Scrollable Content */}
-      <main className="flex-1 overflow-y-auto overscroll-contain pb-24">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain -webkit-overflow-scrolling-touch">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
@@ -555,7 +555,9 @@ export default function MobileCrypto({
       </main>
 
       {/* Fixed Bottom Navigation */}
-      <MobileBottomNav fixed />
+      <div className="flex-shrink-0">
+        <MobileBottomNav />
+      </div>
     </div>
   )
 }

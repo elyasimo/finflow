@@ -82,21 +82,21 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const currentLanguage = languageOptions.find(l => l.code === language)
 
   return (
-    <header className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)]">
-      <div className="flex items-center justify-between px-3 h-14">
+    <header className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] w-full max-w-full overflow-x-hidden">
+      <div className="flex items-center justify-between px-3 h-14 max-w-full">
         {/* Left: Back/Home Icon + Title */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink min-w-0">
           {canGoBack ? (
             <button 
               onClick={() => router.back()}
-              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
+              className="w-9 h-9 flex-shrink-0 rounded-full bg-gray-100 dark:bg-[#1a2332] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-[#232e40] transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
           ) : (
             <Link 
               href="/dashboard" 
-              className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+              className="w-9 h-9 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
             >
               <Home className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </Link>
@@ -105,14 +105,14 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
             <FinflowLogo size="sm" variant="icon" />
           )}
           {(title || canGoBack) && (
-            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[120px]">
+            <h1 className="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-[100px]">
               {title || t('dashboard')}
             </h1>
           )}
         </div>
 
         {/* Right: Compact Actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {/* Language Icon with Dropdown */}
           <div ref={langRef} className="relative">
             <button

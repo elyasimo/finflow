@@ -280,15 +280,17 @@ function RoboAdvisorPageContent() {
   if (showSelectionModal) {
     return (
       <>
-        <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] flex items-center justify-center">
-          <div className="text-center">
-            <Bot className="w-16 h-16 mx-auto text-blue-500 mb-4" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('roboAdvisor') || 'Robo-Advisor'}
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              {t('selectAgentType') || 'Wähle einen Agent-Typ'}
-            </p>
+        <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <Bot className="w-16 h-16 mx-auto text-blue-500 mb-4" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                {t('roboAdvisor') || 'Robo-Advisor'}
+              </h1>
+              <p className="text-gray-500 dark:text-gray-400">
+                {t('selectAgentType') || 'Wähle einen Agent-Typ'}
+              </p>
+            </div>
           </div>
         </div>
         <RoboAdvisorSelectionModal
@@ -312,8 +314,10 @@ function RoboAdvisorPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
       </div>
     );
   }
@@ -321,9 +325,11 @@ function RoboAdvisorPageContent() {
   // Mobile version
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] pb-24">
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
         <MobileHeader user={user} showLogo={false} title={t('roboAdvisor') || 'Robo-Advisor'} />
 
+        {/* Scrollable Content Area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
         {/* Header Card with Agent Type Selector */}
         <div className="px-4 py-4">
           <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-white">
@@ -549,17 +555,18 @@ function RoboAdvisorPageContent() {
 
         {/* Create Sheet */}
         {showCreateSheet && (
-          <div className="fixed inset-0 z-50">
+          <div className="fixed inset-0 z-50" role="dialog">
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowCreateSheet(false)} />
             <div 
-              className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[85vh] overflow-y-auto"
+              className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col"
               style={{
+                maxHeight: '85vh',
                 marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
-                paddingBottom: keyboard.height > 0 ? '20px' : 'env(safe-area-inset-bottom)',
                 transition: 'margin-bottom 0.25s ease-out'
               }}
             >
-              <div className="sticky top-0 bg-white dark:bg-[#1a2332] pt-3 pb-4 px-5 border-b border-gray-100 dark:border-gray-700 z-10">
+              {/* Fixed Header */}
+              <div className="flex-shrink-0 bg-white dark:bg-[#1a2332] pt-3 pb-4 px-5 border-b border-gray-100 dark:border-gray-700 rounded-t-3xl">
                 <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4" />
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -571,6 +578,14 @@ function RoboAdvisorPageContent() {
                 </div>
               </div>
               
+              {/* Scrollable Content */}
+              <div 
+                className="flex-1 overflow-y-auto overscroll-contain"
+                style={{ 
+                  WebkitOverflowScrolling: 'touch',
+                  paddingBottom: keyboard.height > 0 ? '20px' : 'calc(env(safe-area-inset-bottom) + 20px)'
+                }}
+              >
               <div className="p-5 space-y-6">
                 {/* Name */}
                 <div>
@@ -686,11 +701,16 @@ function RoboAdvisorPageContent() {
                   )}
                 </button>
               </div>
+              </div>
             </div>
           </div>
         )}
+        </main>
 
-        <MobileBottomNav fixed />
+        {/* Fixed Bottom Navigation */}
+        <div className="flex-shrink-0">
+          <MobileBottomNav />
+        </div>
       </div>
     );
   }

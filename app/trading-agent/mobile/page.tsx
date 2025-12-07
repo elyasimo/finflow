@@ -207,16 +207,20 @@ export default function MobileTradingAgentPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0e17] pb-24">
+    <div className="fixed inset-0 flex flex-col bg-gray-50 dark:bg-[#0a0e17] overflow-hidden">
       <MobileHeader user={user} showLogo={false} title={t('roboAdvisor') || 'Robo-Advisor'} />
 
+      {/* Scrollable Content Area */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
       {/* Header Card */}
       <div className="px-4 py-4">
         <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-4 text-white">
@@ -451,7 +455,7 @@ export default function MobileTradingAgentPage() {
 
       {/* Create Agent Bottom Sheet */}
       {showCreateSheet && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50" role="dialog">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50"
@@ -460,10 +464,10 @@ export default function MobileTradingAgentPage() {
           
           {/* Sheet */}
           <div 
-            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl max-h-[90vh] flex flex-col animate-slide-up"
+            className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1a2332] rounded-t-3xl flex flex-col animate-slide-up"
             style={{
+              maxHeight: '90vh',
               marginBottom: keyboard.height > 0 ? `${keyboard.height}px` : '0px',
-              paddingBottom: keyboard.height > 0 ? '0px' : 'env(safe-area-inset-bottom)',
               transition: 'margin-bottom 0.25s ease-out'
             }}
           >
@@ -485,8 +489,14 @@ export default function MobileTradingAgentPage() {
               </button>
             </div>
             
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-5 pb-[120px]">
+            {/* Scrollable Content */}
+            <div 
+              className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-5"
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: keyboard.height > 0 ? '20px' : 'calc(env(safe-area-inset-bottom) + 120px)'
+              }}
+            >
               {/* Agent Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -656,8 +666,12 @@ export default function MobileTradingAgentPage() {
           </div>
         </div>
       )}
+      </main>
 
-      <MobileBottomNav fixed />
+      {/* Fixed Bottom Navigation */}
+      <div className="flex-shrink-0">
+        <MobileBottomNav />
+      </div>
     </div>
   );
 }

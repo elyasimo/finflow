@@ -140,7 +140,7 @@ export default function ConfigureRoboAdvisorPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f1623]">
+    <div className="fixed inset-0 flex flex-col bg-[#0f1623] overflow-hidden">
       {/* Header */}
       <div 
         className="flex-shrink-0 z-40 bg-[#0f1623] border-b border-gray-800"
@@ -159,8 +159,11 @@ export default function ConfigureRoboAdvisorPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-32">
+      {/* Scrollable Content */}
+      <main 
+        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}
+      >
         <div className="p-4 space-y-6">
           {/* Agent Name */}
           <div className="space-y-2">
@@ -342,41 +345,38 @@ export default function ConfigureRoboAdvisorPage() {
               <span className="text-sm">{error}</span>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Create Button */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 p-4 bg-[#0f1623] border-t border-gray-800"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}
-      >
-        <button
-          onClick={handleCreate}
-          disabled={isCreating}
-          className={cn(
-            "w-full py-4 rounded-2xl font-semibold text-lg",
-            "bg-gradient-to-r from-blue-500 to-indigo-600 text-white",
-            "active:scale-[0.98] transition-transform",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
-            "flex items-center justify-center gap-2"
-          )}
-        >
-          {isCreating ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Wird erstellt...
-            </>
-          ) : (
-            <>
-              <Bot className="w-5 h-5" />
-              Agent erstellen
-            </>
-          )}
-        </button>
-      </div>
+          {/* Create Button - inside scrollable area */}
+          <button
+            onClick={handleCreate}
+            disabled={isCreating}
+            className={cn(
+              "w-full py-4 rounded-2xl font-semibold text-lg",
+              "bg-gradient-to-r from-blue-500 to-indigo-600 text-white",
+              "active:scale-[0.98] transition-transform",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "flex items-center justify-center gap-2"
+            )}
+          >
+            {isCreating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Wird erstellt...
+              </>
+            ) : (
+              <>
+                <Bot className="w-5 h-5" />
+                Agent erstellen
+              </>
+            )}
+          </button>
+        </div>
+      </main>
 
       {/* Bottom Navigation */}
-      <MobileBottomNav fixed />
+      <div className="flex-shrink-0">
+        <MobileBottomNav />
+      </div>
     </div>
   )
 }

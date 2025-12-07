@@ -24,22 +24,9 @@ export function useBudgets() {
     queryFn: budgetsApi.getAll,
   });
 
-  // Get budget by ID
-  const getBudget = (id: string) => {
-    return useQuery({
-      queryKey: ['budgets', id],
-      queryFn: () => budgetsApi.getById(id),
-      enabled: !!id, // Only run if id is provided
-    });
-  };
-
-  // Get budget usage by ID
-  const getBudgetUsage = (id: string) => {
-    return useQuery({
-      queryKey: ['budgets', id, 'usage'],
-      queryFn: () => budgetsApi.getBudgetUsage(id),
-      enabled: !!id, // Only run if id is provided
-    });
+  // Helper to find budget by ID from cached data
+  const getBudgetById = (id: string): Budget | undefined => {
+    return (budgetsQuery.data as Budget[] | undefined)?.find(b => b.id === id);
   };
 
   // Create budget mutation
@@ -79,8 +66,7 @@ export function useBudgets() {
     budgets: budgetsQuery.data as Budget[] | undefined,
     isLoading: budgetsQuery.isLoading,
     error: budgetsQuery.error,
-    getBudget,
-    getBudgetUsage,
+    getBudgetById,
     
     // Mutations
     createBudget: createBudgetMutation.mutate,

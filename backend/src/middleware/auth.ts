@@ -28,7 +28,13 @@ export const authMiddleware = (
     }
 
     const token = authHeader.substring(7);
-    const secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
+    const secret = process.env.JWT_SECRET;
+    
+    if (!secret) {
+      console.error('CRITICAL: JWT_SECRET environment variable is not set!');
+      res.status(500).json({ error: 'Server configuration error' });
+      return;
+    }
 
     const decoded = jwt.verify(token, secret) as JwtPayload;
     req.userId = decoded.userId;

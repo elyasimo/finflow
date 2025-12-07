@@ -92,9 +92,15 @@ export class AuthController {
       }
 
       // Generate JWT
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        console.error('CRITICAL: JWT_SECRET environment variable is not set!');
+        res.status(500).json({ error: 'Server configuration error' });
+        return;
+      }
       const token = jwt.sign(
         { userId: newUser.id },
-        process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+        jwtSecret,
         { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
       );
 
@@ -146,9 +152,15 @@ export class AuthController {
         .where(eq(users.id, user.id));
 
       // Generate JWT with role
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        console.error('CRITICAL: JWT_SECRET environment variable is not set!');
+        res.status(500).json({ error: 'Server configuration error' });
+        return;
+      }
       const token = jwt.sign(
         { userId: user.id, role: user.role || 'user' },
-        process.env.JWT_SECRET || 'your-super-secret-jwt-key',
+        jwtSecret,
         { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string },
       );
 

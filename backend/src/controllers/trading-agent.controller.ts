@@ -101,11 +101,18 @@ export class TradingAgentController {
    */
   async getAgent(req: Request, res: Response): Promise<void> {
     try {
+      const userId = (req as any).userId;
       const { id } = req.params;
       const agent = await tradingAgentService.getAgent(id);
 
       if (!agent) {
         res.status(404).json({ error: 'Agent not found' });
+        return;
+      }
+
+      // Authorization check: ensure agent belongs to user
+      if (agent.userId !== userId) {
+        res.status(403).json({ error: 'Access denied' });
         return;
       }
 
@@ -121,8 +128,20 @@ export class TradingAgentController {
    */
   async updateAgent(req: Request, res: Response): Promise<void> {
     try {
+      const userId = (req as any).userId;
       const { id } = req.params;
       const updates = req.body;
+
+      // Authorization check: ensure agent belongs to user
+      const existingAgent = await tradingAgentService.getAgent(id);
+      if (!existingAgent) {
+        res.status(404).json({ error: 'Agent not found' });
+        return;
+      }
+      if (existingAgent.userId !== userId) {
+        res.status(403).json({ error: 'Access denied' });
+        return;
+      }
 
       // Validate stop-loss if provided
       if (updates.stopLossPercent && (updates.stopLossPercent < 5 || updates.stopLossPercent > 20)) {
@@ -164,8 +183,20 @@ export class TradingAgentController {
    */
   async toggleAgent(req: Request, res: Response): Promise<void> {
     try {
+      const userId = (req as any).userId;
       const { id } = req.params;
       const { enabled } = req.body;
+
+      // Authorization check: ensure agent belongs to user
+      const existingAgent = await tradingAgentService.getAgent(id);
+      if (!existingAgent) {
+        res.status(404).json({ error: 'Agent not found' });
+        return;
+      }
+      if (existingAgent.userId !== userId) {
+        res.status(403).json({ error: 'Access denied' });
+        return;
+      }
 
       if (typeof enabled !== 'boolean') {
         res.status(400).json({ error: 'enabled must be a boolean' });
@@ -190,7 +221,20 @@ export class TradingAgentController {
    */
   async deleteAgent(req: Request, res: Response): Promise<void> {
     try {
+      const userId = (req as any).userId;
       const { id } = req.params;
+
+      // Authorization check: ensure agent belongs to user
+      const existingAgent = await tradingAgentService.getAgent(id);
+      if (!existingAgent) {
+        res.status(404).json({ error: 'Agent not found' });
+        return;
+      }
+      if (existingAgent.userId !== userId) {
+        res.status(403).json({ error: 'Access denied' });
+        return;
+      }
+
       await tradingAgentService.deleteAgent(id);
 
       res.json({ message: 'Agent deleted successfully' });
