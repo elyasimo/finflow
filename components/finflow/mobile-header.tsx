@@ -83,7 +83,7 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
 
   return (
     <header 
-      className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] mobile-header"
+      className="lg:hidden flex-shrink-0 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] mobile-header app-header"
       style={{ 
         width: '100%',
         maxWidth: '100vw', 
@@ -92,6 +92,8 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
         position: 'relative',
         left: 0,
         right: 0,
+        zIndex: 90,
+        pointerEvents: 'auto',
       }}
     >
       <div 

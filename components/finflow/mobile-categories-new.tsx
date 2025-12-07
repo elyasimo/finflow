@@ -304,10 +304,11 @@ export default function MobileCategoriesNew({
         <Plus className="w-7 h-7 text-white" />
       </button>
 
-      {/* Overlay to close menu */}
+      {/* Overlay to close menu - only when selectedCategory is active, lower z-index than header */}
       {selectedCategory && (
         <div
-          className="fixed inset-0 z-0"
+          className="fixed inset-0"
+          style={{ zIndex: 10, pointerEvents: 'auto' }}
           onClick={() => setSelectedCategory(null)}
         />
       )}

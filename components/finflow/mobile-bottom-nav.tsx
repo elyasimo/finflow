@@ -187,10 +187,18 @@ export default function MobileBottomNav({ onMenuClick, fixed = false }: MobileBo
   }
 
   return (
-    <nav className={cn(
-      "lg:hidden w-full max-w-full z-50 overflow-hidden",
-      fixed && "fixed bottom-0 left-0 right-0"
-    )}>
+    <nav 
+      className={cn(
+        "lg:hidden w-full max-w-full overflow-hidden mobile-bottom-nav",
+        fixed && "fixed bottom-0 left-0 right-0"
+      )}
+      style={{
+        width: '100%',
+        maxWidth: '100vw',
+        boxSizing: 'border-box',
+        overflowX: 'hidden',
+      }}
+    >
       {/* Modern Glass Navigation Bar */}
       <div className="bg-[#0a0a0a]/95 backdrop-blur-2xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-[70px] px-1 max-w-md mx-auto">
