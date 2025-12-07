@@ -82,10 +82,29 @@ export default function MobileHeader({ user, title, showLogo = true }: MobileHea
   const currentLanguage = languageOptions.find(l => l.code === language)
 
   return (
-    <header className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] w-full" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
-      <div className="flex items-center justify-between px-3 h-14 w-full" style={{ maxWidth: '100%' }}>
+    <header 
+      className="lg:hidden flex-shrink-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50 pt-[env(safe-area-inset-top)] mobile-header"
+      style={{ 
+        width: '100%',
+        maxWidth: '100vw', 
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
+        position: 'relative',
+        left: 0,
+        right: 0,
+      }}
+    >
+      <div 
+        className="flex items-center justify-between px-3 h-14"
+        style={{ 
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
+        }}
+      >
         {/* Left: Back/Home Icon + Title */}
-        <div className="flex items-center gap-2 min-w-0 flex-1 max-w-[40%]">
+        <div className="flex items-center gap-2 min-w-0 flex-shrink" style={{ maxWidth: '35%' }}>
           {canGoBack ? (
             <button 
               onClick={() => router.back()}

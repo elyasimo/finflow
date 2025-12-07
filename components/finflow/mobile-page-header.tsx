@@ -145,13 +145,20 @@ export default function MobilePageHeader({
         "lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0f1623]/95 backdrop-blur-xl",
         "border-b border-gray-200/50 dark:border-[#232e40]/50",
         "pt-[env(safe-area-inset-top)]",
+        "mobile-header",
         className
       )}
+      style={{
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
+      }}
       role="banner"
     >
-      <div className="flex items-center justify-between px-4 h-14">
+      <div className="flex items-center justify-between px-4 h-14" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden' }}>
         {/* Left: Back/Home + Title */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-3 min-w-0" style={{ maxWidth: '35%', flexShrink: 1 }}>
           <button 
             onClick={handleBack}
             className={cn(

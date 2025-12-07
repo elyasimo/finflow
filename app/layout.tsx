@@ -100,7 +100,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }}>
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <ReactQueryProvider>
