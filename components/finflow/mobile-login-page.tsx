@@ -202,7 +202,14 @@ export default function MobileLoginPage({
   const BiometricIcon = biometryType === 'face' ? ScanFace : Fingerprint
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f1419] via-[#1a2332] to-[#0f1419] flex flex-col safe-area-inset">
+    <div 
+      className="bg-gradient-to-b from-[#0f1419] via-[#1a2332] to-[#0f1419] flex flex-col"
+      style={{
+        minHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
       {/* Header with Logo */}
       <div className="px-6 pt-16 pb-8 flex-shrink-0">
         <div className="flex justify-center mb-8">

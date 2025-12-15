@@ -5,12 +5,12 @@ const config: CapacitorConfig = {
   appName: 'FinFlow',
   webDir: 'out',
   server: {
-    url: 'https://finflowapp.ch',
-    cleartext: false,
+    url: 'http://192.168.22.5:3000',
+    cleartext: true,
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 1000,
       launchAutoHide: true,
       backgroundColor: '#0a0a0a',
       showSpinner: false,
@@ -38,9 +38,9 @@ const config: CapacitorConfig = {
   },
   android: {
     backgroundColor: '#0a0a0a',
-    allowMixedContent: false,
+    allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: false,
+    webContentsDebuggingEnabled: true,
   },
 };
 

@@ -280,9 +280,9 @@ export default function MobileInvest({
   }
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]">
+    <div className="min-h-screen max-h-screen flex flex-col bg-background dark:bg-[#0f1623]" style={{ maxWidth: '100vw', overflow: 'hidden' }}>
       {/* Fixed Header */}
-      <header className="flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]">
+      <header className="mobile-header flex-shrink-0 sticky top-0 z-50 bg-background dark:bg-[#0f1623] border-b border-border dark:border-[#1e293b] pt-[env(safe-area-inset-top)]" style={{ width: '100%', maxWidth: '100vw', overflow: 'hidden', boxSizing: 'border-box' }}>
         <div className="flex items-center justify-between px-4 h-14">
           {/* Portfolio Button */}
           <Link 

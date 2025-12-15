@@ -653,7 +653,14 @@ export default function MobileOnboarding({ onComplete, onSkip }: MobileOnboardin
   )
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f1419] flex flex-col">
+    <div 
+      className="bg-white dark:bg-[#0f1419] flex flex-col"
+      style={{
+        minHeight: '100dvh',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
       {/* Header */}
       <div className="px-5 pt-14 pb-4">
         <div className="flex justify-center">

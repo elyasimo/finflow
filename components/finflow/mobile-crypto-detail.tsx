@@ -317,9 +317,9 @@ export default function MobileCryptoDetail({ symbol }: MobileCryptoDetailProps) 
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-[#0f1623]">
+    <div className="min-h-screen bg-background dark:bg-[#0f1623]" style={{ maxWidth: '100vw', overflow: 'hidden' }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 dark:bg-[#0f1623]/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
+      <header className="mobile-header sticky top-0 z-50 bg-background/80 dark:bg-[#0f1623]/80 backdrop-blur-xl pt-[env(safe-area-inset-top)]" style={{ width: '100%', maxWidth: '100vw', overflow: 'hidden', boxSizing: 'border-box' }}>
         <div className="flex items-center justify-between px-4 h-14">
           <button 
             onClick={() => router.back()}

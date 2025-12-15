@@ -87,10 +87,10 @@ export default function PriceAlertsPage() {
       setNewAlert({ asset: '', alertType: 'above', targetPrice: '' });
       setShowCreateForm(false);
     },
-    onError: (error: unknown) => {
+    onError: (error: any) => {
       toast({
         title: 'Error',
-        description: error.response?.data?.error || 'Failed to create alert',
+        description: error?.response?.data?.error || error?.message || 'Failed to create alert',
         variant: 'destructive',
       });
     },

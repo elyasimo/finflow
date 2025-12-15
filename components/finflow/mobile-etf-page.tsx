@@ -71,9 +71,9 @@ export default function MobileETFPage({ etfs, isLoading }: MobileETFPageProps) {
   }, [etfs, searchQuery])
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black" style={{ maxWidth: '100vw', overflow: 'hidden' }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-black pt-[env(safe-area-inset-top)]">
+      <header className="mobile-header sticky top-0 z-50 bg-black pt-[env(safe-area-inset-top)]" style={{ width: '100%', maxWidth: '100vw', overflow: 'hidden', boxSizing: 'border-box' }}>
         <div className="flex items-center gap-4 px-4 h-14">
           <button onClick={() => router.back()} className="p-2 -ml-2">
             <ArrowLeft className="w-5 h-5 text-white" />

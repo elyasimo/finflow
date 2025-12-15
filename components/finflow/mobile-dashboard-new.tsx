@@ -113,22 +113,39 @@ export default function MobileDashboard({
   const [activeAccountIndex, setActiveAccountIndex] = useState(0)
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false)
-  const langRef = useRef<HTMLDivElement>(null)
-  const currRef = useRef<HTMLDivElement>(null)
+  const langRef = useRef<HTMLButtonElement>(null)
+  const currRef = useRef<HTMLButtonElement>(null)
+
+  // Toggle functions for dropdowns
+  const toggleLanguageMenu = () => {
+    setShowCurrencyMenu(false)
+    setShowLanguageMenu(prev => !prev)
+  }
+
+  const toggleCurrencyMenu = () => {
+    setShowLanguageMenu(false)
+    setShowCurrencyMenu(prev => !prev)
+  }
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      const isOutsideLang = langRef.current && !langRef.current.contains(target)
+      const isOutsideCurr = currRef.current && !currRef.current.contains(target)
+      
+      if (isOutsideLang && showLanguageMenu) {
         setShowLanguageMenu(false)
       }
-      if (currRef.current && !currRef.current.contains(e.target as Node)) {
+      if (isOutsideCurr && showCurrencyMenu) {
         setShowCurrencyMenu(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showLanguageMenu, showCurrencyMenu])
 
   const languageOptions = [
     { code: 'en', label: 'EN', flag: '🇬🇧' },
@@ -209,10 +226,90 @@ export default function MobileDashboard({
   }
 
   return (
-    <div className="min-h-full bg-[#f8f9fc] dark:bg-[#0f1419]">
+    <div 
+      className="bg-[#f8f9fc] dark:bg-[#0f1419]" 
+      style={{ 
+        overflowX: 'hidden',
+        minHeight: '100dvh',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+      }}
+    >
+      {/* Language Dropdown Portal */}
+      {showLanguageMenu && (
+        <div 
+          className="fixed inset-0 z-[9998]" 
+          onClick={() => setShowLanguageMenu(false)}
+          onTouchEnd={(e) => { e.preventDefault(); setShowLanguageMenu(false); }}
+        />
+      )}
+      {showLanguageMenu && (
+        <div 
+          className="fixed top-[70px] right-4 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden min-w-[140px] z-[9999]"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          {languageOptions.map(opt => (
+            <button
+              key={opt.code}
+              type="button"
+              onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); setLanguage(opt.code as 'en' | 'de' | 'fr' | 'ar'); setShowLanguageMenu(false); }}
+              onClick={(e) => { e.stopPropagation(); setLanguage(opt.code as 'en' | 'de' | 'fr' | 'ar'); setShowLanguageMenu(false); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 text-sm",
+                language === opt.code 
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
+                  : 'active:bg-gray-100 dark:active:bg-[#232e40] text-gray-700 dark:text-gray-300'
+              )}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <span className="text-lg">{opt.flag}</span>
+              <span className="font-medium">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Currency Dropdown Portal */}
+      {showCurrencyMenu && (
+        <div 
+          className="fixed inset-0 z-[9998]" 
+          onClick={() => setShowCurrencyMenu(false)}
+          onTouchEnd={(e) => { e.preventDefault(); setShowCurrencyMenu(false); }}
+        />
+      )}
+      {showCurrencyMenu && (
+        <div 
+          className="fixed top-[70px] right-4 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden min-w-[140px] z-[9999]"
+          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        >
+          {currencyOptions.map(opt => (
+            <button
+              key={opt.code}
+              type="button"
+              onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); updateCurrencyInBackend(opt.code); setShowCurrencyMenu(false); }}
+              onClick={(e) => { e.stopPropagation(); updateCurrencyInBackend(opt.code); setShowCurrencyMenu(false); }}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 text-sm",
+                currency === opt.code 
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
+                  : 'active:bg-gray-100 dark:active:bg-[#232e40] text-gray-700 dark:text-gray-300'
+              )}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <span className="text-lg">{opt.flag}</span>
+              <span className="font-medium">{opt.code}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Sticky Header - Inside scroll container */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#1a2332]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="flex items-center justify-between px-4 h-14">
+      <header 
+        className="sticky top-0 z-40 bg-white/95 dark:bg-[#1a2332]/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-[#232e40]/50" 
+        style={{ 
+          paddingTop: 'env(safe-area-inset-top)',
+        }}
+      >
+        <div className="flex items-center justify-between px-4 h-14 w-full max-w-full">
           {/* Left: Greeting */}
           <div className="min-w-0 flex-shrink">
             <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{getGreeting()}</p>
@@ -222,87 +319,73 @@ export default function MobileDashboard({
           </div>
           
           {/* Right: Action Icons - Compact */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            {/* Language Dropdown */}
-            <div ref={langRef} className="relative">
-              <button
-                onClick={() => { setShowLanguageMenu(!showLanguageMenu); setShowCurrencyMenu(false) }}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
-              >
-                <Globe className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
-              </button>
-              {showLanguageMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[110px]">
-                  {languageOptions.map(opt => (
-                    <button
-                      key={opt.code}
-                      onClick={() => { setLanguage(opt.code as any); setShowLanguageMenu(false) }}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 text-xs",
-                        language === opt.code 
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
-                          : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
-                      )}
-                    >
-                      <span>{opt.flag}</span>
-                      <span className="font-medium">{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {/* Language Button */}
+            <button
+              type="button"
+              ref={langRef}
+              onTouchEnd={(e) => { e.preventDefault(); toggleLanguageMenu(); }}
+              onClick={() => toggleLanguageMenu()}
+              className={cn(
+                "h-8 px-2 rounded-lg flex items-center justify-center gap-1",
+                showLanguageMenu 
+                  ? "bg-blue-100 dark:bg-blue-900/30" 
+                  : "bg-gray-100 dark:bg-[#232e40] active:bg-gray-200 dark:active:bg-[#2a3a50]"
               )}
-            </div>
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <Globe className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300 pointer-events-none" />
+              <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300 pointer-events-none">{language.toUpperCase()}</span>
+            </button>
 
-            {/* Currency Dropdown */}
-            <div ref={currRef} className="relative">
-              <button
-                onClick={() => { setShowCurrencyMenu(!showCurrencyMenu); setShowLanguageMenu(false) }}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
-              >
-                <Coins className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
-              </button>
-              {showCurrencyMenu && (
-                <div className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1a2332] rounded-xl shadow-2xl border border-gray-200 dark:border-[#232e40] overflow-hidden z-[100] min-w-[110px]">
-                  {currencyOptions.map(opt => (
-                    <button
-                      key={opt.code}
-                      onClick={() => { updateCurrencyInBackend(opt.code); setShowCurrencyMenu(false) }}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-3 py-2 text-xs",
-                        currency === opt.code 
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600' 
-                          : 'hover:bg-gray-50 dark:hover:bg-[#232e40] text-gray-700 dark:text-gray-300'
-                      )}
-                    >
-                      <span>{opt.flag}</span>
-                      <span className="font-medium">{opt.code}</span>
-                    </button>
-                  ))}
-                </div>
+            {/* Currency Button */}
+            <button
+              type="button"
+              ref={currRef}
+              onTouchEnd={(e) => { e.preventDefault(); toggleCurrencyMenu(); }}
+              onClick={() => toggleCurrencyMenu()}
+              className={cn(
+                "h-8 px-2 rounded-lg flex items-center justify-center gap-1",
+                showCurrencyMenu 
+                  ? "bg-blue-100 dark:bg-blue-900/30" 
+                  : "bg-gray-100 dark:bg-[#232e40] active:bg-gray-200 dark:active:bg-[#2a3a50]"
               )}
-            </div>
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <Coins className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300 pointer-events-none" />
+              <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300 pointer-events-none">{currency}</span>
+            </button>
 
             {/* Notifications */}
-            <Link href="/price-alerts" className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center relative">
-              <Bell className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300" />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+            <Link 
+              href="/price-alerts" 
+              className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#232e40] flex items-center justify-center relative active:bg-gray-200 dark:active:bg-[#2a3a50]"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <Bell className="w-3.5 h-3.5 text-gray-600 dark:text-gray-300 pointer-events-none" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-rose-500 pointer-events-none"></span>
             </Link>
 
             {/* Theme Toggle */}
             <button
+              type="button"
+              onTouchEnd={(e) => { e.preventDefault(); setTheme(theme === 'dark' ? 'light' : 'dark'); }}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#232e40] flex items-center justify-center"
+              className="h-8 px-2 rounded-lg bg-gray-100 dark:bg-[#232e40] flex items-center justify-center active:bg-gray-200 dark:active:bg-[#2a3a50]"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               {theme === 'dark' ? (
-                <Sun className="w-3.5 h-3.5 text-yellow-500" />
+                <Sun className="w-3.5 h-3.5 text-yellow-500 pointer-events-none" />
               ) : (
-                <Moon className="w-3.5 h-3.5 text-gray-600" />
+                <Moon className="w-3.5 h-3.5 text-gray-600 pointer-events-none" />
               )}
             </button>
 
             {/* User Avatar */}
             <Link 
               href="/settings"
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-[10px] shadow-md"
+              className="h-8 px-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-[10px] shadow-md"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               {userName.charAt(0).toUpperCase()}
             </Link>
@@ -675,8 +758,6 @@ export default function MobileDashboard({
           </div>
         )}
 
-        {/* Bottom Spacing for Nav - handled by parent layout */}
-        <div className="h-4" />
       </div>
     </div>
   )

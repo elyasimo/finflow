@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Pencil, Trash2, Calendar, RefreshCw, ArrowDownCircle, ArrowUpCircle, Repeat, Clock, AlertCircle } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { NavigationBar } from '@/components/navigation-bar';
+import Layout from '@/components/finflow/layout';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface RecurringTransaction {
@@ -57,7 +57,7 @@ interface Category {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export default function RecurringPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { t, language } = useLanguage();
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -292,6 +292,7 @@ export default function RecurringPage() {
     .reduce((sum, r) => sum + r.amountCents, 0);
 
   return (
+    <Layout user={user}>
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 pt-12">
@@ -797,5 +798,6 @@ export default function RecurringPage() {
         </Tabs>
       </div>
     </div>
+    </Layout>
   );
 }

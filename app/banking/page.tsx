@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useAuth } from '@/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 import { bankingApi, accountsApi, transactionsApi } from '@/lib/api';
+import Sidebar from '@/components/finflow/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +17,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Building2, Link, RefreshCw, Download, Trash2, Plus, Search, CheckCircle, XCircle, Clock, AlertCircle, Building, CreditCard, Upload, FileSpreadsheet, Globe, Smartphone, ExternalLink, Eye, HelpCircle, ChevronRight, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useMediaQuery } from '@/hooks/use-mobile';
+import Layout from '@/components/finflow/layout';
+import { useAuth } from '@/hooks/use-auth';
 
 // ============ TYPES ============
 interface Institution {
@@ -158,6 +164,7 @@ const EU_COUNTRIES = [
 // ============ MAIN COMPONENT ============
 export default function BankingPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('swiss');
   
   // Shared state
@@ -430,6 +437,7 @@ export default function BankingPage() {
   }
 
   return (
+    <Layout user={user}>
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
@@ -812,5 +820,6 @@ export default function BankingPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </Layout>
   );
 }
