@@ -19,7 +19,6 @@ import { Building2, Link, RefreshCw, Download, Trash2, Plus, Search, CheckCircle
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useMediaQuery } from '@/hooks/use-mobile';
 import Layout from '@/components/finflow/layout';
-import { useAuth } from '@/hooks/use-auth';
 
 // ============ TYPES ============
 interface Institution {
