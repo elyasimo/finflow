@@ -28,7 +28,6 @@ import { adminController } from './controllers/admin.controller.js';
 import * as recurringController from './controllers/recurring.controller.js';
 import { reportsController } from './controllers/reports.controller.js';
 import * as notificationsController from './controllers/notifications.controller.js';
-import * as bankingController from './controllers/banking.controller.js';
 import { runScheduledTasks } from './services/cron.service.js';
 import { authMiddleware } from './middleware/auth.js';
 import { adminMiddleware } from './middleware/admin.js';
@@ -313,16 +312,6 @@ app.post('/notifications/push-token', authMiddleware, (req, res) => notification
 app.delete('/notifications/push-token', authMiddleware, (req, res) => notificationsController.unregisterPushToken(req, res));
 app.post('/notifications/test', authMiddleware, (req, res) => notificationsController.testPushNotification(req, res));
 app.post('/notifications/cleanup', authMiddleware, adminMiddleware, (req, res) => notificationsController.cleanupOldNotifications(req, res));
-
-// Banking routes (PSD2/Open Banking)
-app.get('/banking/institutions', authMiddleware, (req, res) => bankingController.getInstitutions(req, res));
-app.get('/banking/connections', authMiddleware, (req, res) => bankingController.getBankConnections(req, res));
-app.post('/banking/connect', authMiddleware, (req, res) => bankingController.createBankConnection(req, res));
-app.get('/banking/callback/:requisitionId', authMiddleware, (req, res) => bankingController.handleBankCallback(req, res));
-app.delete('/banking/connections/:id', authMiddleware, (req, res) => bankingController.deleteBankConnection(req, res));
-app.post('/banking/accounts/link', authMiddleware, (req, res) => bankingController.linkToFinFlowAccount(req, res));
-app.post('/banking/accounts/:linkedAccountId/sync', authMiddleware, (req, res) => bankingController.syncBankTransactions(req, res));
-app.get('/banking/accounts/:linkedAccountId/balance', authMiddleware, (req, res) => bankingController.refreshBankBalance(req, res));
 
 // Cron/Scheduler routes (admin only)
 app.post('/cron/run', authMiddleware, adminMiddleware, async (req, res) => {

@@ -848,56 +848,6 @@ export const riskMetricsApi = {
   },
 };
 
-// Banking API (PSD2/Open Banking)
-export const bankingApi = {
-  getInstitutions: async (country: string = 'CH') => {
-    const response = await api.get(`/banking/institutions?country=${country}`);
-    return response.data;
-  },
-
-  getConnections: async () => {
-    const response = await api.get('/banking/connections');
-    return response.data;
-  },
-
-  createConnection: async (data: {
-    institutionId: string;
-    institutionName: string;
-    institutionLogo?: string;
-  }) => {
-    const response = await api.post('/banking/connect', data);
-    return response.data;
-  },
-
-  checkCallback: async (requisitionId: string) => {
-    const response = await api.get(`/banking/callback/${requisitionId}`);
-    return response.data;
-  },
-
-  deleteConnection: async (connectionId: string) => {
-    const response = await api.delete(`/banking/connections/${connectionId}`);
-    return response.data;
-  },
-
-  linkAccount: async (linkedAccountId: string, finflowAccountId: string) => {
-    const response = await api.post('/banking/accounts/link', {
-      linkedAccountId,
-      finflowAccountId,
-    });
-    return response.data;
-  },
-
-  syncTransactions: async (linkedAccountId: string) => {
-    const response = await api.post(`/banking/accounts/${linkedAccountId}/sync`);
-    return response.data;
-  },
-
-  refreshBalance: async (linkedAccountId: string) => {
-    const response = await api.get(`/banking/accounts/${linkedAccountId}/balance`);
-    return response.data;
-  },
-};
-
 // Notifications API
 export const notificationsApi = {
   getNotifications: async (unreadOnly: boolean = false, limit: number = 50) => {
@@ -960,6 +910,5 @@ export default {
   apiKeys: apiKeysApi,
   advancedOrders: advancedOrdersApi,
   riskMetrics: riskMetricsApi,
-  banking: bankingApi,
   notifications: notificationsApi,
 };

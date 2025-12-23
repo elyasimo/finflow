@@ -202,9 +202,6 @@ export default function Sidebar({ user }: SidebarProps) {
                   <NavItem href="/categories" icon={Tags}>
                     {t('categories')}
                   </NavItem>
-                  <NavItem href="/banking" icon={Building2}>
-                    {t('banking')}
-                  </NavItem>
                 </div>
               </div>
 
