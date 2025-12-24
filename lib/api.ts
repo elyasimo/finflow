@@ -153,8 +153,9 @@ api.interceptors.response.use(
         // Refresh failed - clear token and redirect to login
         if (typeof window !== 'undefined') {
           localStorage.removeItem('accessToken');
-          // Only redirect if not already on login page
-          if (!window.location.pathname.includes('/login')) {
+          // Only redirect if not already on login/register page
+          const pathname = window.location.pathname;
+          if (!pathname.includes('/login') && !pathname.includes('/register')) {
             window.location.href = '/login';
           }
         }
