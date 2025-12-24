@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Eye, EyeOff, Check, X } from 'lucide-react';
 import { FinflowLogo } from '@/components/icons/finflow-logo';
-import { useMediaQuery } from '@/hooks/use-mobile';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -23,7 +22,6 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, isRegisterLoading, registerError } = useAuth();
   const router = useRouter();
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
   // Password validation
   const passwordChecks = {
@@ -47,12 +45,6 @@ export default function RegisterPage() {
 
     register({ email, password, fullName });
   };
-
-  // Redirect to mobile onboarding if on mobile
-  if (isMobile) {
-    router.push('/register/mobile');
-    return null;
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">

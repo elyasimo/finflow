@@ -44,10 +44,6 @@ services:
       BINANCE_API_TESTNET_BASE: ${BINANCE_API_TESTNET_BASE:-https://testnet.binance.vision}
       BINANCE_USE_TESTNET: ${BINANCE_USE_TESTNET:-false}
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
-      ALPACA_API_KEY: ${ALPACA_API_KEY}
-      ALPACA_API_SECRET: ${ALPACA_API_SECRET}
-      ALPACA_PAPER_TRADING: ${ALPACA_PAPER_TRADING:-true}
-      ALPACA_BASE_URL: ${ALPACA_BASE_URL:-https://paper-api.alpaca.markets}
       # Gmail SMTP for email verification
       GMAIL_USER: ${GMAIL_USER}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
