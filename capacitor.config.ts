@@ -4,10 +4,6 @@ const config: CapacitorConfig = {
   appId: 'ch.finflowapp.app',
   appName: 'FinFlow',
   webDir: 'out',
-  server: {
-    url: 'http://192.168.22.5:3000',
-    cleartext: true,
-  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 1000,
