@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   useAdminStats, 
@@ -68,7 +68,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function AdminPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   
   const [page, setPage] = useState(1);
@@ -99,6 +99,27 @@ export default function AdminPage() {
   const removeAdminMutation = useRemoveAdmin();
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render anything while redirecting to login
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // Check if current user is admin
   if (user?.role !== 'admin') {
